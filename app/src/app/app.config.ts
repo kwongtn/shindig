@@ -1,19 +1,98 @@
-import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { en_US, provideNzI18n } from "ng-zorro-antd/i18n";
+import { provideNzIcons } from "ng-zorro-antd/icon";
 
-import { routes } from './app.routes';
-import { provideClientHydration } from '@angular/platform-browser';
-import { icons } from './icons-provider';
-import { provideNzIcons } from 'ng-zorro-antd/icon';
-import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
-import { registerLocaleData } from '@angular/common';
-import en from '@angular/common/locales/en';
-import { FormsModule } from '@angular/forms';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideHttpClient } from '@angular/common/http';
+import { registerLocaleData } from "@angular/common";
+import { provideHttpClient } from "@angular/common/http";
+import en from "@angular/common/locales/en";
+import {
+    APP_INITIALIZER,
+    ApplicationConfig,
+    ErrorHandler,
+    importProvidersFrom,
+    provideZoneChangeDetection,
+} from "@angular/core";
+import {
+    getAnalytics,
+    provideAnalytics,
+    ScreenTrackingService,
+    UserTrackingService,
+} from "@angular/fire/analytics";
+import { initializeApp, provideFirebaseApp } from "@angular/fire/app";
+// import {
+//     initializeAppCheck,
+//     provideAppCheck,
+//     ReCaptchaEnterpriseProvider,
+// } from "@angular/fire/app-check";
+import { getAuth, provideAuth } from "@angular/fire/auth";
+import { getFirestore, provideFirestore } from "@angular/fire/firestore";
+import { getFunctions, provideFunctions } from "@angular/fire/functions";
+import { getPerformance, providePerformance } from "@angular/fire/performance";
+import { getStorage, provideStorage } from "@angular/fire/storage";
+import { FormsModule } from "@angular/forms";
+import { provideClientHydration } from "@angular/platform-browser";
+import {
+    provideAnimationsAsync,
+} from "@angular/platform-browser/animations/async";
+import { provideRouter, Router } from "@angular/router";
+import * as Sentry from "@sentry/angular";
+
+import { routes } from "./app.routes";
+import { icons } from "./icons-provider";
 
 registerLocaleData(en);
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideClientHydration(), provideNzIcons(icons), provideNzI18n(en_US), importProvidersFrom(FormsModule), provideAnimationsAsync(), provideHttpClient()]
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideClientHydration(),
+    provideNzIcons(icons),
+    provideNzI18n(en_US),
+    importProvidersFrom(FormsModule),
+    provideAnimationsAsync(),
+    provideHttpClient(),
+    provideFirebaseApp(() =>
+      initializeApp({
+        projectId: 'shindig-15693',
+        appId: '1:978411319677:web:253f2246e0af4691ca5c14',
+        storageBucket: 'shindig-15693.appspot.com',
+        apiKey: 'AIzaSyAO-YiMUSA9ZozZtjwB_tisYSQ50N6Wll4',
+        authDomain: 'shindig-15693.firebaseapp.com',
+        messagingSenderId: '978411319677',
+        measurementId: 'G-BP5DDM9KKB',
+      })
+    ),
+    provideAuth(() => getAuth()),
+    provideAnalytics(() => getAnalytics()),
+    ScreenTrackingService,
+    UserTrackingService,
+    // provideAppCheck(() => {
+    //   // TODO get a reCAPTCHA Enterprise here https://console.cloud.google.com/security/recaptcha?project=_
+    //   const provider =
+    //     new ReCaptchaEnterpriseProvider(/* reCAPTCHA Enterprise site key */);
+    //   return initializeAppCheck(undefined, {
+    //     provider,
+    //     isTokenAutoRefreshEnabled: true,
+    //   });
+    // }),
+    provideFirestore(() => getFirestore()),
+    provideFunctions(() => getFunctions()),
+    providePerformance(() => getPerformance()),
+    provideStorage(() => getStorage()),
+    {
+      provide: ErrorHandler,
+      useValue: Sentry.createErrorHandler(),
+    },
+    {
+      provide: Sentry.TraceService,
+      deps: [Router],
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => () => {},
+      deps: [Sentry.TraceService],
+      multi: true,
+    },
+  ],
+
 };

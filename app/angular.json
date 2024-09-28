@@ -42,6 +42,7 @@
             "scripts": [],
             "server": "src/main.server.ts",
             "prerender": true,
+            "sourceMap": true,
             "ssr": {
               "entry": "server.ts"
             }
@@ -51,8 +52,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "1.5MB",
+                  "maximumError": "10MB"
                 },
                 {
                   "type": "anyComponentStyle",
