@@ -31,5 +31,16 @@ import { AuthService } from "./services/auth.service";
     styleUrls: ["./app.component.less"],
 })
 export class AppComponent {
+    headerMap = [
+        {
+            title: "Organizers",
+            href: "/organizers",
+        },
+        {
+            title: "Events",
+            href: "/events",
+        },
+    ];
+
     constructor(public authService: AuthService) {}
 }

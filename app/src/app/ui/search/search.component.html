@@ -1,0 +1,33 @@
+<form
+    nz-form
+    [formGroup]="form"
+    class="form"
+>
+    <nz-form-item>
+        <nz-form-control>
+            <nz-input-group [nzSize]="'large'">
+                <input
+                    type="text"
+                    nz-input
+                    formControlName="searchText"
+                    placeholder="Type anything to search events"
+                />
+            </nz-input-group>
+        </nz-form-control>
+    </nz-form-item>
+    <!-- <div nz-row class="form-margin">
+        <div nz-col [nzSpan]="12">
+            <label nz-checkbox formControlName="includePastEvents">
+                <span>Include Past Events</span>
+            </label>
+        </div>
+    </div> -->
+
+    <!-- <button
+        nz-button
+        class="form-button form-margin"
+        [nzType]="'primary'"
+    >
+        Search
+    </button> -->
+</form>

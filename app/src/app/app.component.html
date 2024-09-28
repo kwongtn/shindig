@@ -2,8 +2,13 @@
   <nz-header>
     <div class="logo"></div>
     <ul nz-menu nzTheme="dark" nzMode="horizontal">
-      <li nz-menu-item>Events</li>
-      <li nz-menu-item>Organizers</li>
+      @for(header of headerMap; track header) {
+        <li nz-menu-item>
+          <a [href]="header.href" [routerLink]="header.href">
+            {{header.title}}
+          </a>
+        </li>
+      }
       <li nz-menu-item style="float: right;">
         @if(authService.isLoggedIn()) {
           <a nzGhost (click)="authService.logout()">
@@ -22,7 +27,7 @@
       <router-outlet></router-outlet>
     </div>
   </nz-content>
-  <nz-footer>Made with 💙 , Licensed GNU AGPLv3 by
+  <nz-footer>Made with 💙 by
     <a href="http://github.com/kwongtn" target="_blank"> KwongTN </a>
-    & contributors</nz-footer>
+    & contributors, GNU AGPLv3</nz-footer>
 </nz-layout>
