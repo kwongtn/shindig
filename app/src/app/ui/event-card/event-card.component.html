@@ -10,15 +10,16 @@
     ></nz-card-meta>
 </nz-card>
 <ng-template #avatarTemplate>
-    <nz-avatar-group>
+    <!-- <nz-avatar-group>
         <nz-avatar
             nzIcon="user"
             nzSrc="//zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
         ></nz-avatar>
-    </nz-avatar-group>
+    </nz-avatar-group> -->
 </ng-template>
 <ng-template #coverTemplate>
     <img
+        class="banner-image"
         [alt]="(event.bannerUri ? event.title : 'Default') + ' Event Banner'"
         [src]="
             event.bannerUri ??
@@ -27,17 +28,19 @@
     />
 </ng-template>
 <ng-template #actionSetting>
-    <a
-        [href]="
-            event.eventLink.startsWith('http')
-                ? event.eventLink
-                : 'https://' + event.eventLink
-        "
-        rel="noopener noreferrer"
-        target="_blank"
-    >
-        <span nz-icon nzType="link"></span>
-    </a>
+    <span nz-tooltip nzTooltipTitle="Click to open event page in a new tab">
+        <a
+            [href]="
+                event.eventLink.startsWith('http')
+                    ? event.eventLink
+                    : 'https://' + event.eventLink
+            "
+            rel="noopener noreferrer"
+            target="_blank"
+        >
+            <span nz-icon nzType="link"></span>
+        </a>
+    </span>
 </ng-template>
 <ng-template #actionEdit>
     <span nz-icon nzType="edit"></span>
@@ -46,15 +49,27 @@
     <div>
         @if (event.isUnconfirmed || !event.isPublic) { @if(event.isUnconfirmed)
         {
-        <span nz-icon nzType="question-circle"></span>
+        <span
+            nz-icon
+            nzType="question-circle"
+            nz-tooltip
+            nzTooltipTitle="Event is not confirmed"
+        ></span>
         } @if(!event.isPublic) {
-        <span nz-icon nzType="frown"></span>
+        <span
+            nz-icon
+            nzType="frown"
+            nz-tooltip
+            nzTooltipTitle="Event is private"
+        ></span>
         } } @else {
         <span
             nz-icon
             [nzType]="'check-circle'"
             [nzTheme]="'twotone'"
             [nzTwotoneColor]="'#52c41a'"
+            nz-tooltip
+            nzTooltipTitle="Event is both confirmed & public"
         ></span>
         }
     </div>

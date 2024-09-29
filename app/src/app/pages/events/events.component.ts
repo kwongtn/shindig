@@ -33,11 +33,11 @@ export class EventsComponent {
         },
         {
             startDatetime: new Date(),
-            eventLink: "www.google.com",
+            eventLink: "https://www.meetup.com/hackingthursday/events/303408354/",
             organizerIds: [],
             locationId: "",
-            title: "Title1",
-            subtitle: "Subtitle1",
+            title: "Week meetup Tamsui 固定聚會 淡水",
+            subtitle: "HackingThursday 黑客星期四",
             description: "Description1",
             tagIds: [],
             isPublic: true,
@@ -47,7 +47,7 @@ export class EventsComponent {
         },
         {
             startDatetime: new Date(),
-            eventLink: "www.google.com",
+            eventLink: "https://www.meetup.com/hackingthursday/events/303408354/",
             organizerIds: [],
             bannerUri: "https://secure.meetupstatic.com/photos/event/2/1/1/4/600_511088468.webp?w=384",
             locationId: "",
