@@ -1,0 +1,61 @@
+<nz-card
+    [nzCover]="coverTemplate"
+    [nzActions]="[actionSetting, actionEdit, actionEllipsis]"
+    [nzHoverable]="true"
+>
+    <nz-card-meta
+        [nzTitle]="event.title"
+        [nzDescription]="event.subtitle ?? null"
+        [nzAvatar]="avatarTemplate"
+    ></nz-card-meta>
+</nz-card>
+<ng-template #avatarTemplate>
+    <nz-avatar-group>
+        <nz-avatar
+            nzIcon="user"
+            nzSrc="//zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+        ></nz-avatar>
+    </nz-avatar-group>
+</ng-template>
+<ng-template #coverTemplate>
+    <img
+        [alt]="(event.bannerUri ? event.title : 'Default') + ' Event Banner'"
+        [src]="
+            event.bannerUri ??
+            'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png'
+        "
+    />
+</ng-template>
+<ng-template #actionSetting>
+    <a
+        [href]="
+            event.eventLink.startsWith('http')
+                ? event.eventLink
+                : 'https://' + event.eventLink
+        "
+        rel="noopener noreferrer"
+        target="_blank"
+    >
+        <span nz-icon nzType="link"></span>
+    </a>
+</ng-template>
+<ng-template #actionEdit>
+    <span nz-icon nzType="edit"></span>
+</ng-template>
+<ng-template #actionEllipsis>
+    <div>
+        @if (event.isUnconfirmed || !event.isPublic) { @if(event.isUnconfirmed)
+        {
+        <span nz-icon nzType="question-circle"></span>
+        } @if(!event.isPublic) {
+        <span nz-icon nzType="frown"></span>
+        } } @else {
+        <span
+            nz-icon
+            [nzType]="'check-circle'"
+            [nzTheme]="'twotone'"
+            [nzTwotoneColor]="'#52c41a'"
+        ></span>
+        }
+    </div>
+</ng-template>
