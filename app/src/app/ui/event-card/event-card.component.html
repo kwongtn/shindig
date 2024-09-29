@@ -47,7 +47,7 @@
 </ng-template>
 <ng-template #actionEllipsis>
     <div>
-        @if (event.isUnconfirmed || !event.isPublic) { @if(event.isUnconfirmed)
+        @if (event.isUnconfirmed || !event.isWalkInAvailable) { @if(event.isUnconfirmed)
         {
         <span
             nz-icon
@@ -55,12 +55,12 @@
             nz-tooltip
             nzTooltipTitle="Event is not confirmed"
         ></span>
-        } @if(!event.isPublic) {
+        } @if(!event.isWalkInAvailable) {
         <span
             nz-icon
-            nzType="frown"
+            nzType="calendar"
             nz-tooltip
-            nzTooltipTitle="Event is private"
+            nzTooltipTitle="You must register to join. Walk-ins not accepted."
         ></span>
         } } @else {
         <span
@@ -69,7 +69,7 @@
             [nzTheme]="'twotone'"
             [nzTwotoneColor]="'#52c41a'"
             nz-tooltip
-            nzTooltipTitle="Event is both confirmed & public"
+            nzTooltipTitle="Event is both confirmed & accepts walk-ins."
         ></span>
         }
     </div>

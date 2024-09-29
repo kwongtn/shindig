@@ -48,7 +48,7 @@ export interface IEvent {
     subtitle?: string;
     description: string;
     tagIds: string[];
-    isPublic: boolean;
+    isWalkInAvailable: boolean;
     isUnconfirmed: boolean;
 
     createdAt: Date;
