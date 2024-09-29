@@ -6,6 +6,7 @@ import {
     LinkOutline,
     MenuFoldOutline,
     MenuUnfoldOutline,
+    PlusOutline,
     SettingOutline,
     UserOutline,
 } from "@ant-design/icons-angular/icons";
@@ -18,6 +19,7 @@ export const icons = [
     LinkOutline,
     MenuFoldOutline,
     MenuUnfoldOutline,
+    PlusOutline,
     SettingOutline,
     UserOutline,
 ];

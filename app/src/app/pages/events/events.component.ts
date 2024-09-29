@@ -1,3 +1,5 @@
+import { NzButtonModule } from "ng-zorro-antd/button";
+import { NzFlexModule } from "ng-zorro-antd/flex";
 import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
 
@@ -10,7 +12,14 @@ import { SearchComponent } from "../../ui/search/search.component";
 @Component({
     selector: "app-events",
     standalone: true,
-    imports: [EventCardComponent, SearchComponent, NzGridModule, NzIconModule],
+    imports: [
+        EventCardComponent,
+        SearchComponent,
+        NzButtonModule,
+        NzGridModule,
+        NzFlexModule,
+        NzIconModule,
+    ],
     templateUrl: "./events.component.html",
     styleUrl: "./events.component.less",
 })
@@ -20,7 +29,8 @@ export class EventsComponent {
             startDatetime: new Date("2024-10-24 18:00:00"),
             eventLink: "https://www.google.com",
             organizerIds: [],
-            bannerUri: "https://secure.meetupstatic.com/photos/event/7/a/9/4/600_523651380.webp",
+            bannerUri:
+                "https://secure.meetupstatic.com/photos/event/7/a/9/4/600_523651380.webp",
             locationId: "",
             title: "Bring your Infrastructure to Cloud",
             subtitle: "AWS Cloud Club at Asia Pacific University",
@@ -33,7 +43,8 @@ export class EventsComponent {
         },
         {
             startDatetime: new Date(),
-            eventLink: "https://www.meetup.com/hackingthursday/events/303408354/",
+            eventLink:
+                "https://www.meetup.com/hackingthursday/events/303408354/",
             organizerIds: [],
             locationId: "",
             title: "Week meetup Tamsui 固定聚會 淡水",
@@ -47,9 +58,11 @@ export class EventsComponent {
         },
         {
             startDatetime: new Date(),
-            eventLink: "https://www.meetup.com/hackingthursday/events/303408354/",
+            eventLink:
+                "https://www.meetup.com/hackingthursday/events/303408354/",
             organizerIds: [],
-            bannerUri: "https://secure.meetupstatic.com/photos/event/2/1/1/4/600_511088468.webp?w=384",
+            bannerUri:
+                "https://secure.meetupstatic.com/photos/event/2/1/1/4/600_511088468.webp?w=384",
             locationId: "",
             title: "Title2",
             subtitle: "Subtitle2",
@@ -64,7 +77,8 @@ export class EventsComponent {
             startDatetime: new Date(),
             eventLink: "www.google.com",
             organizerIds: [],
-            bannerUri: "https://secure.meetupstatic.com/photos/event/d/e/c/2/600_518457026.webp?w=384",
+            bannerUri:
+                "https://secure.meetupstatic.com/photos/event/d/e/c/2/600_518457026.webp?w=384",
             locationId: "",
             title: "Title3",
             subtitle: "Subtitle3",
@@ -79,7 +93,8 @@ export class EventsComponent {
             startDatetime: new Date(),
             eventLink: "www.google.com",
             organizerIds: [],
-            bannerUri: "https://secure.meetupstatic.com/photos/event/d/e/c/2/600_518457026.webp?w=384",
+            bannerUri:
+                "https://secure.meetupstatic.com/photos/event/d/e/c/2/600_518457026.webp?w=384",
             locationId: "",
             title: "Title4",
             subtitle: "Subtitle4",
@@ -92,7 +107,5 @@ export class EventsComponent {
         },
     ];
 
-    constructor(){
-
-    }
+    constructor() {}
 }
