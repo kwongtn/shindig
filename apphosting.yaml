@@ -1,0 +1,9 @@
+env:
+    - variable: SENTRY_ORG
+      value: kwongtn
+    - variable: SENTRY_PROJECT
+      value: shindig-angular
+    - variable: SENTRY_AUTH_TOKEN
+      secret: sentry-cli-auth-token
+      availability:
+          - BUILD
