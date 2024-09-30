@@ -23,9 +23,17 @@ import { initializeApp, provideFirebaseApp } from "@angular/fire/app";
 //     provideAppCheck,
 //     ReCaptchaEnterpriseProvider,
 // } from "@angular/fire/app-check";
-import { getAuth, provideAuth } from "@angular/fire/auth";
-import { getFirestore, provideFirestore } from "@angular/fire/firestore";
-import { getFunctions, provideFunctions } from "@angular/fire/functions";
+import { connectAuthEmulator, getAuth, provideAuth } from "@angular/fire/auth";
+import {
+    connectFirestoreEmulator,
+    getFirestore,
+    provideFirestore,
+} from "@angular/fire/firestore";
+import {
+    connectFunctionsEmulator,
+    getFunctions,
+    provideFunctions,
+} from "@angular/fire/functions";
 import { getPerformance, providePerformance } from "@angular/fire/performance";
 import { getStorage, provideStorage } from "@angular/fire/storage";
 import { FormsModule } from "@angular/forms";
@@ -36,63 +44,81 @@ import {
 import { provideRouter, Router } from "@angular/router";
 import * as Sentry from "@sentry/angular";
 
+import { environment } from "../environments/environment";
 import { routes } from "./app.routes";
 import { icons } from "./icons-provider";
 
 registerLocaleData(en);
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
-    provideClientHydration(),
-    provideNzIcons(icons),
-    provideNzI18n(en_US),
-    importProvidersFrom(FormsModule),
-    provideAnimationsAsync(),
-    provideHttpClient(),
-    provideFirebaseApp(() =>
-      initializeApp({
-        projectId: 'shindig-15693',
-        appId: '1:978411319677:web:253f2246e0af4691ca5c14',
-        storageBucket: 'shindig-15693.appspot.com',
-        apiKey: 'AIzaSyAO-YiMUSA9ZozZtjwB_tisYSQ50N6Wll4',
-        authDomain: 'shindig-15693.firebaseapp.com',
-        messagingSenderId: '978411319677',
-        measurementId: 'G-BP5DDM9KKB',
-      })
-    ),
-    provideAuth(() => getAuth()),
-    provideAnalytics(() => getAnalytics()),
-    ScreenTrackingService,
-    UserTrackingService,
-    // provideAppCheck(() => {
-    //   // TODO get a reCAPTCHA Enterprise here https://console.cloud.google.com/security/recaptcha?project=_
-    //   const provider =
-    //     new ReCaptchaEnterpriseProvider(/* reCAPTCHA Enterprise site key */);
-    //   return initializeAppCheck(undefined, {
-    //     provider,
-    //     isTokenAutoRefreshEnabled: true,
-    //   });
-    // }),
-    provideFirestore(() => getFirestore()),
-    provideFunctions(() => getFunctions()),
-    providePerformance(() => getPerformance()),
-    provideStorage(() => getStorage()),
-    {
-      provide: ErrorHandler,
-      useValue: Sentry.createErrorHandler(),
-    },
-    {
-      provide: Sentry.TraceService,
-      deps: [Router],
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: () => () => {},
-      deps: [Sentry.TraceService],
-      multi: true,
-    },
-  ],
-
+    providers: [
+        provideZoneChangeDetection({ eventCoalescing: true }),
+        provideRouter(routes),
+        provideClientHydration(),
+        provideNzIcons(icons),
+        provideNzI18n(en_US),
+        importProvidersFrom(FormsModule),
+        provideAnimationsAsync(),
+        provideHttpClient(),
+        provideFirebaseApp(() =>
+            initializeApp({
+                projectId: "shindig-15693",
+                appId: "1:978411319677:web:253f2246e0af4691ca5c14",
+                storageBucket: "shindig-15693.appspot.com",
+                apiKey: "AIzaSyAO-YiMUSA9ZozZtjwB_tisYSQ50N6Wll4",
+                authDomain: "shindig-15693.firebaseapp.com",
+                messagingSenderId: "978411319677",
+                measurementId: "G-BP5DDM9KKB",
+            })
+        ),
+        provideAuth(() => {
+            const auth = getAuth();
+            if (environment.firebase.useEmulators) {
+                connectAuthEmulator(auth, "http://127.0.0.1:9099");
+            }
+            return auth;
+        }),
+        provideAnalytics(() => getAnalytics()),
+        ScreenTrackingService,
+        UserTrackingService,
+        // provideAppCheck(() => {
+        //   // TODO get a reCAPTCHA Enterprise here https://console.cloud.google.com/security/recaptcha?project=_
+        //   const provider =
+        //     new ReCaptchaEnterpriseProvider(/* reCAPTCHA Enterprise site key */);
+        //   return initializeAppCheck(undefined, {
+        //     provider,
+        //     isTokenAutoRefreshEnabled: true,
+        //   });
+        // }),
+        provideFirestore(() => {
+            const db = getFirestore();
+            if (environment.firebase.useEmulators) {
+                connectFirestoreEmulator(db, "localhost", 8080);
+            }
+            return db;
+        }),
+        provideFunctions(() => {
+            const func = getFunctions();
+            if (environment.firebase.useEmulators) {
+                connectFunctionsEmulator(func, "localhost", 5001);
+            }
+            return func;
+        }),
+        providePerformance(() => getPerformance()),
+        provideStorage(() => getStorage()),
+        {
+            provide: ErrorHandler,
+            useValue: Sentry.createErrorHandler(),
+        },
+        {
+            provide: Sentry.TraceService,
+            deps: [Router],
+        },
+        {
+            provide: APP_INITIALIZER,
+            useFactory: () => () => {},
+            deps: [Sentry.TraceService],
+            multi: true,
+        },
+    ],
 };
