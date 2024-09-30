@@ -1,13 +1,29 @@
 import { NzButtonModule } from "ng-zorro-antd/button";
+import {
+    NzDrawerModule,
+    NzDrawerRef,
+    NzDrawerService,
+} from "ng-zorro-antd/drawer";
 import { NzFlexModule } from "ng-zorro-antd/flex";
 import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
 
-import { Component } from "@angular/core";
+import { DOCUMENT } from "@angular/common";
+import {
+    Component,
+    HostListener,
+    Inject,
+    TemplateRef,
+    ViewChild,
+} from "@angular/core";
 
+import { NotificationService } from "../../services/notification.service";
 import { IEvent } from "../../types";
 import { EventCardComponent } from "../../ui/event-card/event-card.component";
+import { EventFormComponent } from "../../ui/event-form/event-form.component";
 import { SearchComponent } from "../../ui/search/search.component";
+
+type DrawerReturnData = any;
 
 @Component({
     selector: "app-events",
@@ -16,8 +32,9 @@ import { SearchComponent } from "../../ui/search/search.component";
         EventCardComponent,
         SearchComponent,
         NzButtonModule,
-        NzGridModule,
+        NzDrawerModule,
         NzFlexModule,
+        NzGridModule,
         NzIconModule,
     ],
     templateUrl: "./events.component.html",
@@ -36,8 +53,8 @@ export class EventsComponent {
             subtitle: "AWS Cloud Club at Asia Pacific University",
             description: "Description",
             tagIds: [],
-            isPublic: true,
-            isUnconfirmed: false,
+            isWalkInAvailable: true,
+            isConfirmed: false,
             createdAt: new Date(),
             updatedAt: new Date(),
         },
@@ -51,8 +68,8 @@ export class EventsComponent {
             subtitle: "HackingThursday 黑客星期四",
             description: "Description1",
             tagIds: [],
-            isPublic: true,
-            isUnconfirmed: true,
+            isWalkInAvailable: true,
+            isConfirmed: true,
             createdAt: new Date(),
             updatedAt: new Date(),
         },
@@ -68,8 +85,8 @@ export class EventsComponent {
             subtitle: "Subtitle2",
             description: "Description2",
             tagIds: [],
-            isPublic: false,
-            isUnconfirmed: false,
+            isWalkInAvailable: false,
+            isConfirmed: false,
             createdAt: new Date(),
             updatedAt: new Date(),
         },
@@ -84,8 +101,8 @@ export class EventsComponent {
             subtitle: "Subtitle3",
             description: "Description3",
             tagIds: [],
-            isPublic: false,
-            isUnconfirmed: true,
+            isWalkInAvailable: false,
+            isConfirmed: true,
             createdAt: new Date(),
             updatedAt: new Date(),
         },
@@ -100,12 +117,75 @@ export class EventsComponent {
             subtitle: "Subtitle4",
             description: "Description4",
             tagIds: [],
-            isPublic: true,
-            isUnconfirmed: false,
+            isWalkInAvailable: true,
+            isConfirmed: false,
             createdAt: new Date(),
             updatedAt: new Date(),
         },
     ];
 
-    constructor() {}
+    drawerRef: NzDrawerRef<EventFormComponent, DrawerReturnData> | undefined =
+        undefined;
+    @ViewChild("drawerFooter") drawerFooter!: TemplateRef<any>;
+
+    width: string = "700px";
+    @HostListener("window:resize")
+    resize(): void {
+        const clientWidth = this.document.body.clientWidth;
+        this.width = clientWidth < 700 ? "100vw" : "700px";
+    }
+
+    constructor(
+        private drawerService: NzDrawerService,
+        private notification: NotificationService,
+        @Inject(DOCUMENT) private document: Document,
+    ) {
+        this.resize();
+    }
+
+    openDrawer() {
+        this.drawerRef = this.drawerService.create<
+            EventFormComponent,
+            { value: string },
+            string
+        >({
+            nzTitle: "Add Event Entry",
+            nzFooter: this.drawerFooter,
+            // nzExtra: "Extra",
+            nzWidth: this.width,
+            nzContent: EventFormComponent,
+        });
+
+        this.drawerRef.afterOpen.subscribe(() => {
+            console.log("Drawer(Component) open");
+        });
+
+        this.drawerRef.afterClose.subscribe((data) => {
+            console.log(data);
+        });
+    }
+
+    close() {
+        this.drawerRef?.close();
+    }
+
+    submit() {
+        const drawerRef = this.drawerRef;
+        if (!drawerRef) return;
+
+        const contentComponent = drawerRef.getContentComponent();
+        if (!contentComponent) return;
+
+        contentComponent.showLoading = true;
+        contentComponent
+            .onSubmit()
+            ?.then((res) => {
+                contentComponent.showLoading = false;
+                drawerRef.close();
+            })
+            .catch((reason: any) => {
+                this.notification.error("Unknown Error", reason.message);
+                contentComponent.showLoading = false;
+            });
+    }
 }

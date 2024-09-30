@@ -5,11 +5,15 @@
     nzJustify="flex-end"
     nzAlign="flex-start"
 >
-    <button nz-button nzType="primary" nzShape="round" nzSize="large">
+    <button
+        nz-button
+        nzType="primary"
+        nzShape="round"
+        nzSize="large"
+        (click)="openDrawer()"
+    >
         <span nz-icon nzType="plus"></span>
-        <span>
-            Add Event
-        </span>
+        <span> Add Event </span>
     </button>
 </div>
 <div
@@ -33,3 +37,12 @@
     </div>
     }
 </div>
+
+<ng-template #drawerFooter>
+    <div style="float: right">
+        <button nz-button style="margin-right: 8px" (click)="close()">
+            Cancel
+        </button>
+        <button nz-button nzType="primary" (click)="submit()">Submit</button>
+    </div>
+</ng-template>

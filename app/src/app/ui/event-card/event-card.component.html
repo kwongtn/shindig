@@ -47,8 +47,8 @@
 </ng-template>
 <ng-template #actionEllipsis>
     <div>
-        @if (event.isUnconfirmed || !event.isWalkInAvailable) { @if(event.isUnconfirmed)
-        {
+        @if (!event.isConfirmed || !event.isWalkInAvailable) {
+        @if(!event.isConfirmed) {
         <span
             nz-icon
             nzType="question-circle"

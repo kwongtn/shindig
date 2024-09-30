@@ -36,20 +36,20 @@ export interface Organizer {
 }
 
 export interface IEvent {
+    title: string;
+    subtitle?: string;
+    description: string;
+
     startDatetime: Date;
     endDatetime?: Date;
     eventLink: string;
     organizerIds: string[];
     bannerUri?: string;
-
     locationId: string;
 
-    title: string;
-    subtitle?: string;
-    description: string;
     tagIds: string[];
     isWalkInAvailable: boolean;
-    isUnconfirmed: boolean;
+    isConfirmed: boolean;
 
     createdAt: Date;
     updatedAt: Date;

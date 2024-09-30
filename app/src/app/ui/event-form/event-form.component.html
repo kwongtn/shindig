@@ -1,0 +1,41 @@
+<form nz-form [formGroup]="submissionForm">
+    @for(prop of formProps; track prop) {
+    <nz-form-item>
+        <nz-form-label
+            [nzSm]="6"
+            [nzXs]="24"
+            [nzRequired]="prop.required"
+            [nzFor]="prop.controlName"
+        >
+            {{ prop.label }}
+        </nz-form-label>
+        <nz-form-control [nzSm]="18" [nzXs]="24">
+            @switch(prop.fieldType) { @case ("simpleText") {
+            <input nz-input [formControlName]="prop.controlName" />
+            } @case ("paragraphText") {
+            <nz-textarea-count>
+                <textarea
+                    rows="4"
+                    nz-input
+                    [formControlName]="prop.controlName"
+                ></textarea>
+            </nz-textarea-count>
+            } @case ("datetime") {
+            <nz-date-picker
+                nzFormat="yyyy-MM-dd HH:mm"
+                [nzShowTime]="{ nzFormat: 'HH:mm' }"
+                nz-input
+                [formControlName]="prop.controlName"
+            ></nz-date-picker>
+            } @case ("checkbox") {
+            <span
+                nz-checkbox
+                nz-input
+                [formControlName]="prop.controlName"
+            ></span>
+            } }
+        </nz-form-control>
+    </nz-form-item>
+
+    }
+</form>
