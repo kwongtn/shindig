@@ -138,7 +138,7 @@ export class EventsComponent {
     constructor(
         private drawerService: NzDrawerService,
         private notification: NotificationService,
-        @Inject(DOCUMENT) private document: Document,
+        @Inject(DOCUMENT) private document: Document
     ) {
         this.resize();
     }
@@ -181,6 +181,10 @@ export class EventsComponent {
             .onSubmit()
             ?.then((res) => {
                 contentComponent.showLoading = false;
+                this.notification.success(
+                    "Success",
+                    "Event added successfully."
+                );
                 drawerRef.close();
             })
             .catch((reason: any) => {

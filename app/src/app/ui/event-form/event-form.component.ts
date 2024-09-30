@@ -3,13 +3,16 @@ import { NzDatePickerModule } from "ng-zorro-antd/date-picker";
 import { NzFormModule } from "ng-zorro-antd/form";
 import { NzInputModule } from "ng-zorro-antd/input";
 
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
+import { addDoc, collection, doc, Firestore } from "@angular/fire/firestore";
 import {
     FormGroup,
     ReactiveFormsModule,
     UntypedFormBuilder,
     Validators,
 } from "@angular/forms";
+
+import { AuthService } from "../../services/auth.service";
 
 class FormProps {
     label: string;
@@ -36,11 +39,19 @@ class FormProps {
 @Component({
     selector: "ui-event-form",
     standalone: true,
-    imports: [NzCheckboxModule, NzDatePickerModule, NzFormModule, NzInputModule, ReactiveFormsModule],
+    imports: [
+        NzCheckboxModule,
+        NzDatePickerModule,
+        NzFormModule,
+        NzInputModule,
+        ReactiveFormsModule,
+    ],
     templateUrl: "./event-form.component.html",
     styleUrl: "./event-form.component.less",
 })
 export class EventFormComponent {
+    private firestore = inject(Firestore);
+
     showLoading: boolean = false;
 
     submissionForm: FormGroup<any>;
@@ -62,11 +73,7 @@ export class EventFormComponent {
         // new FormProps("", "updatedAt"),
     ];
 
-    async onSubmit(): Promise<any> {
-        return;
-    }
-
-    constructor(private fb: UntypedFormBuilder) {
+    constructor(private fb: UntypedFormBuilder, private auth: AuthService) {
         this.submissionForm = this.fb.group({
             title: ["", [Validators.required]],
             subtitle: [undefined, []],
@@ -82,6 +89,19 @@ export class EventFormComponent {
             isConfirmed: [false, []],
             createdAt: [new Date(), [Validators.required]],
             updatedAt: [new Date(), [Validators.required]],
+        });
+    }
+
+    onSubmit(): Promise<any> {
+        console.log(this.submissionForm.value);
+
+        return addDoc(collection(this.firestore, "events"), {
+            ...this.submissionForm.value,
+            authorId: doc(
+                this.firestore,
+                "users",
+                `${this.auth.userData.value?.uid}`
+            ),
         });
     }
 }
