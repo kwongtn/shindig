@@ -1,4 +1,3 @@
-import { NzNotificationService } from "ng-zorro-antd/notification";
 import { BehaviorSubject, Observable, Subscription } from "rxjs";
 
 import { Injectable } from "@angular/core";
@@ -15,6 +14,8 @@ import {
 import { Firestore } from "@angular/fire/firestore";
 import { Router } from "@angular/router";
 import * as Sentry from "@sentry/angular";
+
+import { NotificationService } from "./notification.service";
 
 export interface UserAuthData {
     permissions?: {
@@ -51,7 +52,7 @@ export class AuthService {
 
     constructor(
         private router: Router,
-        private notification: NzNotificationService,
+        private notification: NotificationService,
         private auth: Auth,
         private firestore: Firestore
     ) {
@@ -111,9 +112,7 @@ export class AuthService {
                     toastMessage = "Welcome!";
                 }
 
-                this.notification.success("Login Successful", toastMessage, {
-                    nzPlacement: "top",
-                });
+                this.notification.success("Login Successful", toastMessage);
 
                 console.log(res);
                 this.userData.next(res.user);
