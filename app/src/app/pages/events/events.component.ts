@@ -4,18 +4,31 @@ import {
     NzDrawerRef,
     NzDrawerService,
 } from "ng-zorro-antd/drawer";
+import { NzEmptyModule } from "ng-zorro-antd/empty";
 import { NzFlexModule } from "ng-zorro-antd/flex";
 import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
+import { NzSpinModule } from "ng-zorro-antd/spin";
 
 import { DOCUMENT } from "@angular/common";
 import {
     Component,
     HostListener,
+    inject,
     Inject,
+    OnDestroy,
+    OnInit,
     TemplateRef,
     ViewChild,
 } from "@angular/core";
+import {
+    collection,
+    Firestore,
+    onSnapshot,
+    query,
+    Unsubscribe,
+    where,
+} from "@angular/fire/firestore";
 
 import { NotificationService } from "../../services/notification.service";
 import { IEvent } from "../../types";
@@ -33,96 +46,25 @@ type DrawerReturnData = any;
         SearchComponent,
         NzButtonModule,
         NzDrawerModule,
+        NzEmptyModule,
         NzFlexModule,
         NzGridModule,
         NzIconModule,
+        NzSpinModule,
     ],
     templateUrl: "./events.component.html",
     styleUrl: "./events.component.less",
 })
-export class EventsComponent {
-    events: IEvent[] = [
-        {
-            startDatetime: new Date("2024-10-24 18:00:00"),
-            eventLink: "https://www.google.com",
-            organizerIds: [],
-            bannerUri:
-                "https://secure.meetupstatic.com/photos/event/7/a/9/4/600_523651380.webp",
-            locationId: "",
-            title: "Bring your Infrastructure to Cloud",
-            subtitle: "AWS Cloud Club at Asia Pacific University",
-            description: "Description",
-            tagIds: [],
-            isWalkInAvailable: true,
-            isConfirmed: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        },
-        {
-            startDatetime: new Date(),
-            eventLink:
-                "https://www.meetup.com/hackingthursday/events/303408354/",
-            organizerIds: [],
-            locationId: "",
-            title: "Week meetup Tamsui 固定聚會 淡水",
-            subtitle: "HackingThursday 黑客星期四",
-            description: "Description1",
-            tagIds: [],
-            isWalkInAvailable: true,
-            isConfirmed: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        },
-        {
-            startDatetime: new Date(),
-            eventLink:
-                "https://www.meetup.com/hackingthursday/events/303408354/",
-            organizerIds: [],
-            bannerUri:
-                "https://secure.meetupstatic.com/photos/event/2/1/1/4/600_511088468.webp?w=384",
-            locationId: "",
-            title: "Title2",
-            subtitle: "Subtitle2",
-            description: "Description2",
-            tagIds: [],
-            isWalkInAvailable: false,
-            isConfirmed: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        },
-        {
-            startDatetime: new Date(),
-            eventLink: "www.google.com",
-            organizerIds: [],
-            bannerUri:
-                "https://secure.meetupstatic.com/photos/event/d/e/c/2/600_518457026.webp?w=384",
-            locationId: "",
-            title: "Title3",
-            subtitle: "Subtitle3",
-            description: "Description3",
-            tagIds: [],
-            isWalkInAvailable: false,
-            isConfirmed: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        },
-        {
-            startDatetime: new Date(),
-            eventLink: "www.google.com",
-            organizerIds: [],
-            bannerUri:
-                "https://secure.meetupstatic.com/photos/event/d/e/c/2/600_518457026.webp?w=384",
-            locationId: "",
-            title: "Title4",
-            subtitle: "Subtitle4",
-            description: "Description4",
-            tagIds: [],
-            isWalkInAvailable: true,
-            isConfirmed: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        },
-    ];
+export class EventsComponent implements OnInit, OnDestroy {
+    private firestore = inject(Firestore);
+    events: IEvent[] = [];
+
+    isLoading: boolean = true;
+    eventCollectionRef = collection(this.firestore, "events");
+    eventQueryRef = query(
+        this.eventCollectionRef,
+        where("endDatetime", ">=", new Date())
+    );
 
     drawerRef: NzDrawerRef<EventFormComponent, DrawerReturnData> | undefined =
         undefined;
@@ -139,8 +81,29 @@ export class EventsComponent {
         private drawerService: NzDrawerService,
         private notification: NotificationService,
         @Inject(DOCUMENT) private document: Document
-    ) {
+    ) {}
+
+    unsubscribeEvents?: Unsubscribe;
+    ngOnInit(): void {
+        this.unsubscribeEvents = onSnapshot(
+            this.eventQueryRef,
+            (data) => {
+                const currArray: IEvent[] = [];
+                data.forEach((elem) => {
+                    currArray.push(elem.data() as IEvent);
+                });
+                this.events = currArray;
+                this.isLoading = false;
+            },
+            (err) => {
+                console.error(err);
+            }
+        );
         this.resize();
+    }
+
+    ngOnDestroy(): void {
+        this.unsubscribeEvents?.();
     }
 
     openDrawer() {

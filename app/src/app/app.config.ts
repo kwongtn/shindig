@@ -92,7 +92,11 @@ export const appConfig: ApplicationConfig = {
         // }),
         provideFirestore(() => {
             const db = getFirestore();
-            if (environment.firebase.useEmulators) {
+
+            if (
+                environment.firebase.useEmulators &&
+                !(db as any)._settingsFrozen
+            ) {
                 connectFirestoreEmulator(db, "localhost", 8080);
             }
             return db;
