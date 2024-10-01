@@ -1,4 +1,6 @@
+import { editor } from "monaco-editor/esm/vs/editor/editor.api";
 import { NzCheckboxModule } from "ng-zorro-antd/checkbox";
+import { NzCodeEditorModule } from "ng-zorro-antd/code-editor";
 import { NzDatePickerModule } from "ng-zorro-antd/date-picker";
 import { NzFormModule } from "ng-zorro-antd/form";
 import { NzInputModule } from "ng-zorro-antd/input";
@@ -18,21 +20,21 @@ class FormProps {
     label: string;
     controlName: string;
     fieldType: string;
-    required: boolean;
-    defaultValue: any;
+    extra: { [key: string]: any } = { required: false };
 
     constructor(
         label = "",
         controlName = "",
         fieldType = "simpleText",
-        required = false,
-        defaultValue = undefined
+        extra = {}
     ) {
         this.label = label;
         this.controlName = controlName;
         this.fieldType = fieldType;
-        this.required = required;
-        this.defaultValue = defaultValue;
+        this.extra = {
+            ...this.extra,
+            ...extra,
+        };
     }
 }
 
@@ -45,26 +47,46 @@ class FormProps {
         NzFormModule,
         NzInputModule,
         ReactiveFormsModule,
+        NzCodeEditorModule,
     ],
     templateUrl: "./event-form.component.html",
     styleUrl: "./event-form.component.less",
 })
 export class EventFormComponent {
     private firestore = inject(Firestore);
+    codeEditorOptions: editor.IStandaloneEditorConstructionOptions = {
+        language: "markdown",
+        lineNumbers: "off",
+        lineNumbersMinChars: 0,
+        folding: false,
+        lineDecorationsWidth: 0,
+        wordWrap: "on",
+        minimap: { enabled: false },
+        lineHeight: 16,
+    };
 
     showLoading: boolean = false;
 
     submissionForm: FormGroup<any>;
 
     formProps = [
-        new FormProps("Title", "title", "simpleText", true),
+        new FormProps("Title", "title", "simpleText", { required: true }),
         new FormProps("Subtitle", "subtitle", "simpleText", false),
-        new FormProps("Description", "description", "paragraphText", true),
-        new FormProps("Start Datetime", "startDatetime", "datetime", true),
-        new FormProps("End Datetime", "endDatetime", "datetime", true),
-        new FormProps("Event Link", "eventLink", "simpleText", true),
+        new FormProps("Description", "description", "markdown", {
+            required: true,
+            helpText: "You can use markdown here 😎",
+        }),
+        new FormProps("Start Datetime", "startDatetime", "datetime", {
+            required: true,
+        }),
+        new FormProps("End Datetime", "endDatetime", "datetime", {
+            required: true,
+        }),
+        new FormProps("Event Link", "eventLink", "simpleText", {
+            required: true,
+        }),
         // new FormProps("", "organizerIds"),
-        new FormProps("Event Banner Url", "bannerUri", "simpleText", true),
+        new FormProps("Event Banner Url", "bannerUri", "simpleText"),
         // new FormProps("", "locationId"),
         // new FormProps("", "tagIds"),
         new FormProps("Walk-In Available", "isWalkInAvailable", "checkbox"),

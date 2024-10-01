@@ -4,12 +4,16 @@
         <nz-form-label
             [nzSm]="6"
             [nzXs]="24"
-            [nzRequired]="prop.required"
+            [nzRequired]="prop.extra['required']"
             [nzFor]="prop.controlName"
         >
             {{ prop.label }}
         </nz-form-label>
-        <nz-form-control [nzSm]="18" [nzXs]="24">
+        <nz-form-control
+            [nzSm]="18"
+            [nzXs]="24"
+            [nzExtra]="prop.extra['helpText']"
+        >
             @switch(prop.fieldType) { @case ("simpleText") {
             <input nz-input [formControlName]="prop.controlName" />
             } @case ("paragraphText") {
@@ -20,7 +24,17 @@
                     [formControlName]="prop.controlName"
                 ></textarea>
             </nz-textarea-count>
-            } @case ("datetime") {
+            } @case ("markdown") {
+            <div class="editor-wrapper">
+                <nz-code-editor
+                    nzEditorMode="normal"
+                    class="editor"
+                    nz-input
+                    [formControlName]="prop.controlName"
+                    [nzEditorOption]="codeEditorOptions"
+                ></nz-code-editor>
+            </div>
+            }@case ("datetime") {
             <nz-date-picker
                 nzFormat="yyyy-MM-dd HH:mm"
                 [nzShowTime]="{ nzFormat: 'HH:mm' }"
