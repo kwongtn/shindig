@@ -25,6 +25,7 @@ import {
     collection,
     Firestore,
     onSnapshot,
+    orderBy,
     query,
     Unsubscribe,
     where,
@@ -63,7 +64,8 @@ export class EventsComponent implements OnInit, OnDestroy {
     eventCollectionRef = collection(this.firestore, "events");
     eventQueryRef = query(
         this.eventCollectionRef,
-        where("endDatetime", ">=", new Date())
+        where("endDatetime", ">=", new Date()),
+        orderBy("startDatetime", "asc")
     );
 
     drawerRef: NzDrawerRef<EventFormComponent, DrawerReturnData> | undefined =
