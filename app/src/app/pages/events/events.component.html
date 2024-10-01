@@ -36,9 +36,9 @@
         >
             <ui-event-card class="inner-box" [event]="event"></ui-event-card>
         </div>
-        }@empty {
+        }@empty { @if(!isLoading) {
         <nz-empty nzNotFoundImage="simple" class="no-data-image"></nz-empty>
-        }
+        } }
     </div>
 </nz-spin>
 
