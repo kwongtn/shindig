@@ -1,0 +1,60 @@
+<nz-card
+    [nzCover]="coverTemplate"
+    [nzActions]="[actionSetting, actionEdit, actionEllipsis]"
+    [nzHoverable]="true"
+>
+    <nz-card-meta
+        [nzTitle]="organizer.name"
+        [nzDescription]="organizer.subtitle ?? null"
+        [nzAvatar]="avatarTemplate"
+    ></nz-card-meta>
+</nz-card>
+<ng-template #avatarTemplate>
+    <!-- <nz-avatar-group>
+        <nz-avatar
+            nzIcon="user"
+            nzSrc="//zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+        ></nz-avatar>
+    </nz-avatar-group> -->
+</ng-template>
+<ng-template #coverTemplate>
+    <img
+        class="banner-image"
+        [alt]="
+            (organizer.bannerUri ? organizer.name : 'Default') + ' Event Banner'
+        "
+        [src]="
+            organizer.bannerUri ??
+            'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png'
+        "
+    />
+</ng-template>
+<ng-template #actionSetting>
+    <a nz-dropdown [nzDropdownMenu]="menu" nz-tooltip nzTooltipTitle="Socials">
+        <span nz-icon nzType="link"></span>
+    </a>
+    <nz-dropdown-menu #menu="nzDropdownMenu">
+        <ul nz-menu nzSelectable>
+            @for(link of organizer.officialPageUrls; track link) {
+            <li nz-menu-item>
+                <a
+                    [href]="link.startsWith('http') ? link : 'https://' + link"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                >
+                    <span nz-icon nzType="link"></span>
+                    {{ link | extractDomain }}
+                </a>
+            </li>
+            }
+        </ul>
+    </nz-dropdown-menu>
+</ng-template>
+<ng-template #actionEdit>
+    <span nz-icon nzType="edit"></span>
+</ng-template>
+<ng-template #actionEllipsis>
+    @if (organizer.isInactive) {
+    <span nz-icon nzType="close-circle" nzTheme="twotone"></span>
+    }
+</ng-template>

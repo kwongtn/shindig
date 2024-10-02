@@ -11,6 +11,16 @@ export const routes: Routes = [
         },
     },
     {
+        path: "organizers",
+        loadComponent: async () => {
+            return import("./pages/organizers/organizers.component").then(
+                (c) => {
+                    return c.OrganizersComponent;
+                }
+            );
+        },
+    },
+    {
         path: "welcome",
         loadChildren: () =>
             import("./pages/welcome/welcome.routes").then(

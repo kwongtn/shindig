@@ -1,0 +1,54 @@
+<ui-search
+    searchPlaceholder="Type anything to search organizers"
+></ui-search>
+<div
+    class="add-event-button-container"
+    nz-flex
+    nzJustify="flex-end"
+    nzAlign="flex-start"
+>
+    <button
+        nz-button
+        nzType="primary"
+        nzShape="round"
+        nzSize="large"
+        (click)="openDrawer()"
+    >
+        <span nz-icon nzType="plus"></span>
+        <span> Add Organizer </span>
+    </button>
+</div>
+<nz-spin [nzSpinning]="isLoading" nzTip="Loading...">
+    <div
+        class="list-container"
+        nz-row
+        [nzGutter]="[
+            { xs: 8, sm: 16, md: 24, lg: 32 },
+            { xs: 8, sm: 16, md: 24, lg: 32 }
+        ]"
+    >
+        @for(item of organizers; track item) {
+        <div
+            nz-col
+            class="gutter-row"
+            [nzXs]="24"
+            [nzSm]="12"
+            [nzMd]="8"
+            [nzLg]="6"
+        >
+            <ui-organizer-card class="inner-box" [organizer]="item"></ui-organizer-card>
+        </div>
+        }@empty { @if(!isLoading) {
+        <nz-empty nzNotFoundImage="simple" class="no-data-image"></nz-empty>
+        } }
+    </div>
+</nz-spin>
+
+<ng-template #drawerFooter>
+    <div style="float: right">
+        <button nz-button style="margin-right: 8px" (click)="close()">
+            Cancel
+        </button>
+        <button nz-button nzType="primary" (click)="submit()">Submit</button>
+    </div>
+</ng-template>

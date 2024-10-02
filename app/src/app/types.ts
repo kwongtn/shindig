@@ -20,19 +20,23 @@ export interface IUser {
     createdAt: Date;
 }
 
-export interface Organizer {
+export interface IOrganizer {
     name: string;
-    profilePictureUri: string;
-    bannerUri: string;
+    subtitle?: string;
+    profilePictureUri?: string;
+    bannerUri?: string;
+    officialPageUrls: string[];
+    description: string;
 
     // This is only used for deciding who can edit/delete stuff. Not for public display.
     leaders: IUser[];
     commitees: IUser[];
     subscribers: IUser[];
-    officialPageUrl: string;
-    description: string;
+
+    isInactive?: boolean;
+
     createdAt: Date;
-    lastModifiedAt: Date;
+    updatedAt: Date;
 }
 
 export interface IEvent {
