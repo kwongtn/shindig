@@ -2,7 +2,7 @@ import { NzButtonModule } from "ng-zorro-antd/button";
 import { NzFormModule } from "ng-zorro-antd/form";
 import { NzInputModule } from "ng-zorro-antd/input";
 
-import { Component } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import {
     FormControl,
     FormGroup,
@@ -18,6 +18,8 @@ import {
     styleUrl: "./search.component.less",
 })
 export class SearchComponent {
+    @Input() searchPlaceholder!: string;
+
     form: FormGroup<{
         searchText: FormControl<string>;
         includePastEvents: FormControl<boolean>;
