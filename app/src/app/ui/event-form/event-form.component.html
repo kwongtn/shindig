@@ -17,13 +17,11 @@
             @switch(prop.fieldType) { @case ("simpleText") {
             <input nz-input [formControlName]="prop.controlName" />
             } @case ("paragraphText") {
-            <nz-textarea-count [nzMaxCharacterCount]="5120">
-                <textarea
-                    rows="4"
-                    nz-input
-                    [formControlName]="prop.controlName"
-                ></textarea>
-            </nz-textarea-count>
+            <textarea
+                rows="4"
+                nz-input
+                [formControlName]="prop.controlName"
+            ></textarea>
             } @case ("markdown") {
             <div class="editor-wrapper">
                 <nz-code-editor

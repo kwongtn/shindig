@@ -82,8 +82,9 @@ export class EventFormComponent {
         new FormProps("End Datetime", "endDatetime", "datetime", {
             required: true,
         }),
-        new FormProps("Event Link", "eventLink", "simpleText", {
+        new FormProps("Event Links", "eventLinks", "paragraphText", {
             required: true,
+            helpText: "Related links, one per row",
         }),
         // new FormProps("", "organizerIds"),
         new FormProps("Event Banner Url", "bannerUri", "simpleText"),
@@ -102,7 +103,7 @@ export class EventFormComponent {
             description: ["", [Validators.required]],
             startDatetime: [undefined, [Validators.required]],
             endDatetime: [undefined, [Validators.required]],
-            eventLink: ["", [Validators.required]],
+            eventLinks: ["", [Validators.required]],
             organizerIds: [[], [Validators.required]],
             bannerUri: [undefined, []],
             locationId: [undefined, [Validators.required]],
@@ -119,6 +120,9 @@ export class EventFormComponent {
 
         return addDoc(collection(this.firestore, "events"), {
             ...this.submissionForm.value,
+            eventLinks: (this.submissionForm.value.eventLinks as string).split(
+                "\n"
+            ),
             authorId: doc(
                 this.firestore,
                 "users",

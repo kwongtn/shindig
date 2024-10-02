@@ -42,7 +42,7 @@ export interface IEvent {
 
     startDatetime: Date;
     endDatetime?: Date;
-    eventLink: string;
+    eventLinks: string[];
     organizerIds: string[];
     bannerUri?: string;
     locationId: string;

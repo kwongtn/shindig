@@ -28,12 +28,40 @@
     />
 </ng-template>
 <ng-template #actionSetting>
+    @if(event.eventLinks.length > 1) {
+    <a
+        nz-dropdown
+        [nzDropdownMenu]="menu"
+        nz-tooltip
+        nzTooltipTitle="Multiple Links Available"
+    >
+        <span nz-icon nzType="link"></span>
+        <span nz-icon nzType="plus"></span>
+    </a>
+    <nz-dropdown-menu #menu="nzDropdownMenu">
+        <ul nz-menu nzSelectable>
+            @for(link of event.eventLinks; track link) {
+            <li nz-menu-item>
+                <a
+                    [href]="link.startsWith('http') ? link : 'https://' + link"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                >
+                    <span nz-icon nzType="link"></span>
+                    {{ extractDomain(link) }}
+                </a>
+            </li>
+            }
+        </ul>
+    </nz-dropdown-menu>
+    } @else {
+
     <span nz-tooltip nzTooltipTitle="Click to open event page in a new tab">
         <a
             [href]="
-                event.eventLink.startsWith('http')
-                    ? event.eventLink
-                    : 'https://' + event.eventLink
+                event.eventLinks[0].startsWith('http')
+                    ? event.eventLinks[0]
+                    : 'https://' + event.eventLinks[0]
             "
             rel="noopener noreferrer"
             target="_blank"
@@ -41,6 +69,7 @@
             <span nz-icon nzType="link"></span>
         </a>
     </span>
+    }
 </ng-template>
 <ng-template #actionEdit>
     <span nz-icon nzType="edit"></span>
