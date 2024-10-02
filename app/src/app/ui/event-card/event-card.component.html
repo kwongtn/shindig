@@ -100,6 +100,18 @@
             nz-tooltip
             nzTooltipTitle="Event is both confirmed & accepts walk-ins."
         ></span>
+        } @if(event.minumumEntranceFee) {
+        <span
+            nz-icon
+            nzType="dollar"
+            nz-tooltip
+            [nzTooltipTitle]="
+                'This event has an entrance fee of ' +
+                env.currency.prefix +
+                ' ' +
+                event.minumumEntranceFee.toFixed(env.currency.decimalPlaces)
+            "
+        ></span>
         }
     </div>
 </ng-template>

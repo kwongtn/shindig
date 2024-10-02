@@ -6,6 +6,7 @@ import { NzToolTipModule } from "ng-zorro-antd/tooltip";
 
 import { Component, Input } from "@angular/core";
 
+import { environment } from "../../../environments/environment";
 import { IEvent } from "../../types";
 
 @Component({
@@ -23,6 +24,8 @@ import { IEvent } from "../../types";
 })
 export class EventCardComponent {
     @Input() event!: IEvent;
+
+    env = environment;
 
     extractDomain(url: string) {
         return (url.match(
