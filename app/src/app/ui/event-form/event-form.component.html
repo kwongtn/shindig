@@ -1,5 +1,5 @@
 <form nz-form [formGroup]="submissionForm">
-    @for(prop of formProps; track prop) {
+    @for(prop of formProps; track prop.controlName) { @if(prop.extra.display) {
     <nz-form-item>
         <nz-form-label
             [nzSm]="6"
@@ -14,7 +14,7 @@
             [nzXs]="24"
             [nzExtra]="prop.extra['helpText']"
         >
-            @switch(prop.fieldType) { @case ("simpleText") {
+            @switch(prop.extra.fieldType) { @case ("simpleText") {
             <input nz-input [formControlName]="prop.controlName" />
             } @case ("paragraphText") {
             <textarea
@@ -35,7 +35,8 @@
             }@case ("datetime") {
             <nz-date-picker
                 nzFormat="yyyy-MM-dd HH:mm"
-                [nzShowTime]="{ nzFormat: 'HH:mm' }"
+                [nzShowTime]="{ nzFormat: 'HH:mm', nzMinuteStep: 15 }"
+                [nzShowWeekNumber]="true"
                 nz-input
                 [formControlName]="prop.controlName"
             ></nz-date-picker>
@@ -49,5 +50,5 @@
         </nz-form-control>
     </nz-form-item>
 
-    }
+    } }
 </form>

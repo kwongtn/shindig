@@ -1,10 +1,7 @@
-export const environment = {
-    currency: {
-        symbol: "MYR",
-        prefix: "RM",
-        suffix: "Ringgit",
-        decimalPlaces: 2,
-    },
+import { CommonEnvironment, IEnvironment } from "./environment.common";
+
+export const environment: IEnvironment = {
+    ...CommonEnvironment,
     firebase: {
         useEmulators: true,
     },

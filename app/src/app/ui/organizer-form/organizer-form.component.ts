@@ -48,30 +48,42 @@ export class OrganizerFormComponent {
     submissionForm: FormGroup<any>;
 
     formProps = [
-        new FormProps("Title", "title", "simpleText", { required: true }),
-        new FormProps("Subtitle", "subtitle", "simpleText", false),
-        new FormProps("Description", "description", "markdown", {
+        new FormProps("Title", "title", {
+            required: true,
+        }),
+        new FormProps("Subtitle", "subtitle", {
+            required: false,
+        }),
+        new FormProps("Description", "description", {
+            fieldType: "markdown",
             required: true,
             helpText: "You can use markdown here 😎",
         }),
-        new FormProps("Start Datetime", "startDatetime", "datetime", {
+        new FormProps("Start Datetime", "startDatetime", {
+            fieldType: "datetime",
             required: true,
         }),
-        new FormProps("End Datetime", "endDatetime", "datetime", {
+        new FormProps("End Datetime", "endDatetime", {
+            fieldType: "datetime",
             required: true,
         }),
-        new FormProps("Event Links", "eventLinks", "paragraphText", {
+        new FormProps("Event Links", "eventLinks", {
+            fieldType: "paragraphText",
             required: true,
             helpText: "Related links, one per row",
         }),
         // new FormProps("", "organizerIds"),
-        new FormProps("Event Banner Url", "bannerUri", "simpleText"),
+        new FormProps("Event Banner Url", "bannerUri"),
         // new FormProps("", "locationId"),
         // new FormProps("", "tagIds"),
-        new FormProps("Walk-In Available", "isWalkInAvailable", "checkbox"),
-        new FormProps("Details Confirmed", "isConfirmed", "checkbox"),
-        // new FormProps("", "createdAt"),
-        // new FormProps("", "updatedAt"),
+        new FormProps("Walk-In Available", "isWalkInAvailable", {
+            fieldType: "checkbox",
+        }),
+        new FormProps("Details Confirmed", "isConfirmed", {
+            fieldType: "checkbox",
+        }),
+        new FormProps("", "createdAt", { display: false }),
+        new FormProps("", "updatedAt", { display: false }),
     ];
 
     constructor(private fb: UntypedFormBuilder, private auth: AuthService) {

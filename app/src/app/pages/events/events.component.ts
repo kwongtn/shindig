@@ -31,6 +31,7 @@ import {
     where,
 } from "@angular/fire/firestore";
 
+import { FormProps } from "../../form-classes";
 import { NotificationService } from "../../services/notification.service";
 import { IEvent } from "../../types";
 import { EventCardComponent } from "../../ui/event-card/event-card.component";
@@ -111,7 +112,7 @@ export class EventsComponent implements OnInit, OnDestroy {
     openDrawer() {
         this.drawerRef = this.drawerService.create<
             EventFormComponent,
-            { value: string },
+            { [key: string]: any },
             string
         >({
             nzTitle: "Add Event Entry",
@@ -119,6 +120,56 @@ export class EventsComponent implements OnInit, OnDestroy {
             // nzExtra: "Extra",
             nzWidth: this.width,
             nzContent: EventFormComponent,
+            nzMaskClosable: false,
+            nzData: {
+                targetCollection: "events",
+                formProps: [
+                    new FormProps("Title", "title", {
+                        required: true,
+                    }),
+                    new FormProps("Subtitle", "subtitle", {
+                        required: false,
+                        default: "undefined",
+                    }),
+                    new FormProps("Description", "description", {
+                        fieldType: "markdown",
+                        required: true,
+                        helpText: "You can use markdown here 😎",
+                    }),
+                    new FormProps("Start Datetime", "startDatetime", {
+                        fieldType: "datetime",
+                        required: true,
+                        default: "undefined",
+                    }),
+                    new FormProps("End Datetime", "endDatetime", {
+                        fieldType: "datetime",
+                        required: true,
+                        default: "undefined",
+                    }),
+                    new FormProps("Event Links", "eventLinks", {
+                        fieldType: "paragraphText",
+                        required: true,
+                        helpText: "Related links, one per row",
+                    }),
+                    // new FormProps("", "organizerIds"),
+                    new FormProps("Event Banner Url", "bannerUri", {
+                        default: "undefined",
+                    }),
+                    // new FormProps("", "locationId"),
+                    // new FormProps("", "tagIds", {
+                    //     default: [],
+                    // }),
+                    new FormProps("Walk-In Available", "isWalkInAvailable", {
+                        fieldType: "checkbox",
+                        default: true,
+                    }),
+                    new FormProps("Details Confirmed", "isConfirmed", {
+                        fieldType: "checkbox",
+                    }),
+                    new FormProps("", "createdAt", { display: false }),
+                    new FormProps("", "updatedAt", { display: false }),
+                ],
+            },
         });
 
         this.drawerRef.afterOpen.subscribe(() => {
