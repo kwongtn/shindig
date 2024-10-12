@@ -23,6 +23,7 @@ import {
 } from "@angular/core";
 import {
     collection,
+    doc,
     Firestore,
     onSnapshot,
     orderBy,
@@ -171,6 +172,17 @@ export class EventsComponent implements OnInit, OnDestroy {
                     new FormProps("", "createdAt", { display: false }),
                     new FormProps("", "updatedAt", { display: false }),
                 ],
+                submissionModifier: (data: any) => {
+                    data.eventLinks = (
+                        data.eventLinks as string
+                    ).split("\n");
+                    data.authorId= doc(
+                        this.firestore,
+                        "users",
+                        `${this.auth.userData.value?.uid}`
+                    );
+                    return data;
+                },
             },
         });
 

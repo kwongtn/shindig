@@ -7,7 +7,7 @@ import { NzFormModule } from "ng-zorro-antd/form";
 import { NzInputModule } from "ng-zorro-antd/input";
 
 import { Component, Inject } from "@angular/core";
-import { addDoc, collection, doc, Firestore } from "@angular/fire/firestore";
+import { addDoc, collection, Firestore } from "@angular/fire/firestore";
 import {
     FormGroup,
     ReactiveFormsModule,
@@ -40,6 +40,9 @@ export class EventFormComponent {
     targetCollection!: string;
 
     showLoading: boolean = false;
+    submissionModifier: (data: any) => any = (data) => {
+        return data;
+    };
 
     submissionForm: FormGroup<any>;
 
@@ -53,6 +56,8 @@ export class EventFormComponent {
     ) {
         this.targetCollection = this.drawerData["targetCollection"];
         this.formProps = this.drawerData["formProps"];
+        this.submissionModifier =
+            this.drawerData["submissionModifier"] ?? this.submissionModifier;
 
         this.submissionForm = this.fb.group(
             Object.fromEntries(
@@ -72,15 +77,7 @@ export class EventFormComponent {
         console.log(this.submissionForm.value);
 
         return addDoc(collection(this.firestore, this.targetCollection), {
-            ...this.submissionForm.value,
-            eventLinks: (this.submissionForm.value.eventLinks as string).split(
-                "\n"
-            ),
-            authorId: doc(
-                this.firestore,
-                "users",
-                `${this.auth.userData.value?.uid}`
-            ),
+            ...this.submissionModifier(this.submissionForm.value),
         });
     }
 }
