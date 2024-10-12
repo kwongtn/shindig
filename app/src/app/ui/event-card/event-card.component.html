@@ -28,7 +28,7 @@
     />
 </ng-template>
 <ng-template #actionSetting>
-    @if(event.eventLinks.length > 1) {
+    @if(event.eventLinks.length > 1) { @defer {
     <a
         nz-dropdown
         [nzDropdownMenu]="menu"
@@ -54,7 +54,9 @@
             }
         </ul>
     </nz-dropdown-menu>
-    } @else {
+    } @placeholder {
+    <span nz-icon nzType="link"></span>
+    <span nz-icon nzType="plus"></span>} } @else {
 
     <span nz-tooltip nzTooltipTitle="Click to open event page in a new tab">
         <a
