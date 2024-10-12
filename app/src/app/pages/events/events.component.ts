@@ -32,6 +32,7 @@ import {
 } from "@angular/fire/firestore";
 
 import { FormProps } from "../../form-classes";
+import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
 import { IEvent } from "../../types";
 import { EventCardComponent } from "../../ui/event-card/event-card.component";
@@ -83,6 +84,7 @@ export class EventsComponent implements OnInit, OnDestroy {
     constructor(
         private drawerService: NzDrawerService,
         private notification: NotificationService,
+        public auth: AuthService,
         @Inject(DOCUMENT) private document: Document
     ) {}
 

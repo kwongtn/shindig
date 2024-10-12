@@ -1,12 +1,14 @@
 <ui-search
     searchPlaceholder="Type anything to search upcoming events"
 ></ui-search>
+
 <div
     class="add-event-button-container"
     nz-flex
     nzJustify="flex-end"
     nzAlign="flex-start"
 >
+    @if(auth.isLoggedIn()) {
     <button
         nz-button
         nzType="primary"
@@ -17,6 +19,7 @@
         <span nz-icon nzType="plus"></span>
         <span> Add Event </span>
     </button>
+    }
 </div>
 <nz-spin [nzSpinning]="isLoading" nzTip="Loading...">
     <div
