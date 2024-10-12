@@ -22,14 +22,13 @@ import {
 } from "@angular/core";
 import { Firestore } from "@angular/fire/firestore";
 
+import { FormProps } from "../../form-classes";
 import { NotificationService } from "../../services/notification.service";
 import { IOrganizer } from "../../types";
+import { EventFormComponent } from "../../ui/event-form/event-form.component";
 import {
     OrganizerCardComponent,
 } from "../../ui/organizer-card/organizer-card.component";
-import {
-    OrganizerFormComponent,
-} from "../../ui/organizer-form/organizer-form.component";
 import { SearchComponent } from "../../ui/search/search.component";
 
 type DrawerReturnData = any;
@@ -79,9 +78,8 @@ export class OrganizersComponent {
     //     orderBy("startDatetime", "asc")
     // );
 
-    drawerRef:
-        | NzDrawerRef<OrganizerFormComponent, DrawerReturnData>
-        | undefined = undefined;
+    drawerRef: NzDrawerRef<EventFormComponent, DrawerReturnData> | undefined =
+        undefined;
     @ViewChild("drawerFooter") drawerFooter!: TemplateRef<any>;
 
     width: string = "700px";
@@ -99,15 +97,52 @@ export class OrganizersComponent {
 
     openDrawer() {
         this.drawerRef = this.drawerService.create<
-            OrganizerFormComponent,
-            { value: string },
+            EventFormComponent,
+            { [key: string]: any },
             string
         >({
-            nzTitle: "Add Event Entry",
+            nzTitle: "Add Organizer",
             nzFooter: this.drawerFooter,
             // nzExtra: "Extra",
             nzWidth: this.width,
-            nzContent: OrganizerFormComponent,
+            nzContent: EventFormComponent,
+            nzMaskClosable: false,
+            nzData: {
+                targetCollection: "organizers",
+                formProps: [
+                    new FormProps("Name", "name", {
+                        required: true,
+                    }),
+                    new FormProps("Subtitle", "subtitle", {
+                        required: false,
+                        default: "undefined",
+                    }),
+                    new FormProps("Profile Picture URI", "profilePictureUri", {
+                        required: false,
+                        default: "undefined",
+                    }),
+                    new FormProps("Banner URI", "bannerUri", {
+                        required: false,
+                        default: "undefined",
+                    }),
+                    new FormProps("Page Links", "officialPageUrls", {
+                        fieldType: "paragraphText",
+                        required: true,
+                        helpText: "Related links, one per row",
+                    }),
+                    new FormProps("Description", "description", {
+                        fieldType: "markdown",
+                        required: true,
+                        helpText: "You can use markdown here 😎",
+                    }),
+                ],
+                submissionModifier: (data: any) => {
+                    data.officialPageUrls = (
+                        data.officialPageUrls as string
+                    ).split("\n");
+                    return data;
+                },
+            },
         });
 
         this.drawerRef.afterOpen.subscribe(() => {
