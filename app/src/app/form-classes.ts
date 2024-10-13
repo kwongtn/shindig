@@ -40,12 +40,11 @@ export class FormProps {
             ...extra,
         };
 
-        if(extra["default"] === "undefined"){
+        if (extra["default"] === "undefined") {
             this.defaultValue = undefined;
-
-        }else {
-            this.defaultValue = extra["default"] ?? defaultMap[extra["fieldType"]];
+        } else {
+            this.defaultValue =
+                extra["default"] ?? defaultMap[extra["fieldType"]];
         }
-
     }
 }

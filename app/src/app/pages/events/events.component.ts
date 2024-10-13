@@ -31,6 +31,7 @@ import {
     Unsubscribe,
     where,
 } from "@angular/fire/firestore";
+import { FormGroup } from "@angular/forms";
 
 import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
@@ -215,6 +216,18 @@ export class EventsComponent implements OnInit, OnDestroy {
                         `${this.auth.userData.value?.uid}`
                     );
                     return data;
+                },
+                onInputChange: (
+                    controlName: string,
+                    data: any,
+                    rootForm: FormGroup<any>
+                ) => {
+                    switch (controlName) {
+                        case "startDatetime": {
+                            console.log(data);
+                            rootForm.patchValue({ endDatetime: data });
+                        }
+                    }
                 },
             },
         });

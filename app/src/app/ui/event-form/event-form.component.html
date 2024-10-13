@@ -15,12 +15,21 @@
             [nzExtra]="prop.extra['helpText']"
         >
             @switch(prop.extra.fieldType) { @case ("simpleText") {
-            <input nz-input [formControlName]="prop.controlName" />
+            <input
+                nz-input
+                [formControlName]="prop.controlName"
+                (ngModelChange)="
+                    onInputChange(prop.controlName, $event, submissionForm)
+                "
+            />
             } @case ("paragraphText") {
             <textarea
                 rows="4"
                 nz-input
                 [formControlName]="prop.controlName"
+                (ngModelChange)="
+                    onInputChange(prop.controlName, $event, submissionForm)
+                "
             ></textarea>
             } @case ("markdown") {
             <div class="editor-wrapper">
@@ -30,6 +39,9 @@
                     nz-input
                     [formControlName]="prop.controlName"
                     [nzEditorOption]="codeEditorOptions"
+                    (ngModelChange)="
+                        onInputChange(prop.controlName, $event, submissionForm)
+                    "
                 ></nz-code-editor>
             </div>
             }@case ("datetime") {
@@ -37,14 +49,21 @@
                 nzFormat="yyyy-MM-dd HH:mm"
                 [nzShowTime]="{ nzFormat: 'HH:mm', nzMinuteStep: 15 }"
                 [nzShowWeekNumber]="true"
+                [nzAllowClear]="false"
                 nz-input
                 [formControlName]="prop.controlName"
+                (ngModelChange)="
+                    onInputChange(prop.controlName, $event, submissionForm)
+                "
             ></nz-date-picker>
             } @case ("checkbox") {
             <span
                 nz-checkbox
                 nz-input
                 [formControlName]="prop.controlName"
+                (ngModelChange)="
+                    onInputChange(prop.controlName, $event, submissionForm)
+                "
             ></span>
             } }
         </nz-form-control>

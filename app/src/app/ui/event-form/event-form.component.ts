@@ -43,6 +43,11 @@ export class EventFormComponent {
     submissionModifier: (data: any) => any = (data) => {
         return data;
     };
+    onInputChange: (
+        controlName: string,
+        data: any,
+        rootForm: FormGroup<any>
+    ) => any = (data) => {};
 
     submissionForm: FormGroup<any>;
 
@@ -56,6 +61,8 @@ export class EventFormComponent {
     ) {
         this.targetCollection = this.drawerData["targetCollection"];
         this.formProps = this.drawerData["formProps"];
+        this.onInputChange =
+            this.drawerData["onInputChange"] ?? this.onInputChange;
         this.submissionModifier =
             this.drawerData["submissionModifier"] ?? this.submissionModifier;
 
