@@ -62,6 +62,9 @@ type DrawerReturnData = any;
 export class EventsComponent implements OnInit, OnDestroy {
     private firestore = inject(Firestore);
     events: IEvent[] = [];
+    oriEvents: IEvent[] = [];
+
+    currInputText = "";
 
     isLoading: boolean = true;
     eventCollectionRef = collection(this.firestore, "events");
@@ -98,7 +101,9 @@ export class EventsComponent implements OnInit, OnDestroy {
                 data.forEach((elem) => {
                     currArray.push(elem.data() as IEvent);
                 });
-                this.events = currArray;
+                this.oriEvents = currArray;
+                this.filterEvents(this.currInputText);
+
                 this.isLoading = false;
             },
             (err) => {
@@ -112,6 +117,30 @@ export class EventsComponent implements OnInit, OnDestroy {
         this.unsubscribeEvents?.();
     }
 
+    filterEvents(inputText: string) {
+        if (inputText === "") {
+            this.events = [...this.oriEvents];
+            return;
+        }
+
+        const caseInsensitiveLowerCase = inputText.toLowerCase();
+        this.events = this.oriEvents.filter((data) => {
+            return (
+                data.title.toLowerCase().indexOf(caseInsensitiveLowerCase) >
+                    -1 ||
+                (data.subtitle
+                    ?.toLowerCase()
+                    .indexOf(caseInsensitiveLowerCase) ??
+                    false) ||
+                data.description
+                    .toLowerCase()
+                    .indexOf(caseInsensitiveLowerCase) > -1
+            );
+        });
+
+        this.currInputText = inputText;
+    }
+
     openDrawer() {
         this.drawerRef = this.drawerService.create<
             EventFormComponent,
@@ -123,7 +152,6 @@ export class EventsComponent implements OnInit, OnDestroy {
             // nzExtra: "Extra",
             nzWidth: this.width,
             nzContent: EventFormComponent,
-            nzMaskClosable: false,
             nzData: {
                 targetCollection: "events",
                 formProps: [
@@ -176,10 +204,8 @@ export class EventsComponent implements OnInit, OnDestroy {
                     new FormProps("", "updatedAt", { display: false }),
                 ],
                 submissionModifier: (data: any) => {
-                    data.eventLinks = (
-                        data.eventLinks as string
-                    ).split("\n");
-                    data.authorId= doc(
+                    data.eventLinks = (data.eventLinks as string).split("\n");
+                    data.authorId = doc(
                         this.firestore,
                         "users",
                         `${this.auth.userData.value?.uid}`

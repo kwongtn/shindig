@@ -2,7 +2,7 @@ import { NzButtonModule } from "ng-zorro-antd/button";
 import { NzFormModule } from "ng-zorro-antd/form";
 import { NzInputModule } from "ng-zorro-antd/input";
 
-import { Component, Input } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 import {
     FormControl,
     FormGroup,
@@ -19,6 +19,7 @@ import {
 })
 export class SearchComponent {
     @Input() searchPlaceholder!: string;
+    @Output() onInputTextChange: EventEmitter<string> = new EventEmitter();
 
     form: FormGroup<{
         searchText: FormControl<string>;
@@ -30,5 +31,9 @@ export class SearchComponent {
             searchText: [""],
             includePastEvents: [true],
         });
+    }
+
+    onInputChange(inputText: string) {
+        this.onInputTextChange.emit(inputText);
     }
 }

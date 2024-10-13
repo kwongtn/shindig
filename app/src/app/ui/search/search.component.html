@@ -11,6 +11,7 @@
                     nz-input
                     formControlName="searchText"
                     [placeholder]="searchPlaceholder"
+                    (ngModelChange)="onInputChange($event)"
                 />
             </nz-input-group>
         </nz-form-control>
