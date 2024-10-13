@@ -162,6 +162,9 @@ export class EventsComponent implements OnInit, OnDestroy {
                     // new FormProps("", "tagIds", {
                     //     default: [],
                     // }),
+                    new FormProps("Is Paid Event", "isPaid", {
+                        fieldType: "checkbox",
+                    }),
                     new FormProps("Walk-In Available", "isWalkInAvailable", {
                         fieldType: "checkbox",
                         default: true,

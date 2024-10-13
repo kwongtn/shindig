@@ -51,11 +51,11 @@ export interface IEvent {
     bannerUri?: string;
     locationId: string;
 
-    minumumEntranceFee?: number;
-
+    
     tagIds: string[];
     isWalkInAvailable: boolean;
     isConfirmed: boolean;
+    isPaid: boolean;
 
     createdAt: Date;
     updatedAt: Date;

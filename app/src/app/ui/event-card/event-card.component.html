@@ -84,7 +84,7 @@
             nz-icon
             nzType="question-circle"
             nz-tooltip
-            nzTooltipTitle="Event is not confirmed"
+            nzTooltipTitle="Event not confirmed"
         ></span>
         } @if(!event.isWalkInAvailable) {
         <span
@@ -102,17 +102,12 @@
             nz-tooltip
             nzTooltipTitle="Event is both confirmed & accepts walk-ins."
         ></span>
-        } @if(event.minumumEntranceFee) {
+        } @if(event.isPaid) {
         <span
             nz-icon
             nzType="dollar"
             nz-tooltip
-            [nzTooltipTitle]="
-                'This event has an entrance fee of ' +
-                env.currency.prefix +
-                ' ' +
-                event.minumumEntranceFee.toFixed(env.currency.decimalPlaces)
-            "
+            nzTooltipTitle="This event is paid"
         ></span>
         }
     </div>
