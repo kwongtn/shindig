@@ -21,31 +21,29 @@
     </button>
     }
 </div>
-<nz-spin [nzSpinning]="isLoading" nzTip="Loading...">
+<div
+    class="list-container"
+    nz-row
+    [nzGutter]="[
+        { xs: 8, sm: 16, md: 24, lg: 32 },
+        { xs: 8, sm: 16, md: 24, lg: 32 }
+    ]"
+>
+    @for(event of events; track event) {
     <div
-        class="list-container"
-        nz-row
-        [nzGutter]="[
-            { xs: 8, sm: 16, md: 24, lg: 32 },
-            { xs: 8, sm: 16, md: 24, lg: 32 }
-        ]"
+        nz-col
+        class="gutter-row"
+        [nzXs]="24"
+        [nzSm]="12"
+        [nzMd]="8"
+        [nzLg]="6"
     >
-        @for(event of events; track event) {
-        <div
-            nz-col
-            class="gutter-row"
-            [nzXs]="24"
-            [nzSm]="12"
-            [nzMd]="8"
-            [nzLg]="6"
-        >
-            <ui-event-card class="inner-box" [event]="event"></ui-event-card>
-        </div>
-        }@empty { @if(!isLoading) {
-        <nz-empty nzNotFoundImage="simple" class="no-data-image"></nz-empty>
-        } }
+        <ui-event-card class="inner-box" [event]="event"></ui-event-card>
     </div>
-</nz-spin>
+    }@empty { @if(!isLoading) {
+    <nz-empty nzNotFoundImage="simple" class="no-data-image"></nz-empty>
+    } }
+</div>
 
 <ng-template #drawerFooter>
     <div style="float: right">
