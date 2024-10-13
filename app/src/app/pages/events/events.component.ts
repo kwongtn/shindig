@@ -102,7 +102,11 @@ export class EventsComponent implements OnInit, OnDestroy {
                     currArray.push(elem.data() as IEvent);
                 });
                 this.oriEvents = currArray;
-                this.filterEvents(this.currInputText);
+                if (this.currInputText) {
+                    this.filterEvents(this.currInputText);
+                } else {
+                    this.events = [...this.oriEvents];
+                }
 
                 this.isLoading = false;
             },
