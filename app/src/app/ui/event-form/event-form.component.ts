@@ -84,7 +84,7 @@ export class EventFormComponent {
         console.log(this.submissionForm.value);
 
         return addDoc(collection(this.firestore, this.targetCollection), {
-            ...this.submissionModifier(this.submissionForm.value),
+            ...this.submissionModifier({...this.submissionForm.value}),
         });
     }
 }
