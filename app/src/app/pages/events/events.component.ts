@@ -209,7 +209,9 @@ export class EventsComponent implements OnInit, OnDestroy {
                     new FormProps("", "updatedAt", { display: false }),
                 ],
                 submissionModifier: (data: any) => {
-                    data.eventLinks = (data.eventLinks as string).split("\n");
+                    data.eventLinks = (data.eventLinks as string)
+                        .trim()
+                        .split("\n");
                     data.authorId = doc(
                         this.firestore,
                         "users",
