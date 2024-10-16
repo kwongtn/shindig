@@ -56,6 +56,7 @@ export interface IEvent {
     isWalkInAvailable: boolean;
     isConfirmed: boolean;
     isPaid: boolean;
+    isApproved?: boolean;
 
     createdAt: Date;
     updatedAt: Date;

@@ -74,7 +74,19 @@
     }
 </ng-template>
 <ng-template #actionEdit>
-    <span nz-icon nzType="edit"></span>
+    <span>
+        <span nz-icon nzType="edit"></span>
+        @if(!event.isApproved){
+        <span
+            nz-icon
+            nzType="eye-invisible"
+            nzTheme="twotone"
+            nzTwotoneColor="#eb2f96"
+            nz-tooltip
+            nzTooltipTitle="Requires approval"
+        ></span>
+        }
+    </span>
 </ng-template>
 <ng-template #actionEllipsis>
     <div>

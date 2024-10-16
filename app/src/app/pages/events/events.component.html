@@ -7,7 +7,7 @@
             'margin-bottom': '-50px'
         }"
     >
-        @if(auth.isAdmin()) {
+        @if(auth.isLoggedIn()) {
         <span class="search-option-label">Show unapproved</span>
         <nz-switch
             [ngModel]="showUnapproved"

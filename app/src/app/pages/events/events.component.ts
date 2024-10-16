@@ -104,6 +104,19 @@ export class EventsComponent implements OnInit, OnDestroy {
         if (!this.showUnapproved) {
             queryList.push(where("isApproved", "==", true));
         }
+        if (!this.auth.isAdmin()) {
+            queryList.push(
+                where(
+                    "authorId",
+                    "==",
+                    doc(
+                        this.firestore,
+                        "users",
+                        `${this.auth.userData.value?.uid}`
+                    )
+                )
+            );
+        }
         queryList.push(orderBy("startDatetime", "asc"));
 
         const queryRef = query(this.eventCollectionRef, ...queryList);
