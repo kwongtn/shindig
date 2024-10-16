@@ -1,7 +1,32 @@
-<ui-search
-    searchPlaceholder="Type anything to search upcoming events"
-    (onInputTextChange)="filterEvents($event)"
-></ui-search>
+<nz-collapse nzGhost class="search-options">
+    <nz-collapse-panel
+        #p
+        [nzHeader]="collapseHeader"
+        [nzExpandedIcon]="expandedIcon"
+    >
+        @if(auth.isAdmin()) {
+        <span class="search-option-label">Show unapproved</span>
+        <nz-switch [(ngModel)]="switchValue"></nz-switch>
+        }
+    </nz-collapse-panel>
+</nz-collapse>
+
+<ng-template #expandedIcon let-active>
+    {{ active }}
+    <span
+        nz-icon
+        nzType="caret-right"
+        class="ant-collapse-arrow search-header-icon"
+        [nzRotate]="p.nzActive ? 90 : 0"
+    ></span>
+</ng-template>
+<ng-template #collapseHeader>
+    <ui-search
+        searchPlaceholder="Type anything to search upcoming events"
+        (onInputTextChange)="filterEvents($event)"
+        (click)="$event.stopPropagation()"
+    ></ui-search>
+</ng-template>
 
 <div
     class="add-event-button-container"

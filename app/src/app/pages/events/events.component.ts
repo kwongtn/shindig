@@ -1,4 +1,5 @@
 import { NzButtonModule } from "ng-zorro-antd/button";
+import { NzCollapseModule } from "ng-zorro-antd/collapse";
 import {
     NzDrawerModule,
     NzDrawerRef,
@@ -9,6 +10,7 @@ import { NzFlexModule } from "ng-zorro-antd/flex";
 import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzSpinModule } from "ng-zorro-antd/spin";
+import { NzSwitchModule } from "ng-zorro-antd/switch";
 
 import { DOCUMENT } from "@angular/common";
 import {
@@ -31,7 +33,7 @@ import {
     Unsubscribe,
     where,
 } from "@angular/fire/firestore";
-import { FormGroup } from "@angular/forms";
+import { FormGroup, FormsModule } from "@angular/forms";
 
 import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
@@ -47,15 +49,18 @@ type DrawerReturnData = any;
     selector: "app-events",
     standalone: true,
     imports: [
+        FormsModule,
         EventCardComponent,
         SearchComponent,
         NzButtonModule,
+        NzCollapseModule,
         NzDrawerModule,
         NzEmptyModule,
         NzFlexModule,
         NzGridModule,
         NzIconModule,
         NzSpinModule,
+        NzSwitchModule,
     ],
     templateUrl: "./events.component.html",
     styleUrl: "./events.component.less",
@@ -66,12 +71,14 @@ export class EventsComponent implements OnInit, OnDestroy {
     oriEvents: IEvent[] = [];
 
     currInputText = "";
+    switchValue = false;
 
     isLoading: boolean = true;
     eventCollectionRef = collection(this.firestore, "events");
     eventQueryRef = query(
         this.eventCollectionRef,
         where("endDatetime", ">=", new Date()),
+        where("isApproved", "==", true),
         orderBy("startDatetime", "asc")
     );
 
