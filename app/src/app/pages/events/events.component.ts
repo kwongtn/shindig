@@ -12,7 +12,7 @@ import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzSpinModule } from "ng-zorro-antd/spin";
 import { NzSwitchModule } from "ng-zorro-antd/switch";
 
-import { DOCUMENT } from "@angular/common";
+import { CommonModule, DOCUMENT } from "@angular/common";
 import {
     Component,
     HostListener,
@@ -49,6 +49,7 @@ type DrawerReturnData = any;
     selector: "app-events",
     standalone: true,
     imports: [
+        CommonModule,
         FormsModule,
         EventCardComponent,
         SearchComponent,
@@ -82,6 +83,8 @@ export class EventsComponent implements OnInit, OnDestroy {
         orderBy("startDatetime", "asc")
     );
 
+    isSmallScreen: boolean = false;
+
     drawerRef: NzDrawerRef<EventFormComponent, DrawerReturnData> | undefined =
         undefined;
     @ViewChild("drawerFooter") drawerFooter!: TemplateRef<any>;
@@ -91,6 +94,7 @@ export class EventsComponent implements OnInit, OnDestroy {
     resize(): void {
         const clientWidth = this.document.body.clientWidth;
         this.width = clientWidth < 700 ? "100vw" : "700px";
+        this.isSmallScreen = clientWidth < 1240;
     }
 
     constructor(

@@ -1,8 +1,11 @@
-<nz-collapse nzGhost class="search-options">
+<nz-collapse nzGhost class="search-options" [nzBordered]="false">
     <nz-collapse-panel
         #p
         [nzHeader]="collapseHeader"
         [nzExpandedIcon]="expandedIcon"
+        [ngStyle]="{
+            'margin-bottom': '-50px'
+        }"
     >
         @if(auth.isAdmin()) {
         <span class="search-option-label">Show unapproved</span>
@@ -43,7 +46,9 @@
         (click)="openDrawer()"
     >
         <span nz-icon nzType="plus"></span>
+        @if(!isSmallScreen){
         <span> Add Event </span>
+        }
     </button>
     }
 </div>
