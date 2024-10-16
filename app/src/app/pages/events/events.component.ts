@@ -27,10 +27,10 @@ import {
     collection,
     doc,
     Firestore,
-    onSnapshot,
+    getDocs,
     orderBy,
     query,
-    Unsubscribe,
+    QueryConstraint,
     where,
 } from "@angular/fire/firestore";
 import { FormGroup, FormsModule } from "@angular/forms";
@@ -72,17 +72,10 @@ export class EventsComponent implements OnInit, OnDestroy {
     oriEvents: IEvent[] = [];
 
     currInputText = "";
-    switchValue = false;
+    showUnapproved = false;
 
     isLoading: boolean = true;
     eventCollectionRef = collection(this.firestore, "events");
-    eventQueryRef = query(
-        this.eventCollectionRef,
-        where("endDatetime", ">=", new Date()),
-        where("isApproved", "==", true),
-        orderBy("startDatetime", "asc")
-    );
-
     isSmallScreen: boolean = false;
 
     drawerRef: NzDrawerRef<EventFormComponent, DrawerReturnData> | undefined =
@@ -104,11 +97,18 @@ export class EventsComponent implements OnInit, OnDestroy {
         @Inject(DOCUMENT) private document: Document
     ) {}
 
-    unsubscribeEvents?: Unsubscribe;
-    ngOnInit(): void {
-        this.unsubscribeEvents = onSnapshot(
-            this.eventQueryRef,
-            (data) => {
+    runQuery() {
+        const queryList: QueryConstraint[] = [
+            where("endDatetime", ">=", new Date()),
+        ];
+        if (!this.showUnapproved) {
+            queryList.push(where("isApproved", "==", true));
+        }
+        queryList.push(orderBy("startDatetime", "asc"));
+
+        const queryRef = query(this.eventCollectionRef, ...queryList);
+        getDocs(queryRef)
+            .then((data) => {
                 const currArray: IEvent[] = [];
                 data.forEach((elem) => {
                     currArray.push(elem.data() as IEvent);
@@ -121,16 +121,22 @@ export class EventsComponent implements OnInit, OnDestroy {
                 }
 
                 this.isLoading = false;
-            },
-            (err) => {
+            })
+            .catch((err) => {
                 console.error(err);
-            }
-        );
+            });
+    }
+
+    ngOnInit(): void {
+        this.runQuery();
         this.resize();
     }
 
-    ngOnDestroy(): void {
-        this.unsubscribeEvents?.();
+    ngOnDestroy(): void {}
+
+    onShowUnapprovedChange(showUnapproved: boolean) {
+        this.showUnapproved = showUnapproved;
+        this.runQuery();
     }
 
     filterEvents(inputText: string) {

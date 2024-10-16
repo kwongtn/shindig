@@ -9,7 +9,10 @@
     >
         @if(auth.isAdmin()) {
         <span class="search-option-label">Show unapproved</span>
-        <nz-switch [(ngModel)]="switchValue"></nz-switch>
+        <nz-switch
+            [ngModel]="showUnapproved"
+            (ngModelChange)="onShowUnapprovedChange($event)"
+        ></nz-switch>
         }
     </nz-collapse-panel>
 </nz-collapse>
