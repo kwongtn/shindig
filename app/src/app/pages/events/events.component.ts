@@ -124,7 +124,7 @@ export class EventsComponent implements OnInit, OnDestroy {
             .then((data) => {
                 const currArray: IEvent[] = [];
                 data.forEach((elem) => {
-                    currArray.push(elem.data() as IEvent);
+                    currArray.push({ ...(elem.data() as IEvent), id: elem.id });
                 });
                 this.oriEvents = currArray;
                 if (this.currInputText) {
@@ -247,6 +247,8 @@ export class EventsComponent implements OnInit, OnDestroy {
                         "users",
                         `${this.auth.userData.value?.uid}`
                     );
+                    data.createdAt = new Date();
+                    data.updatedAt = new Date();
                     return data;
                 },
                 onInputChange: (

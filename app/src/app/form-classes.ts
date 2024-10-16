@@ -8,6 +8,7 @@ interface IFormPropsExtra {
         | "datetime"
         | "checkbox";
     helpText?: string;
+    disabled: boolean;
 }
 
 const defaultMap: { [key: string]: any } = {
@@ -26,6 +27,7 @@ export class FormProps {
         fieldType: "simpleText",
         required: false,
         display: true,
+        disabled: false,
     };
 
     constructor(

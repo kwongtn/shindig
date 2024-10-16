@@ -1,3 +1,5 @@
+import { Timestamp } from "@angular/fire/firestore";
+
 export interface ILocation {
     name: string;
     coordinates: {
@@ -40,12 +42,13 @@ export interface IOrganizer {
 }
 
 export interface IEvent {
+    id: string;
     title: string;
     subtitle?: string;
     description: string;
 
-    startDatetime: Date;
-    endDatetime?: Date;
+    startDatetime: Timestamp;
+    endDatetime: Timestamp;
     eventLinks: string[];
     organizerIds: string[];
     bannerUri?: string;
@@ -58,6 +61,6 @@ export interface IEvent {
     isPaid: boolean;
     isApproved?: boolean;
 
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: Timestamp;
+    updatedAt: Timestamp;
 }

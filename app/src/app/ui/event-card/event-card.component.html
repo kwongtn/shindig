@@ -75,7 +75,7 @@
 </ng-template>
 <ng-template #actionEdit>
     <span>
-        <span nz-icon nzType="edit"></span>
+        <span nz-icon nzType="edit" (click)="openDrawer()"></span>
         @if(!event.isApproved){
         <span
             nz-icon
@@ -122,5 +122,14 @@
             nzTooltipTitle="This event is paid"
         ></span>
         }
+    </div>
+</ng-template>
+
+<ng-template #drawerFooter>
+    <div style="float: right">
+        <button nz-button style="margin-right: 8px" (click)="close()">
+            Cancel
+        </button>
+        <button nz-button nzType="primary" (click)="submit()">Submit</button>
     </div>
 </ng-template>

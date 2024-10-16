@@ -7,7 +7,13 @@ import { NzFormModule } from "ng-zorro-antd/form";
 import { NzInputModule } from "ng-zorro-antd/input";
 
 import { Component, Inject } from "@angular/core";
-import { addDoc, collection, Firestore } from "@angular/fire/firestore";
+import {
+    addDoc,
+    collection,
+    doc,
+    Firestore,
+    updateDoc,
+} from "@angular/fire/firestore";
 import {
     FormGroup,
     ReactiveFormsModule,
@@ -74,17 +80,51 @@ export class EventFormComponent {
                     if (data.extra.required) {
                         validators.push(Validators.required);
                     }
-                    return [data.controlName, [data.defaultValue, validators]];
+
+                    let dataProps = data.defaultValue;
+                    if (data.extra.disabled) {
+                        dataProps = {
+                            value: data.defaultValue,
+                            disabled: true,
+                        };
+                    }
+                    return [data.controlName, [dataProps, validators]];
                 })
             )
         );
+
+        if (this.drawerData["formData"]) {
+            this.submissionForm.patchValue(this.drawerData["formData"], {
+                emitEvent: false,
+            });
+            this.submissionForm.markAsPristine();
+        }
+
+        console.log(this.submissionForm);
     }
 
     onSubmit(): Promise<any> {
         console.log(this.submissionForm.value);
 
-        return addDoc(collection(this.firestore, this.targetCollection), {
-            ...this.submissionModifier({...this.submissionForm.value}),
-        });
+        if (this.drawerData["formData"]) {
+            // Get changed data
+            const changedData: { [key: string]: any } = {};
+            Object.entries(this.submissionForm.controls).map(([key, ctrl]) => {
+                changedData[key] = ctrl.value;
+            });
+
+            return updateDoc(
+                doc(
+                    this.firestore,
+                    this.targetCollection,
+                    this.drawerData["formData"].id
+                ),
+                { ...this.submissionModifier({ ...changedData }) }
+            );
+        } else {
+            return addDoc(collection(this.firestore, this.targetCollection), {
+                ...this.submissionModifier({ ...this.submissionForm.value }),
+            });
+        }
     }
 }
