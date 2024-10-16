@@ -135,6 +135,10 @@ export class EventCardComponent {
                     new FormProps("Details Confirmed", "isConfirmed", {
                         fieldType: "checkbox",
                     }),
+                    new FormProps("Approved", "isApproved", {
+                        fieldType: "checkbox",
+                        disabled: !this.auth.isAdmin(),
+                    }),
                 ],
                 formData: {
                     ...this.event,
@@ -155,6 +159,7 @@ export class EventCardComponent {
                             .split("\n");
                     }
                     data.updatedAt = new Date();
+                    delete data.id;
                     return data;
                 },
                 onInputChange: (
@@ -162,12 +167,9 @@ export class EventCardComponent {
                     data: any,
                     rootForm: FormGroup<any>
                 ) => {
-                    // switch (controlName) {
-                    //     case "startDatetime": {
-                    //         console.log(data);
-                    //         rootForm.patchValue({ endDatetime: data });
-                    //     }
-                    // }
+                    if (!this.auth.isAdmin()) {
+                        rootForm.patchValue({ isApproved: false });
+                    }
                 },
             },
         });
