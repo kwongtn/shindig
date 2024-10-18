@@ -24,8 +24,7 @@ export interface UserAuthData {
 }
 
 export interface CustomClaims {
-    admin?: boolean;
-    betaTester?: boolean;
+    isAdmin?: boolean;
 }
 
 @Injectable({
@@ -171,6 +170,6 @@ export class AuthService {
     }
 
     isAdmin(): boolean {
-        return Boolean(this.customClaims.value?.["admin"]);
+        return Boolean(this.customClaims.value?.["isAdmin"]);
     }
 }
