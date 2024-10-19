@@ -1,22 +1,24 @@
 import { NzAvatarModule } from "ng-zorro-antd/avatar";
+import { NzBadgeModule } from "ng-zorro-antd/badge";
 import { NzButtonModule } from "ng-zorro-antd/button";
 import { NzCardModule } from "ng-zorro-antd/card";
 import { NzDrawerRef, NzDrawerService } from "ng-zorro-antd/drawer";
 import { NzDropDownModule } from "ng-zorro-antd/dropdown";
 import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzToolTipModule } from "ng-zorro-antd/tooltip";
+import { Subscription } from "rxjs";
 
-import { DOCUMENT } from "@angular/common";
+import { DOCUMENT, NgTemplateOutlet } from "@angular/common";
 import {
     Component,
     HostListener,
-    inject,
     Inject,
     Input,
+    OnDestroy,
+    OnInit,
     TemplateRef,
     ViewChild,
 } from "@angular/core";
-import { Firestore } from "@angular/fire/firestore";
 import { FormGroup } from "@angular/forms";
 
 import { environment } from "../../../environments/environment";
@@ -31,7 +33,9 @@ type DrawerReturnData = any;
     selector: "ui-event-card",
     standalone: true,
     imports: [
+        NgTemplateOutlet,
         NzAvatarModule,
+        NzBadgeModule,
         NzButtonModule,
         NzCardModule,
         NzDropDownModule,
@@ -41,11 +45,11 @@ type DrawerReturnData = any;
     templateUrl: "./event-card.component.html",
     styleUrl: "./event-card.component.less",
 })
-export class EventCardComponent {
-    private firestore = inject(Firestore);
+export class EventCardComponent implements OnInit, OnDestroy {
     @Input() event!: IEvent;
 
     env = environment;
+    authStateSubsription!: Subscription;
 
     extractDomain(url: string) {
         return (url.match(
@@ -62,12 +66,34 @@ export class EventCardComponent {
         const clientWidth = this.document.body.clientWidth;
         this.width = clientWidth < 700 ? "100vw" : "700px";
     }
+
+    canEdit: boolean = false;
     constructor(
         private drawerService: NzDrawerService,
         public auth: AuthService,
         private notification: NotificationService,
         @Inject(DOCUMENT) private document: Document
     ) {}
+    ngOnInit(): void {
+        this.authStateSubsription = this.auth.authState$.subscribe(() => {
+            // TODO: Debug why on logout the edit button does not disappear
+            /**
+             * On logout button to edit should disappear
+             * Should also not display when user does not have permission to edit.
+             *
+             * Only admin and author should be able to edit.
+             * Also add ReadOnly flag to freeze events
+             * Events that has happened cannot be edited too.
+             */
+            this.canEdit =
+                this.auth.userData.value?.uid === this.event.authorId.id ||
+                this.auth.isAdmin();
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.authStateSubsription?.unsubscribe();
+    }
 
     openDrawer() {
         this.drawerRef = this.drawerService.create<
@@ -75,7 +101,7 @@ export class EventCardComponent {
             { [key: string]: any },
             string
         >({
-            nzTitle: "Add Event Entry",
+            nzTitle: "Edit Event Entry",
             nzFooter: this.drawerFooter,
             // nzExtra: "Extra",
             nzWidth: this.width,

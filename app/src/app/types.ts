@@ -1,4 +1,4 @@
-import { Timestamp } from "@angular/fire/firestore";
+import { DocumentReference, Timestamp } from "@angular/fire/firestore";
 
 export interface ILocation {
     name: string;
@@ -60,6 +60,8 @@ export interface IEvent {
     isConfirmed: boolean;
     isPaid: boolean;
     isApproved?: boolean;
+
+    authorId: DocumentReference;
 
     createdAt: Timestamp;
     updatedAt: Timestamp;

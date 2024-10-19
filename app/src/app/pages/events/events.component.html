@@ -10,7 +10,7 @@
         @if(auth.isLoggedIn()) {
         <span class="search-option-label">Only show unapproved</span>
         <nz-switch
-            [ngModel]="showUnapproved"
+            [ngModel]="showUnapprovedOnly"
             (ngModelChange)="onShowUnapprovedChange($event)"
         ></nz-switch>
         }

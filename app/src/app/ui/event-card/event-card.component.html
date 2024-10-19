@@ -1,14 +1,23 @@
-<nz-card
-    [nzCover]="coverTemplate"
-    [nzActions]="[actionSetting, actionEdit, actionEllipsis]"
-    [nzHoverable]="true"
->
-    <nz-card-meta
-        [nzTitle]="event.title"
-        [nzDescription]="event.subtitle ?? null"
-        [nzAvatar]="avatarTemplate"
-    ></nz-card-meta>
-</nz-card>
+@if(!event.isApproved){
+<nz-ribbon nzText="Needs Approval" nzColor="red">
+    <ng-container [ngTemplateOutlet]="card"></ng-container>
+</nz-ribbon>
+}@else {<ng-container [ngTemplateOutlet]="card"></ng-container> }
+
+<ng-template #card>
+    <nz-card
+        [nzCover]="coverTemplate"
+        [nzActions]="[actionSetting, actionEllipsis]"
+        [nzHoverable]="true"
+    >
+        <nz-card-meta
+            [nzTitle]="event.title"
+            [nzDescription]="event.subtitle ?? null"
+            [nzAvatar]="avatarTemplate"
+        ></nz-card-meta>
+    </nz-card>
+</ng-template>
+
 <ng-template #avatarTemplate>
     <!-- <nz-avatar-group>
         <nz-avatar
@@ -18,14 +27,31 @@
     </nz-avatar-group> -->
 </ng-template>
 <ng-template #coverTemplate>
-    <img
-        class="banner-image"
-        [alt]="(event.bannerUri ? event.title : 'Default') + ' Event Banner'"
-        [src]="
-            event.bannerUri ??
-            'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png'
-        "
-    />
+    <span class="banner-image-container">
+        <img
+            class="banner-image"
+            [alt]="
+                (event.bannerUri ? event.title : 'Default') + ' Event Banner'
+            "
+            [src]="
+                event.bannerUri ??
+                'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png'
+            "
+        />
+        @if(canEdit){
+            <button
+                nz-button
+                nzType="primary"
+                nzSize="large"
+                nzShape="circle"
+                (click)="openDrawer()"
+                class="edit-icon"
+            >
+                <span nz-icon nzType="edit"> </span>
+            </button>
+
+        }
+    </span>
 </ng-template>
 <ng-template #actionSetting>
     @if(event.eventLinks.length > 1) { @defer {
@@ -72,21 +98,6 @@
         </a>
     </span>
     }
-</ng-template>
-<ng-template #actionEdit>
-    <span>
-        <span nz-icon nzType="edit" (click)="openDrawer()"></span>
-        @if(!event.isApproved){
-        <span
-            nz-icon
-            nzType="eye-invisible"
-            nzTheme="twotone"
-            nzTwotoneColor="#eb2f96"
-            nz-tooltip
-            nzTooltipTitle="Requires approval"
-        ></span>
-        }
-    </span>
 </ng-template>
 <ng-template #actionEllipsis>
     <div>

@@ -11,6 +11,7 @@ import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzSpinModule } from "ng-zorro-antd/spin";
 import { NzSwitchModule } from "ng-zorro-antd/switch";
+import { Subscription } from "rxjs";
 
 import { CommonModule, DOCUMENT } from "@angular/common";
 import {
@@ -24,13 +25,15 @@ import {
     ViewChild,
 } from "@angular/core";
 import {
+    and,
     collection,
     doc,
     Firestore,
     getDocs,
+    or,
     orderBy,
     query,
-    QueryConstraint,
+    QueryFilterConstraint,
     where,
 } from "@angular/fire/firestore";
 import { FormGroup, FormsModule } from "@angular/forms";
@@ -72,11 +75,13 @@ export class EventsComponent implements OnInit, OnDestroy {
     oriEvents: IEvent[] = [];
 
     currInputText = "";
-    showUnapproved = false;
+    showUnapprovedOnly = false;
 
     isLoading: boolean = true;
     eventCollectionRef = collection(this.firestore, "events");
     isSmallScreen: boolean = false;
+
+    authStateSubscription!: Subscription;
 
     drawerRef: NzDrawerRef<EventFormComponent, DrawerReturnData> | undefined =
         undefined;
@@ -98,28 +103,55 @@ export class EventsComponent implements OnInit, OnDestroy {
     ) {}
 
     runQuery() {
-        const queryList: QueryConstraint[] = [
+        const queryList: QueryFilterConstraint[] = [
             where("endDatetime", ">=", new Date()),
-            where("isApproved", "==", !this.showUnapproved),
         ];
 
-        // If is not admin, show unapproved for self only
-        if (!this.auth.isAdmin() && this.showUnapproved) {
-            queryList.push(
-                where(
-                    "authorId",
-                    "==",
-                    doc(
-                        this.firestore,
-                        "users",
-                        `${this.auth.userData.value?.uid}`
-                    )
-                )
-            );
-        }
-        queryList.push(orderBy("startDatetime", "asc"));
+        if (!this.auth.isLoggedIn()) {
+            queryList.push(where("isApproved", "==", true));
+        } else {
+            if (!this.auth.isAdmin()) {
+                /**
+                 * If show all:
+                 * isApproved = true +
+                 * isApproved = false , author = me
+                 *
+                 * If show unapproved only:
+                 * isApproved = false , author = me
+                 */
+                const orClause = [];
 
-        const queryRef = query(this.eventCollectionRef, ...queryList);
+                if (!this.showUnapprovedOnly) {
+                    orClause.push(where("isApproved", "==", true));
+                }
+                orClause.push(
+                    and(
+                        where("isApproved", "==", false),
+                        where(
+                            "authorId",
+                            "==",
+                            doc(
+                                this.firestore,
+                                "users",
+                                `${this.auth.userData.value?.uid}`
+                            )
+                        )
+                    )
+                );
+
+                queryList.push(or(...orClause));
+            } else {
+                if (this.showUnapprovedOnly) {
+                    queryList.push(where("isApproved", "==", false));
+                }
+            }
+        }
+
+        const queryRef = query(
+            this.eventCollectionRef,
+            and(...queryList),
+            orderBy("startDatetime", "asc")
+        );
         getDocs(queryRef)
             .then((data) => {
                 const currArray: IEvent[] = [];
@@ -132,7 +164,6 @@ export class EventsComponent implements OnInit, OnDestroy {
                 } else {
                     this.events = [...this.oriEvents];
                 }
-
                 this.isLoading = false;
             })
             .catch((err) => {
@@ -143,12 +174,17 @@ export class EventsComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.runQuery();
         this.resize();
+        this.authStateSubscription = this.auth.authState$.subscribe(() => {
+            this.runQuery();
+        });
     }
 
-    ngOnDestroy(): void {}
+    ngOnDestroy(): void {
+        this.authStateSubscription?.unsubscribe();
+    }
 
-    onShowUnapprovedChange(showUnapproved: boolean) {
-        this.showUnapproved = showUnapproved;
+    onShowUnapprovedChange(showUnapprovedOnly: boolean) {
+        this.showUnapprovedOnly = showUnapprovedOnly;
         this.runQuery();
     }
 
@@ -234,6 +270,11 @@ export class EventsComponent implements OnInit, OnDestroy {
                     }),
                     new FormProps("Details Confirmed", "isConfirmed", {
                         fieldType: "checkbox",
+                    }),
+                    new FormProps("Is Approved", "isApproved", {
+                        fieldType: "checkbox",
+                        display: this.auth.isAdmin(),
+                        default: false,
                     }),
                     new FormProps("", "createdAt", { display: false }),
                     new FormProps("", "updatedAt", { display: false }),
