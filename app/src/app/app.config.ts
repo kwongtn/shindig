@@ -1,5 +1,6 @@
 import { en_US, provideNzI18n } from "ng-zorro-antd/i18n";
 import { provideNzIcons } from "ng-zorro-antd/icon";
+import { provideMarkdown } from "ngx-markdown";
 
 import { registerLocaleData } from "@angular/common";
 import { provideHttpClient } from "@angular/common/http";
@@ -124,5 +125,6 @@ export const appConfig: ApplicationConfig = {
             deps: [Sentry.TraceService],
             multi: true,
         },
+        provideMarkdown(),
     ],
 };

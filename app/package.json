@@ -26,8 +26,10 @@
     "@sentry/angular": "^8.32.0",
     "@sentry/cli": "^2.36.3",
     "express": "^4.18.2",
+    "marked": "^12.0.2",
     "monaco-editor": "^0.52.0",
     "ng-zorro-antd": "^18.1.1",
+    "ngx-markdown": "^18.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"

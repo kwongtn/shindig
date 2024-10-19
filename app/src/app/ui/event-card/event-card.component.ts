@@ -5,6 +5,7 @@ import { NzCardModule } from "ng-zorro-antd/card";
 import { NzDrawerRef, NzDrawerService } from "ng-zorro-antd/drawer";
 import { NzDropDownModule } from "ng-zorro-antd/dropdown";
 import { NzIconModule } from "ng-zorro-antd/icon";
+import { NzModalModule, NzModalService } from "ng-zorro-antd/modal";
 import { NzToolTipModule } from "ng-zorro-antd/tooltip";
 import { Subscription } from "rxjs";
 
@@ -26,6 +27,9 @@ import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
 import { IEvent } from "../../types";
+import {
+    EventDetailsComponent,
+} from "../event-details/event-details.component";
 import { EventFormComponent } from "../event-form/event-form.component";
 
 type DrawerReturnData = any;
@@ -35,6 +39,7 @@ type DrawerReturnData = any;
     imports: [
         NgTemplateOutlet,
         NzAvatarModule,
+        NzModalModule,
         NzBadgeModule,
         NzButtonModule,
         NzCardModule,
@@ -72,6 +77,7 @@ export class EventCardComponent implements OnInit, OnDestroy {
         private drawerService: NzDrawerService,
         public auth: AuthService,
         private notification: NotificationService,
+        private modal: NzModalService,
         @Inject(DOCUMENT) private document: Document
     ) {}
     ngOnInit(): void {
@@ -233,5 +239,16 @@ export class EventCardComponent implements OnInit, OnDestroy {
                 this.notification.error("Unknown Error", reason.message);
                 contentComponent.showLoading = false;
             });
+    }
+
+    onCardClick() {
+        this.modal.create({
+            nzTitle: this.event.title,
+            nzContent: EventDetailsComponent,
+            nzData: {
+                content: this.event.description,
+            },
+            nzFooter: null,
+        });
     }
 }

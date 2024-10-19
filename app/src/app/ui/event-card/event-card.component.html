@@ -11,6 +11,7 @@
         [nzHoverable]="true"
     >
         <nz-card-meta
+            (click)="onCardClick()"
             [nzTitle]="event.title"
             [nzDescription]="event.subtitle ?? null"
             [nzAvatar]="avatarTemplate"
@@ -37,18 +38,19 @@
                 event.bannerUri ??
                 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png'
             "
+            (click)="onCardClick()"
         />
         @if(canEdit){
-            <button
-                nz-button
-                nzType="primary"
-                nzSize="large"
-                nzShape="circle"
-                (click)="openDrawer()"
-                class="edit-icon"
-            >
-                <span nz-icon nzType="edit"> </span>
-            </button>
+        <button
+            nz-button
+            nzType="primary"
+            nzSize="large"
+            nzShape="circle"
+            (click)="openDrawer()"
+            class="edit-icon"
+        >
+            <span nz-icon nzType="edit"> </span>
+        </button>
 
         }
     </span>
