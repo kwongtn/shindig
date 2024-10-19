@@ -100,11 +100,11 @@ export class EventsComponent implements OnInit, OnDestroy {
     runQuery() {
         const queryList: QueryConstraint[] = [
             where("endDatetime", ">=", new Date()),
+            where("isApproved", "==", !this.showUnapproved),
         ];
-        if (!this.showUnapproved) {
-            queryList.push(where("isApproved", "==", true));
-        }
-        if (!this.auth.isAdmin()) {
+
+        // If is not admin, show unapproved for self only
+        if (!this.auth.isAdmin() && this.showUnapproved) {
             queryList.push(
                 where(
                     "authorId",
