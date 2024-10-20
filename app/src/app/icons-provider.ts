@@ -1,4 +1,5 @@
 import {
+    CaretRightOutline,
     CheckCircleTwoTone,
     LinkOutline,
     MenuFoldOutline,
@@ -17,5 +18,6 @@ export const icons = [
     PlusOutline,
     SettingOutline,
     StarOutline,
+    CaretRightOutline,
     UserOutline,
 ];
