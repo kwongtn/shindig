@@ -2,7 +2,7 @@ import { en_US, provideNzI18n } from "ng-zorro-antd/i18n";
 import { provideNzIcons } from "ng-zorro-antd/icon";
 import { provideMarkdown } from "ngx-markdown";
 
-import { registerLocaleData } from "@angular/common";
+import { isPlatformServer, registerLocaleData } from "@angular/common";
 import { provideHttpClient } from "@angular/common/http";
 import en from "@angular/common/locales/en";
 import {
@@ -10,6 +10,8 @@ import {
     ApplicationConfig,
     ErrorHandler,
     importProvidersFrom,
+    inject,
+    PLATFORM_ID,
     provideZoneChangeDetection,
 } from "@angular/core";
 import {
@@ -18,12 +20,14 @@ import {
     ScreenTrackingService,
     UserTrackingService,
 } from "@angular/fire/analytics";
-import { initializeApp, provideFirebaseApp } from "@angular/fire/app";
-// import {
-//     initializeAppCheck,
-//     provideAppCheck,
-//     ReCaptchaEnterpriseProvider,
-// } from "@angular/fire/app-check";
+import { getApp, initializeApp, provideFirebaseApp } from "@angular/fire/app";
+import {
+    AppCheck,
+    initializeAppCheck,
+    provideAppCheck,
+    ReCaptchaEnterpriseProvider,
+    ReCaptchaV3Provider,
+} from "@angular/fire/app-check";
 import { connectAuthEmulator, getAuth, provideAuth } from "@angular/fire/auth";
 import {
     connectFirestoreEmulator,
@@ -82,15 +86,22 @@ export const appConfig: ApplicationConfig = {
         provideAnalytics(() => getAnalytics()),
         ScreenTrackingService,
         UserTrackingService,
-        // provideAppCheck(() => {
-        //   // TODO get a reCAPTCHA Enterprise here https://console.cloud.google.com/security/recaptcha?project=_
-        //   const provider =
-        //     new ReCaptchaEnterpriseProvider(/* reCAPTCHA Enterprise site key */);
-        //   return initializeAppCheck(undefined, {
-        //     provider,
-        //     isTokenAutoRefreshEnabled: true,
-        //   });
-        // }),
+        provideAppCheck(() => {
+            // Don't initialise AppCheck if running in server
+            // Workaround for https://github.com/angular/angularfire/issues/3488
+            const platformId = inject(PLATFORM_ID);
+            if (isPlatformServer(platformId)) {
+                return undefined as unknown as AppCheck;
+            }
+
+            const key = environment.recaptcha.key;
+            return initializeAppCheck(getApp(), {
+                provider: environment.recaptcha.isEnterprise
+                    ? new ReCaptchaEnterpriseProvider(key)
+                    : new ReCaptchaV3Provider(key),
+                isTokenAutoRefreshEnabled: true,
+            });
+        }),
         provideFirestore(() => {
             const db = getFirestore();
 

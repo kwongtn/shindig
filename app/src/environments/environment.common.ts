@@ -13,6 +13,10 @@ export interface IEnvironment {
     firebase: {
         useEmulators: boolean;
     };
+    recaptcha: {
+        key: string;
+        isEnterprise: boolean;
+    };
     sentry: {
         dsn?: string;
         environment: string;
@@ -37,5 +41,9 @@ export const CommonEnvironment = {
         prefix: "RM",
         suffix: "Ringgit",
         decimalPlaces: 2,
+    },
+    recaptcha: {
+        key: "6LdqlGYqAAAAACqPN6d6ui4Apb6Us3uGq5TDcipa",
+        isEnterprise: false,
     },
 };
