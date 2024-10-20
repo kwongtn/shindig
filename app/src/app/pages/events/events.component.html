@@ -63,7 +63,7 @@
         { xs: 8, sm: 16, md: 24, lg: 32 }
     ]"
 >
-    @for(event of events; track event) {
+    @for(event of events; track event.id) {
     <div
         nz-col
         class="gutter-row"
