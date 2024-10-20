@@ -87,6 +87,9 @@ export const appConfig: ApplicationConfig = {
         ScreenTrackingService,
         UserTrackingService,
         provideAppCheck(() => {
+            if (environment.firebase.useEmulators) {
+                return undefined as unknown as AppCheck;
+            }
             // Don't initialise AppCheck if running in server
             // Workaround for https://github.com/angular/angularfire/issues/3488
             const platformId = inject(PLATFORM_ID);
