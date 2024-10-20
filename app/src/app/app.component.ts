@@ -32,10 +32,10 @@ import { AuthService } from "./services/auth.service";
 })
 export class AppComponent {
     headerMap = [
-        {
-            title: "Organizers",
-            href: "/organizers",
-        },
+        // {
+        //     title: "Organizers",
+        //     href: "/organizers",
+        // },
         {
             title: "Events",
             href: "/events",

@@ -1,8 +1,8 @@
 <nz-layout>
   <nz-header>
-    <div class="logo"></div>
+    <!-- <div class="logo">Shindig</div> -->
     <ul nz-menu nzTheme="dark" nzMode="horizontal">
-      @for(header of headerMap; track header) {
+      @for(header of headerMap; track header.href) {
         <li nz-menu-item>
           <a [href]="header.href" [routerLink]="header.href">
             {{header.title}}
