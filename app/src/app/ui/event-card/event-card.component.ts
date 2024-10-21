@@ -56,6 +56,9 @@ export class EventCardComponent implements OnInit, OnDestroy {
     env = environment;
     authStateSubsription!: Subscription;
 
+    isHappeningNow: boolean = false;
+    timeout!: NodeJS.Timeout;
+
     extractDomain(url: string) {
         return (url.match(
             /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n]+)/im
@@ -95,10 +98,23 @@ export class EventCardComponent implements OnInit, OnDestroy {
                 this.auth.userData.value?.uid === this.event.authorId.id ||
                 this.auth.isAdmin();
         });
+
+        this.setHappeningNow();
+        this.timeout = setInterval(() => {
+            this.setHappeningNow();
+        }, 30e3);
+    }
+
+    setHappeningNow() {
+        const now = new Date().valueOf() / 1000;
+        this.isHappeningNow =
+            this.event.startDatetime.seconds < now &&
+            this.event.endDatetime.seconds > now;
     }
 
     ngOnDestroy(): void {
         this.authStateSubsription?.unsubscribe();
+        clearInterval(this.timeout);
     }
 
     openDrawer() {
