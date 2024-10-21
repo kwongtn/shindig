@@ -4,8 +4,10 @@
         [nzHeader]="collapseHeader"
         [nzExpandedIcon]="expandedIcon"
         [ngStyle]="{
-            'margin-bottom': '-50px'
+            'margin-bottom': '-50px',
+            cursor: 'default'
         }"
+        [nzDisabled]="!this.auth.isLoggedIn()"
     >
         @if(auth.isLoggedIn()) {
         <span class="search-option-label">Only show unapproved</span>
@@ -18,6 +20,7 @@
 </nz-collapse>
 
 <ng-template #expandedIcon let-active>
+    @if(this.auth.isLoggedIn()){
     {{ active }}
     <span
         nz-icon
@@ -25,6 +28,7 @@
         class="ant-collapse-arrow search-header-icon"
         [nzRotate]="p.nzActive ? 90 : 0"
     ></span>
+    }
 </ng-template>
 <ng-template #collapseHeader>
     <ui-search
@@ -55,29 +59,35 @@
     </button>
     }
 </div>
-<div
-    class="list-container"
-    nz-row
-    [nzGutter]="[
-        { xs: 8, sm: 16, md: 24, lg: 32 },
-        { xs: 8, sm: 16, md: 24, lg: 32 }
-    ]"
+<nz-spin
+    [nzSpinning]="isLoading"
+    nzTip="Loading..."
+    [class]="isLoading ? 'loading-spinner' : ''"
 >
-    @for(event of events; track event.id) {
     <div
-        nz-col
-        class="gutter-row"
-        [nzXs]="24"
-        [nzSm]="12"
-        [nzMd]="8"
-        [nzLg]="6"
+        class="list-container"
+        nz-row
+        [nzGutter]="[
+            { xs: 8, sm: 16, md: 24, lg: 32 },
+            { xs: 8, sm: 16, md: 24, lg: 32 }
+        ]"
     >
-        <ui-event-card class="inner-box" [event]="event"></ui-event-card>
+        @for(event of events; track event.id) {
+        <div
+            nz-col
+            class="gutter-row"
+            [nzXs]="24"
+            [nzSm]="12"
+            [nzMd]="8"
+            [nzLg]="6"
+        >
+            <ui-event-card class="inner-box" [event]="event"></ui-event-card>
+        </div>
+        }@empty { @if(!isLoading) {
+        <nz-empty nzNotFoundImage="simple" class="no-data-image"></nz-empty>
+        } }
     </div>
-    }@empty { @if(!isLoading) {
-    <nz-empty nzNotFoundImage="simple" class="no-data-image"></nz-empty>
-    } }
-</div>
+</nz-spin>
 
 <ng-template #drawerFooter>
     <div style="float: right">
