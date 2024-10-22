@@ -17,7 +17,7 @@
         <nz-card-meta
             (click)="onCardClick()"
             [nzTitle]="event.title"
-            [nzDescription]="event.subtitle ?? null"
+            [nzDescription]="subtitle"
             [nzAvatar]="avatarTemplate"
         ></nz-card-meta>
     </nz-card>
@@ -58,6 +58,20 @@
 
         }
     </span>
+</ng-template>
+<ng-template #subtitle>
+    @if(event.subtitle) {
+    {{ event.subtitle }} <br />
+    }<i>
+        @if(isMultiDayEvent) {
+        {{ event.startDatetime.toDate() | date : "dd-MMM-yyyy HH:MM" }} -
+        {{ event.endDatetime.toDate() | date : "dd-MMM-yyyy HH:MM" }}
+        } @else {
+        {{ event.startDatetime.toDate() | date : "dd-MMM-yyyy" }}
+        {{ event.startDatetime.toDate() | date : "HH:MM" }} -
+        {{ event.endDatetime.toDate() | date : "HH:MM" }}
+        }
+    </i>
 </ng-template>
 <ng-template #actionSetting>
     @if(event.eventLinks.length > 1) { @defer {

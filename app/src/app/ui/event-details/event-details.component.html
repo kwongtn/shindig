@@ -1,1 +1,11 @@
+@if(isMultiDayEvent) {
+    {{ event.startDatetime.toDate() | date:'dd-MMM-yyyy HH:MM' }} - 
+    {{ event.endDatetime.toDate() | date:'dd-MMM-yyyy HH:MM' }}
+} @else {
+    {{ event.startDatetime.toDate() | date:'dd-MMM-yyyy' }} 
+    {{ event.startDatetime.toDate() | date:'HH:MM' }} - 
+    {{ event.endDatetime.toDate() | date:'HH:MM' }}
+
+}
+
 <div [innerHTML]="renderedHtml"></div>

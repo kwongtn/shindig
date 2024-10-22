@@ -9,7 +9,7 @@ import { NzModalModule, NzModalService } from "ng-zorro-antd/modal";
 import { NzToolTipModule } from "ng-zorro-antd/tooltip";
 import { Subscription } from "rxjs";
 
-import { DOCUMENT, NgTemplateOutlet } from "@angular/common";
+import { CommonModule, DOCUMENT, NgTemplateOutlet } from "@angular/common";
 import {
     Component,
     HostListener,
@@ -37,6 +37,7 @@ type DrawerReturnData = any;
     selector: "ui-event-card",
     standalone: true,
     imports: [
+        CommonModule,
         NgTemplateOutlet,
         NzAvatarModule,
         NzModalModule,
@@ -57,6 +58,7 @@ export class EventCardComponent implements OnInit, OnDestroy {
     authStateSubsription!: Subscription;
 
     isHappeningNow: boolean = false;
+    isMultiDayEvent!: boolean;
     timeout!: NodeJS.Timeout;
 
     extractDomain(url: string) {
@@ -103,13 +105,19 @@ export class EventCardComponent implements OnInit, OnDestroy {
         this.timeout = setInterval(() => {
             this.setHappeningNow();
         }, 30e3);
+
+        this.isMultiDayEvent =
+            this.event.endDatetime.seconds - this.event.startDatetime.seconds >
+            3600 * 24;
     }
 
     setHappeningNow() {
-        const now = new Date().valueOf() / 1000;
+        const now = new Date().valueOf();
+
+        // TODO: Add happening today display
         this.isHappeningNow =
-            this.event.startDatetime.seconds < now &&
-            this.event.endDatetime.seconds > now;
+            this.event.startDatetime.toMillis() < now &&
+            this.event.endDatetime.toMillis() > now;
     }
 
     ngOnDestroy(): void {
@@ -262,7 +270,7 @@ export class EventCardComponent implements OnInit, OnDestroy {
             nzTitle: this.event.title,
             nzContent: EventDetailsComponent,
             nzData: {
-                content: this.event.description,
+                event: this.event,
             },
             nzFooter: null,
         });
