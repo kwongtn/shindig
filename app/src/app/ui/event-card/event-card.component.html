@@ -63,14 +63,7 @@
     @if(event.subtitle) {
     {{ event.subtitle }} <br />
     }<i>
-        @if(isMultiDayEvent) {
-        {{ event.startDatetime.toDate() | date : "dd-MMM-yyyy HH:MM" }} -
-        {{ event.endDatetime.toDate() | date : "dd-MMM-yyyy HH:MM" }}
-        } @else {
-        {{ event.startDatetime.toDate() | date : "dd-MMM-yyyy" }}
-        {{ event.startDatetime.toDate() | date : "HH:MM" }} -
-        {{ event.endDatetime.toDate() | date : "HH:MM" }}
-        }
+        {{ dateRange }}
     </i>
 </ng-template>
 <ng-template #actionSetting>

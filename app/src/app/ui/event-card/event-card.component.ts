@@ -27,6 +27,7 @@ import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
 import { IEvent } from "../../types";
+import { dateRangeHumanizer } from "../../utils";
 import {
     EventDetailsComponent,
 } from "../event-details/event-details.component";
@@ -53,12 +54,12 @@ type DrawerReturnData = any;
 })
 export class EventCardComponent implements OnInit, OnDestroy {
     @Input() event!: IEvent;
+    dateRange: string = "";
 
     env = environment;
     authStateSubsription!: Subscription;
 
     isHappeningNow: boolean = false;
-    isMultiDayEvent!: boolean;
     timeout!: NodeJS.Timeout;
 
     extractDomain(url: string) {
@@ -106,9 +107,10 @@ export class EventCardComponent implements OnInit, OnDestroy {
             this.setHappeningNow();
         }, 30e3);
 
-        this.isMultiDayEvent =
-            this.event.endDatetime.seconds - this.event.startDatetime.seconds >
-            3600 * 24;
+        this.dateRange = dateRangeHumanizer(
+            this.event.startDatetime,
+            this.event.endDatetime
+        );
     }
 
     setHappeningNow() {
