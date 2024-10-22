@@ -5,6 +5,7 @@ import { CommonModule } from "@angular/common";
 import { Component, Inject, OnInit } from "@angular/core";
 
 import { IEvent } from "../../types";
+import { dateRangeHumanizer } from "../../utils";
 
 @Component({
     selector: "app-event-details",
@@ -16,8 +17,7 @@ import { IEvent } from "../../types";
 export class EventDetailsComponent implements OnInit {
     renderedHtml: string = "";
     event!: IEvent;
-
-    isMultiDayEvent!: boolean;
+    dateRange: string = "";
 
     constructor(
         private markdownService: MarkdownService,
@@ -30,8 +30,9 @@ export class EventDetailsComponent implements OnInit {
         this.renderedHtml = await this.markdownService.parse(
             this.event.description
         );
-        this.isMultiDayEvent =
-            this.event.endDatetime.seconds - this.event.startDatetime.seconds >
-            3600 * 24;
+        this.dateRange = dateRangeHumanizer(
+            this.event.startDatetime,
+            this.event.endDatetime
+        );
     }
 }
