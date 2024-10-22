@@ -25,43 +25,30 @@ export function dateRangeHumanizer(start: Timestamp, end: Timestamp): string {
     const cStartDT = new CDate(startDT);
     const cEndDT = new CDate(endDT);
 
-    let returnString = "";
+    let returnString: string = `${cStartDT.transform("E")}`;
     if (cStartDT.year === cEndDT.year) {
         if (cStartDT.month === cEndDT.month) {
             if (cStartDT.day === cEndDT.day) {
-                returnString += cStartDT.transform("E, yyyy MMM dd | HH:MM");
-                returnString += " - ";
-                returnString += cEndDT.transform("HH:MM");
+                returnString += cStartDT.transform(", yyyy MMM");
             } else {
-                returnString += cStartDT.transform("E - ");
-                returnString += cEndDT.transform("E, ");
-
-                returnString += cStartDT.transform("yyyy MMM dd - ");
-                returnString += cEndDT.transform("dd | ");
-
-                returnString += cStartDT.transform("HH:MM - ");
-                returnString += cEndDT.transform("HH:MM");
+                returnString += cEndDT.transform(" - E, ");
+                returnString += cStartDT.transform("yyyy MMM dd -");
             }
         } else {
-            returnString += cStartDT.transform("E - ");
-            returnString += cEndDT.transform("E, ");
+            returnString += cEndDT.transform(" - E, ");
 
             returnString += cStartDT.transform("yyyy MMM dd - ");
-            returnString += cEndDT.transform("MMM dd | ");
-
-            returnString += cStartDT.transform("HH:MM - ");
-            returnString += cEndDT.transform("HH:MM");
+            returnString += cEndDT.transform("MMM");
         }
     } else {
-        returnString += cStartDT.transform("E - ");
-        returnString += cEndDT.transform("E, ");
+        returnString += cEndDT.transform(" - E, ");
 
         returnString += cStartDT.transform("yyyy MMM dd - ");
-        returnString += cEndDT.transform("yyyy MMM dd | ");
-
-        returnString += cStartDT.transform("HH:MM - ");
-        returnString += cEndDT.transform("HH:MM");
+        returnString += cEndDT.transform("yyyy MMM");
     }
+    returnString += cEndDT.transform(" dd | ");
+    returnString += cStartDT.transform("HH:MM - ");
+    returnString += cEndDT.transform("HH:MM");
 
     return returnString;
 }
