@@ -196,16 +196,21 @@ export class EventsComponent implements OnInit, OnDestroy {
 
         const caseInsensitiveLowerCase = inputText.toLowerCase();
         this.events = this.oriEvents.filter((data) => {
+            // console.log(
+            //     caseInsensitiveLowerCase,
+            //     data.title,
+            //     data.title.toLowerCase().indexOf(caseInsensitiveLowerCase),
+            //     data.subtitle,
+            //     data.subtitle
+            //         ?.toLowerCase()
+            //         .indexOf(caseInsensitiveLowerCase) ?? false
+            // );
             return (
                 data.title.toLowerCase().indexOf(caseInsensitiveLowerCase) >
                     -1 ||
                 (data.subtitle
                     ?.toLowerCase()
-                    .indexOf(caseInsensitiveLowerCase) ??
-                    false) ||
-                data.description
-                    .toLowerCase()
-                    .indexOf(caseInsensitiveLowerCase) > -1
+                    .indexOf(caseInsensitiveLowerCase) ?? -1) > -1
             );
         });
 
