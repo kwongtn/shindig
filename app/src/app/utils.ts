@@ -47,8 +47,8 @@ export function dateRangeHumanizer(start: Timestamp, end: Timestamp): string {
         returnString += cEndDT.transform("yyyy MMM");
     }
     returnString += cEndDT.transform(" dd | ");
-    returnString += cStartDT.transform("HH:MM - ");
-    returnString += cEndDT.transform("HH:MM");
+    returnString += cStartDT.transform("HH:mm - ");
+    returnString += cEndDT.transform("HH:mm");
 
     return returnString;
 }
