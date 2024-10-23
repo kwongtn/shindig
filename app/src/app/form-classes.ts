@@ -8,6 +8,7 @@ interface IFormPropsExtra {
         | "datetime"
         | "checkbox";
     helpText?: string;
+    tooltip?: string;
     disabled: boolean;
 }
 

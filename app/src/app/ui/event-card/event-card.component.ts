@@ -161,7 +161,7 @@ export class EventCardComponent implements OnInit, OnDestroy {
                     new FormProps("Description", "description", {
                         fieldType: "markdown",
                         required: true,
-                        helpText: "You can use markdown here 😎",
+                        tooltip: "You can use markdown here 😎",
                     }),
                     new FormProps("Start Datetime", "startDatetime", {
                         fieldType: "datetime",
