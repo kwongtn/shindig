@@ -276,10 +276,10 @@ export class EventCardComponent implements OnInit, OnDestroy {
             },
             nzFooter: null,
             nzWidth: getIdealModalWidth(this.document.body.clientWidth),
-            nzCentered: true,
             nzStyle: {
-                top: "-90px",
+                top: "20px",
             },
+
         });
     }
 }
