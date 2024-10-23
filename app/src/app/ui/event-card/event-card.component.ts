@@ -27,7 +27,7 @@ import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
 import { IEvent } from "../../types";
-import { dateRangeHumanizer } from "../../utils";
+import { dateRangeHumanizer, getIdealModalWidth } from "../../utils";
 import {
     EventDetailsComponent,
 } from "../event-details/event-details.component";
@@ -275,6 +275,11 @@ export class EventCardComponent implements OnInit, OnDestroy {
                 event: this.event,
             },
             nzFooter: null,
+            nzWidth: getIdealModalWidth(this.document.body.clientWidth),
+            nzCentered: true,
+            nzStyle: {
+                top: "-90px",
+            },
         });
     }
 }
