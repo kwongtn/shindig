@@ -41,9 +41,15 @@
 <div
     class="add-event-button-container"
     nz-flex
-    nzJustify="flex-end"
+    nzJustify="space-between"
     nzAlign="flex-start"
 >
+    <nz-segmented
+        [nzOptions]="displaySegmentOptions"
+        [ngModel]="segmentSelection"
+        (nzValueChange)="onSegmentChange($event)"
+        nzSize="large"
+    ></nz-segmented>
     @if(auth.isLoggedIn()) {
     <button
         nz-button

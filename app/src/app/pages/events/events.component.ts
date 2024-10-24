@@ -9,6 +9,11 @@ import { NzEmptyModule } from "ng-zorro-antd/empty";
 import { NzFlexModule } from "ng-zorro-antd/flex";
 import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
+import {
+    NzSegmentedModule,
+    NzSegmentedOption,
+    NzSegmentedOptions,
+} from "ng-zorro-antd/segmented";
 import { NzSpinModule } from "ng-zorro-antd/spin";
 import { NzSwitchModule } from "ng-zorro-antd/switch";
 import { Subscription } from "rxjs";
@@ -48,6 +53,19 @@ import { SearchComponent } from "../../ui/search/search.component";
 
 type DrawerReturnData = any;
 
+const segmentOptions: NzSegmentedOptions = [
+    {
+        label: "Past Events",
+        value: "pastEvents",
+        icon: "history",
+    },
+    {
+        label: "Upcoming Events",
+        value: "upcomingEvents",
+        icon: "calendar",
+    },
+];
+
 @Component({
     selector: "app-events",
     standalone: true,
@@ -63,6 +81,7 @@ type DrawerReturnData = any;
         NzFlexModule,
         NzGridModule,
         NzIconModule,
+        NzSegmentedModule,
         NzSpinModule,
         NzSwitchModule,
     ],
@@ -93,6 +112,15 @@ export class EventsComponent implements OnInit, OnDestroy {
         const clientWidth = this.document.body.clientWidth;
         this.width = clientWidth < 700 ? "100vw" : "700px";
         this.isSmallScreen = clientWidth < 1240;
+
+        this.displaySegmentOptions = segmentOptions.map((elem) => {
+            return {
+                ...(elem as any),
+                label: this.isSmallScreen
+                    ? undefined
+                    : (elem as NzSegmentedOption).label,
+            };
+        });
     }
 
     constructor(
@@ -103,8 +131,9 @@ export class EventsComponent implements OnInit, OnDestroy {
     ) {}
 
     runQuery() {
+        this.isLoading = true;
         const queryList: QueryFilterConstraint[] = [
-            where("endDatetime", ">=", new Date()),
+            where("endDatetime", this.showFuture ? ">=" : "<=", new Date()),
         ];
 
         if (!this.auth.isLoggedIn()) {
@@ -172,8 +201,8 @@ export class EventsComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.runQuery();
         this.resize();
+        this.runQuery();
         this.authStateSubscription = this.auth.authState$.subscribe(() => {
             this.runQuery();
         });
@@ -185,6 +214,21 @@ export class EventsComponent implements OnInit, OnDestroy {
 
     onShowUnapprovedChange(showUnapprovedOnly: boolean) {
         this.showUnapprovedOnly = showUnapprovedOnly;
+        this.runQuery();
+    }
+
+    displaySegmentOptions = { ...segmentOptions };
+    segmentSelection: number = 1;
+    showFuture: boolean = true;
+    onSegmentChange(index: number) {
+        this.segmentSelection = index;
+
+        if (index === 0) {
+            this.showFuture = false;
+        } else {
+            this.showFuture = true;
+        }
+
         this.runQuery();
     }
 
