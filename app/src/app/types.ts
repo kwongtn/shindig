@@ -50,7 +50,7 @@ export interface IEvent {
     startDatetime: Timestamp;
     endDatetime: Timestamp;
     eventLinks: string[];
-    organizerIds: string[];
+    organizerIds: DocumentReference[];
     bannerUri?: string;
     locationId: string;
 

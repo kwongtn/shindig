@@ -1,3 +1,11 @@
+import {
+    collection,
+    Firestore,
+    getDocs,
+    orderBy,
+    query,
+} from "@angular/fire/firestore";
+
 interface IFormPropsExtra {
     required: boolean;
     display: boolean;
@@ -6,10 +14,14 @@ interface IFormPropsExtra {
         | "paragraphText"
         | "markdown"
         | "datetime"
-        | "checkbox";
+        | "checkbox"
+        | "multiSelect";
     helpText?: string;
     tooltip?: string;
     disabled: boolean;
+
+    // Firebase specific
+    collection?: string;
 }
 
 const defaultMap: { [key: string]: any } = {
@@ -21,9 +33,18 @@ const defaultMap: { [key: string]: any } = {
 };
 
 export class FormProps {
+    firestore?: Firestore;
+
     label: string;
     controlName: string;
     defaultValue: any;
+
+    isLoading: boolean = false;
+    options: {
+        label: string;
+        value: any;
+    }[] = [];
+
     extra: IFormPropsExtra = {
         fieldType: "simpleText",
         required: false,
@@ -48,6 +69,25 @@ export class FormProps {
         } else {
             this.defaultValue =
                 extra["default"] ?? defaultMap[extra["fieldType"]];
+        }
+
+        if (extra["firestore"]) {
+            this.isLoading = true;
+            this.firestore = extra["firestore"] as Firestore;
+            const collectionRef = collection(
+                this.firestore,
+                extra["collection"]
+            );
+            const queryRef = query(collectionRef, orderBy("name", "asc"));
+            getDocs(queryRef).then((data) => {
+                this.options = data.docs.map((val) => {
+                    return {
+                        label: val.get(extra["labelField"]),
+                        value: val.ref,
+                    };
+                });
+                this.isLoading = false;
+            });
         }
     }
 }

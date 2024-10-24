@@ -5,6 +5,7 @@ import { NzDatePickerModule } from "ng-zorro-antd/date-picker";
 import { NZ_DRAWER_DATA } from "ng-zorro-antd/drawer";
 import { NzFormModule } from "ng-zorro-antd/form";
 import { NzInputModule } from "ng-zorro-antd/input";
+import { NzSelectModule } from "ng-zorro-antd/select";
 
 import { Component, Inject } from "@angular/core";
 import {
@@ -33,6 +34,7 @@ import { AuthService } from "../../services/auth.service";
         NzDatePickerModule,
         NzFormModule,
         NzInputModule,
+        NzSelectModule,
         ReactiveFormsModule,
         NzCodeEditorModule,
     ],

@@ -302,7 +302,12 @@ export class EventsComponent implements OnInit, OnDestroy {
                         required: true,
                         helpText: "Related links, one per row",
                     }),
-                    // new FormProps("", "organizerIds"),
+                    new FormProps("Organizers", "organizerIds", {
+                        firestore: this.firestore,
+                        fieldType: "multiSelect",
+                        collection: "organizers",
+                        labelField: "name",
+                    }),
                     new FormProps("Event Banner Url", "bannerUri", {
                         default: "undefined",
                     }),
