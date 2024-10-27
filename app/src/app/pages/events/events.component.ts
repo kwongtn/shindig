@@ -179,7 +179,7 @@ export class EventsComponent implements OnInit, OnDestroy {
         const queryRef = query(
             this.eventCollectionRef,
             and(...queryList),
-            orderBy("startDatetime", "asc")
+            orderBy("startDatetime", this.showFuture ? "asc" : "desc")
         );
         getDocs(queryRef)
             .then((data) => {
