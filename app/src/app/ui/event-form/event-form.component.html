@@ -67,20 +67,24 @@
                 "
             ></span>
             } @case ("multiSelect") {
-            <nz-select
-                nzMode="multiple"
-                nzPlaceHolder="Select organizer"
-                nzShowSearch
-                nz-input
-                [formControlName]="prop.controlName"
-                (ngModelChange)="
-                    onInputChange(prop.controlName, $event, submissionForm)
-                "
-            >
-                @for (o of prop.options; track o.value) {
-                <nz-option [nzValue]="o.value" [nzLabel]="o.label"></nz-option>
-                }@empty { }
-            </nz-select>
+              @if (!(prop.$isLoading | async)) {
+                <nz-select
+                    nzMode="multiple"
+                    nzPlaceHolder="Select organizer"
+                    nzShowSearch
+                    nz-input
+                    [nzLoading]="prop.$isLoading | async"
+                    [formControlName]="prop.controlName"
+                    (ngModelChange)="
+                        onInputChange(prop.controlName, $event, submissionForm)
+                    "
+                >
+                    @for (o of prop.options; track o.value) {
+                      <nz-option [nzValue]="o.value" [nzLabel]="o.label"></nz-option>
+                    }@empty { }
+                </nz-select>
+
+              }
             }}
         </nz-form-control>
     </nz-form-item>

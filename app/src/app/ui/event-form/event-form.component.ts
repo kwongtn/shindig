@@ -7,7 +7,7 @@ import { NzFormModule } from "ng-zorro-antd/form";
 import { NzInputModule } from "ng-zorro-antd/input";
 import { NzSelectModule } from "ng-zorro-antd/select";
 
-import { Component, Inject } from "@angular/core";
+import { Component, Inject, OnInit } from "@angular/core";
 import {
     addDoc,
     collection,
@@ -25,11 +25,13 @@ import {
 import { environment } from "../../../environments/environment";
 import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
+import { CommonModule } from "@angular/common";
 
 @Component({
     selector: "ui-event-form",
     standalone: true,
     imports: [
+        CommonModule,
         NzCheckboxModule,
         NzDatePickerModule,
         NzFormModule,
@@ -41,7 +43,7 @@ import { AuthService } from "../../services/auth.service";
     templateUrl: "./event-form.component.html",
     styleUrl: "./event-form.component.less",
 })
-export class EventFormComponent {
+export class EventFormComponent implements OnInit {
     codeEditorOptions: editor.IStandaloneEditorConstructionOptions =
         environment.form.codeEditorOptions;
 
@@ -94,7 +96,9 @@ export class EventFormComponent {
                 })
             )
         );
+    }
 
+    ngOnInit() {
         if (this.drawerData["formData"]) {
             this.submissionForm.patchValue(this.drawerData["formData"], {
                 emitEvent: false,

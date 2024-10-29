@@ -5,6 +5,7 @@ import {
     orderBy,
     query,
 } from "@angular/fire/firestore";
+import { BehaviorSubject } from "rxjs";
 
 interface IFormPropsExtra {
     required: boolean;
@@ -39,7 +40,7 @@ export class FormProps {
     controlName: string;
     defaultValue: any;
 
-    isLoading: boolean = false;
+    $isLoading: BehaviorSubject<boolean> = new BehaviorSubject(false);
     options: {
         label: string;
         value: any;
@@ -72,7 +73,8 @@ export class FormProps {
         }
 
         if (extra["firestore"]) {
-            this.isLoading = true;
+            this.$isLoading.next(true);
+
             this.firestore = extra["firestore"] as Firestore;
             const collectionRef = collection(
                 this.firestore,
@@ -83,10 +85,10 @@ export class FormProps {
                 this.options = data.docs.map((val) => {
                     return {
                         label: val.get(extra["labelField"]),
-                        value: val.ref,
-                    };
+                        value: val.ref.id,
+                    }
                 });
-                this.isLoading = false;
+              this.$isLoading.next(false);
             });
         }
     }

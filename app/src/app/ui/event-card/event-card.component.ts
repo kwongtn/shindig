@@ -13,6 +13,7 @@ import { CommonModule, DOCUMENT, NgTemplateOutlet } from "@angular/common";
 import {
     Component,
     HostListener,
+    inject,
     Inject,
     Input,
     OnDestroy,
@@ -20,6 +21,7 @@ import {
     TemplateRef,
     ViewChild,
 } from "@angular/core";
+import { doc, Firestore } from "@angular/fire/firestore";
 import { FormGroup } from "@angular/forms";
 
 import { environment } from "../../../environments/environment";
@@ -53,6 +55,7 @@ type DrawerReturnData = any;
     styleUrl: "./event-card.component.less",
 })
 export class EventCardComponent implements OnInit, OnDestroy {
+    private firestore = inject(Firestore);
     @Input() event!: IEvent;
     dateRange: string = "";
 
@@ -176,7 +179,12 @@ export class EventCardComponent implements OnInit, OnDestroy {
                         required: true,
                         helpText: "Related links, one per row",
                     }),
-                    // new FormProps("", "organizerIds"),
+                    new FormProps("Organizers", "organizerIds", {
+                        firestore: this.firestore,
+                        fieldType: "multiSelect",
+                        collection: "organizers",
+                        labelField: "name",
+                    }),
                     new FormProps("Event Banner Url", "bannerUri", {
                         default: this.event.bannerUri ?? "undefined",
                     }),
@@ -200,6 +208,10 @@ export class EventCardComponent implements OnInit, OnDestroy {
                 ],
                 formData: {
                     ...this.event,
+                    organizerIds: this.event.organizerIds ? this.event.organizerIds.map((doc)=> {
+                      console.log(doc)
+                      return doc.id;
+                    }) : [],
                     eventLinks: this.event.eventLinks.join("\n"),
                     startDatetime: new Date(
                         this.event.startDatetime.seconds * 1000
@@ -217,6 +229,9 @@ export class EventCardComponent implements OnInit, OnDestroy {
                             .split("\n");
                     }
                     data.updatedAt = new Date();
+                    data.organizerIds = data.organizerIds.map((id: string) => {
+                        return doc(this.firestore, "organizers", id);
+                    });
                     delete data.id;
                     return data;
                 },
@@ -279,7 +294,6 @@ export class EventCardComponent implements OnInit, OnDestroy {
             nzStyle: {
                 top: "20px",
             },
-
         });
     }
 }

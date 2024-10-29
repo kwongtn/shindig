@@ -342,6 +342,9 @@ export class EventsComponent implements OnInit, OnDestroy {
                         "users",
                         `${this.auth.userData.value?.uid}`
                     );
+                    data.organizerIds = data.organizerIds ? data.organizerIds.map((id: string) => {
+                        return doc(this.firestore, "organizers", id);
+                    }) : [];
                     data.createdAt = new Date();
                     data.updatedAt = new Date();
                     return data;
