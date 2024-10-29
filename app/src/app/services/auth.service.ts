@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable, Subscription } from "rxjs";
 
-import { Injectable } from "@angular/core";
+import { isPlatformBrowser } from "@angular/common";
+import { Inject, Injectable, PLATFORM_ID } from "@angular/core";
 import {
     Auth,
     authState,
@@ -49,20 +50,33 @@ export class AuthService {
     loginViaLoginFunction: boolean = false;
     unsubscribe: Unsubscribe | undefined = undefined;
 
+    isLastLoggedIn: boolean = false;
+
     constructor(
         private router: Router,
         private notification: NotificationService,
         private auth: Auth,
-        private firestore: Firestore
+        private firestore: Firestore,
+        @Inject(PLATFORM_ID) private platformId: Object
     ) {
+        if (isPlatformBrowser(this.platformId)) {
+            this.isLastLoggedIn = !!localStorage.getItem("isLastLoggedIn");
+        }
+
         this.authState$ = authState(this.auth);
         this.authStateSubscription = this.authState$.subscribe(
             (user: User | null) => {
                 if (user) {
                     this.userData.next(user);
+                    localStorage.setItem("isLastLoggedIn", "true");
+                    this.isLastLoggedIn = true;
+
                     user.getIdTokenResult().then((token) => {
                         this.customClaims.next(token.claims);
                     });
+                } else {
+                    localStorage.removeItem("isLastLoggedIn");
+                    this.isLastLoggedIn = false;
                 }
             }
         );

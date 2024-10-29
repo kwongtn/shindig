@@ -1,38 +1,43 @@
 <nz-layout>
-  <nz-header>
-    <!-- <div class="logo">Shindig</div> -->
-    <ul nz-menu nzTheme="dark" nzMode="horizontal">
-      @for(header of headerMap; track header.href) {
-        <li nz-menu-item>
-          <a [href]="header.href" [routerLink]="header.href">
-            <span nz-icon [nzType]="header.icon"></span>
-            @if(!isSmallScreen) {
-              <span>
-                {{header.title}}
-              </span>
+    <nz-header>
+        <!-- <div class="logo">Shindig</div> -->
+        <ul nz-menu nzTheme="dark" nzMode="horizontal">
+            @for(header of headerMap; track header.href) {
+            <li nz-menu-item>
+                <a [href]="header.href" [routerLink]="header.href">
+                    <span nz-icon [nzType]="header.icon"></span>
+                    @if(!isSmallScreen) {
+                    <span>
+                        {{ header.title }}
+                    </span>
+                    }
+                </a>
+            </li>
             }
-          </a>
-        </li>
-      }
-      <li nz-menu-item style="float: right;">
-        @if(authService.isLoggedIn()) {
-          <a nzGhost (click)="authService.logout()">
-            Hi, {{ (authService.userData | async)?.displayName }}
-          </a>
-        } @else {
-          <a nzGhost (click)="authService.login()">
-            Login
-          </a>
-        }
-      </li>
-    </ul>
-  </nz-header>
-  <nz-content>
-    <div class="inner-content">
-      <router-outlet class="main-container"></router-outlet>
-    </div>
-  </nz-content>
-  <nz-footer>Made with 💙 by
-    <a href="http://github.com/kwongtn" target="_blank"> KwongTN </a>
-    & contributors, GNU AGPLv3</nz-footer>
+            <li nz-menu-item style="float: right">
+                @if(authService.isLoggedIn()) {
+                <a nzGhost (click)="authService.logout()">
+                    Hi, {{ (authService.userData | async)?.displayName }}
+                </a>
+                } @else if(authService.isLastLoggedIn){
+                  <!--
+                    If previously logged in, display spinner while validation is being done
+                  -->
+                  <span nz-icon nzType="loading"></span>
+                } @else {
+                  <a nzGhost (click)="authService.login()"> Login </a>
+                }
+            </li>
+        </ul>
+    </nz-header>
+    <nz-content>
+        <div class="inner-content">
+            <router-outlet class="main-container"></router-outlet>
+        </div>
+    </nz-content>
+    <nz-footer
+        >Made with 💙 by
+        <a href="http://github.com/kwongtn" target="_blank"> KwongTN </a>
+        & contributors, GNU AGPLv3</nz-footer
+    >
 </nz-layout>
