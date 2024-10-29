@@ -6,8 +6,8 @@ import { NzLayoutModule } from "ng-zorro-antd/layout";
 import { NzMenuModule } from "ng-zorro-antd/menu";
 import { NzNotificationModule } from "ng-zorro-antd/notification";
 
-import { CommonModule } from "@angular/common";
-import { Component } from "@angular/core";
+import { CommonModule, DOCUMENT } from "@angular/common";
+import { Component, HostListener, Inject, OnInit } from "@angular/core";
 import { RouterLink, RouterOutlet } from "@angular/router";
 
 import { AuthService } from "./services/auth.service";
@@ -30,17 +30,33 @@ import { AuthService } from "./services/auth.service";
     templateUrl: "./app.component.html",
     styleUrls: ["./app.component.less"],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
     headerMap = [
-        // {
-        //     title: "Organizers",
-        //     href: "/organizers",
-        // },
+        {
+            title: "Organizers",
+            href: "/organizers",
+            icon: "team",
+        },
         {
             title: "Events",
             href: "/events",
+            icon: "calendar",
         },
     ];
+    isSmallScreen: boolean = false;
 
-    constructor(public authService: AuthService) {}
+    constructor(
+        public authService: AuthService,
+        @Inject(DOCUMENT) private document: Document
+    ) {}
+
+    @HostListener("window:resize")
+    resize(): void {
+        const clientWidth = this.document.body.clientWidth;
+        this.isSmallScreen = clientWidth < 1240;
+    }
+
+    ngOnInit(): void {
+        this.resize();
+    }
 }

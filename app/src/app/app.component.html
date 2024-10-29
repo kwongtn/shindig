@@ -5,7 +5,12 @@
       @for(header of headerMap; track header.href) {
         <li nz-menu-item>
           <a [href]="header.href" [routerLink]="header.href">
-            {{header.title}}
+            <span nz-icon [nzType]="header.icon"></span>
+            @if(!isSmallScreen) {
+              <span>
+                {{header.title}}
+              </span>
+            }
           </a>
         </li>
       }

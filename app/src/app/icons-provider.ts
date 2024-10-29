@@ -1,4 +1,5 @@
 import {
+    CalendarOutline,
     CaretRightOutline,
     CheckCircleTwoTone,
     LinkOutline,
@@ -20,4 +21,5 @@ export const icons = [
     StarOutline,
     CaretRightOutline,
     UserOutline,
+    CalendarOutline,
 ];
