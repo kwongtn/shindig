@@ -15,18 +15,30 @@
             </li>
             }
             <li nz-menu-item style="float: right">
-                @if(authService.isLoggedIn()) {
+                @defer { @if(authService.isLoggedIn()) {
                 <a nzGhost (click)="authService.logout()">
-                    Hi, {{ (authService.userData | async)?.displayName }}
+                    <span nz-icon nzType="logout" nzTheme="outline"></span>
+
+                    @if(!isSmallScreen){
+                    <span>
+                        Hi, {{ (authService.userData | async)?.displayName }}
+                    </span>
+                    }
                 </a>
                 } @else if(authService.isLastLoggedIn){
-                  <!--
+                <!--
                     If previously logged in, display spinner while validation is being done
                   -->
-                  <span nz-icon nzType="loading"></span>
+                <span nz-icon nzType="loading"></span>
                 } @else {
-                  <a nzGhost (click)="authService.login()"> Login </a>
-                }
+                <a nzGhost (click)="authService.login()">
+                    <span nz-icon nzType="login" nzTheme="outline"></span>
+
+                    @if(!isSmallScreen){
+                    <span> Login </span>
+                    }
+                </a>
+                } }
             </li>
         </ul>
     </nz-header>

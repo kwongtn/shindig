@@ -44,13 +44,14 @@
     nzJustify="space-between"
     nzAlign="flex-start"
 >
+    @defer {
     <nz-segmented
         [nzOptions]="displaySegmentOptions"
         [ngModel]="segmentSelection"
         (nzValueChange)="onSegmentChange($event)"
         nzSize="large"
     ></nz-segmented>
-    @if(auth.isLoggedIn()) {
+    } @if(auth.isLoggedIn()) {
     <button
         nz-button
         nzType="primary"
