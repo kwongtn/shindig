@@ -6,24 +6,20 @@
             <li nz-menu-item>
                 <a [href]="header.href" [routerLink]="header.href">
                     <span nz-icon [nzType]="header.icon"></span>
-                    @if(!isSmallScreen) {
-                    <span>
+                    <span class="icon-text">
                         {{ header.title }}
                     </span>
-                    }
+                    
                 </a>
             </li>
             }
             <li nz-menu-item style="float: right">
                 @defer { @if(authService.isLoggedIn()) {
                 <a nzGhost (click)="authService.logout()">
-                    <span nz-icon nzType="logout" nzTheme="outline"></span>
-
-                    @if(!isSmallScreen){
-                    <span>
+                    <span class="icon-text">
                         Hi, {{ (authService.userData | async)?.displayName }}
                     </span>
-                    }
+                    <span nz-icon nzType="logout" nzTheme="outline"></span>
                 </a>
                 } @else if(authService.isLastLoggedIn){
                 <!--
@@ -32,11 +28,8 @@
                 <span nz-icon nzType="loading"></span>
                 } @else {
                 <a nzGhost (click)="authService.login()">
+                    <span class="icon-text"> Login </span>
                     <span nz-icon nzType="login" nzTheme="outline"></span>
-
-                    @if(!isSmallScreen){
-                    <span> Login </span>
-                    }
                 </a>
                 } }
             </li>

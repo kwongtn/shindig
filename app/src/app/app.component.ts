@@ -7,7 +7,7 @@ import { NzMenuModule } from "ng-zorro-antd/menu";
 import { NzNotificationModule } from "ng-zorro-antd/notification";
 
 import { CommonModule, DOCUMENT } from "@angular/common";
-import { Component, HostListener, Inject, OnInit } from "@angular/core";
+import { Component, Inject, OnInit } from "@angular/core";
 import { RouterLink, RouterOutlet } from "@angular/router";
 
 import { AuthService } from "./services/auth.service";
@@ -43,20 +43,11 @@ export class AppComponent implements OnInit {
             icon: "calendar",
         },
     ];
-    isSmallScreen: boolean = false;
 
     constructor(
         public authService: AuthService,
         @Inject(DOCUMENT) private document: Document
     ) {}
 
-    @HostListener("window:resize")
-    resize(): void {
-        const clientWidth = this.document.body.clientWidth;
-        this.isSmallScreen = clientWidth < 1240;
-    }
-
-    ngOnInit(): void {
-        this.resize();
-    }
+    ngOnInit(): void {}
 }
