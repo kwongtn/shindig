@@ -216,10 +216,12 @@ export class EventCardComponent implements OnInit, OnDestroy {
                 ],
                 formData: {
                     ...this.event,
-                    organizerIds: this.event.organizerIds ? this.event.organizerIds.map((doc)=> {
-                      console.log(doc)
-                      return doc.id;
-                    }) : [],
+                    organizerIds: this.event.organizerIds
+                        ? this.event.organizerIds.map((doc) => {
+                              console.log(doc);
+                              return doc.id;
+                          })
+                        : [],
                     eventLinks: this.event.eventLinks.join("\n"),
                     startDatetime: new Date(
                         this.event.startDatetime.seconds * 1000
