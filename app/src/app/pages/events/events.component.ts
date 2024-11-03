@@ -9,11 +9,7 @@ import { NzEmptyModule } from "ng-zorro-antd/empty";
 import { NzFlexModule } from "ng-zorro-antd/flex";
 import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
-import {
-    NzSegmentedModule,
-    NzSegmentedOption,
-    NzSegmentedOptions,
-} from "ng-zorro-antd/segmented";
+import { NzSegmentedModule, NzSegmentedOption } from "ng-zorro-antd/segmented";
 import { NzSpinModule } from "ng-zorro-antd/spin";
 import { NzSwitchModule } from "ng-zorro-antd/switch";
 import { Subscription } from "rxjs";
@@ -23,7 +19,7 @@ import {
     Component,
     HostListener,
     inject,
-    Inject,
+    Input,
     OnDestroy,
     OnInit,
     TemplateRef,
@@ -42,6 +38,7 @@ import {
     where,
 } from "@angular/fire/firestore";
 import { FormGroup, FormsModule } from "@angular/forms";
+import { Router } from "@angular/router";
 
 import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
@@ -53,15 +50,15 @@ import { SearchComponent } from "../../ui/search/search.component";
 
 type DrawerReturnData = any;
 
-const segmentOptions: NzSegmentedOptions = [
+const segmentOptions: NzSegmentedOption[] = [
     {
         label: "Past Events",
-        value: "pastEvents",
+        value: "past",
         icon: "history",
     },
     {
         label: "Upcoming Events",
-        value: "upcomingEvents",
+        value: "upcoming",
         icon: "calendar",
     },
 ];
@@ -90,6 +87,8 @@ const segmentOptions: NzSegmentedOptions = [
 })
 export class EventsComponent implements OnInit, OnDestroy {
     private firestore = inject(Firestore);
+    private document = inject(DOCUMENT);
+
     events: IEvent[] = [];
     oriEvents: IEvent[] = [];
 
@@ -116,9 +115,7 @@ export class EventsComponent implements OnInit, OnDestroy {
         this.displaySegmentOptions = segmentOptions.map((elem) => {
             return {
                 ...(elem as any),
-                label: this.isSmallScreen
-                    ? undefined
-                    : (elem as NzSegmentedOption).label,
+                label: this.isSmallScreen ? undefined : elem.label,
             };
         });
     }
@@ -127,13 +124,16 @@ export class EventsComponent implements OnInit, OnDestroy {
         private drawerService: NzDrawerService,
         private notification: NotificationService,
         public auth: AuthService,
-        @Inject(DOCUMENT) private document: Document
+        private router: Router
     ) {}
 
     runQuery() {
         this.isLoading = true;
+
+        const showFuture =
+            segmentOptions[this.segmentSelection].value === "upcoming";
         const queryList: QueryFilterConstraint[] = [
-            where("endDatetime", this.showFuture ? ">=" : "<=", new Date()),
+            where("endDatetime", showFuture ? ">=" : "<=", new Date()),
         ];
 
         if (!this.auth.isLoggedIn()) {
@@ -179,7 +179,7 @@ export class EventsComponent implements OnInit, OnDestroy {
         const queryRef = query(
             this.eventCollectionRef,
             and(...queryList),
-            orderBy("startDatetime", this.showFuture ? "asc" : "desc")
+            orderBy("startDatetime", showFuture ? "asc" : "desc")
         );
         getDocs(queryRef)
             .then((data) => {
@@ -200,9 +200,19 @@ export class EventsComponent implements OnInit, OnDestroy {
             });
     }
 
+    @Input()
+    set state(state: string) {
+        this.onSegmentChange(
+            segmentOptions.findIndex((val: NzSegmentedOption) => {
+                return val.value === state;
+            })
+        );
+    }
+    @Input()
+    set page(page: number) {}
+
     ngOnInit(): void {
         this.resize();
-        this.runQuery();
         this.authStateSubscription = this.auth.authState$.subscribe(() => {
             this.runQuery();
         });
@@ -219,17 +229,19 @@ export class EventsComponent implements OnInit, OnDestroy {
 
     displaySegmentOptions = { ...segmentOptions };
     segmentSelection: number = 1;
-    showFuture: boolean = true;
     onSegmentChange(index: number) {
-        this.segmentSelection = index;
-
-        if (index === 0) {
-            this.showFuture = false;
-        } else {
-            this.showFuture = true;
+        if (index < 0) {
+            return;
         }
 
-        this.runQuery();
+        this.router
+            .navigate(["events", segmentOptions[index].value, 1], {
+                queryParamsHandling: "preserve",
+            })
+            .then(() => {
+                this.segmentSelection = index;
+                this.runQuery();
+            });
     }
 
     filterEvents(inputText: string) {
@@ -342,9 +354,11 @@ export class EventsComponent implements OnInit, OnDestroy {
                         "users",
                         `${this.auth.userData.value?.uid}`
                     );
-                    data.organizerIds = data.organizerIds ? data.organizerIds.map((id: string) => {
-                        return doc(this.firestore, "organizers", id);
-                    }) : [];
+                    data.organizerIds = data.organizerIds
+                        ? data.organizerIds.map((id: string) => {
+                              return doc(this.firestore, "organizers", id);
+                          })
+                        : [];
                     data.createdAt = new Date();
                     data.updatedAt = new Date();
                     return data;

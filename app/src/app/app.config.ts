@@ -46,7 +46,11 @@ import { provideClientHydration } from "@angular/platform-browser";
 import {
     provideAnimationsAsync,
 } from "@angular/platform-browser/animations/async";
-import { provideRouter, Router } from "@angular/router";
+import {
+    provideRouter,
+    Router,
+    withComponentInputBinding,
+} from "@angular/router";
 import * as Sentry from "@sentry/angular";
 
 import { environment } from "../environments/environment";
@@ -58,7 +62,7 @@ registerLocaleData(en);
 export const appConfig: ApplicationConfig = {
     providers: [
         provideZoneChangeDetection({ eventCoalescing: true }),
-        provideRouter(routes),
+        provideRouter(routes, withComponentInputBinding()),
         provideClientHydration(),
         provideNzIcons(icons),
         provideNzI18n(en_US),

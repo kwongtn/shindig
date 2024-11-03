@@ -7,14 +7,13 @@ import { NzDropDownModule } from "ng-zorro-antd/dropdown";
 import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzModalModule, NzModalService } from "ng-zorro-antd/modal";
 import { NzToolTipModule } from "ng-zorro-antd/tooltip";
-import { Subscription } from "rxjs";
+import { firstValueFrom, Subscription } from "rxjs";
 
 import { CommonModule, DOCUMENT, NgTemplateOutlet } from "@angular/common";
 import {
     Component,
     HostListener,
     inject,
-    Inject,
     Input,
     OnDestroy,
     OnInit,
@@ -23,6 +22,7 @@ import {
 } from "@angular/core";
 import { doc, Firestore } from "@angular/fire/firestore";
 import { FormGroup } from "@angular/forms";
+import { ActivatedRoute, Router } from "@angular/router";
 
 import { environment } from "../../../environments/environment";
 import { FormProps } from "../../form-classes";
@@ -56,6 +56,8 @@ type DrawerReturnData = any;
 })
 export class EventCardComponent implements OnInit, OnDestroy {
     private firestore = inject(Firestore);
+    private document = inject(DOCUMENT);
+
     @Input() event!: IEvent;
     dateRange: string = "";
 
@@ -87,9 +89,15 @@ export class EventCardComponent implements OnInit, OnDestroy {
         public auth: AuthService,
         private notification: NotificationService,
         private modal: NzModalService,
-        @Inject(DOCUMENT) private document: Document
+        private router: Router,
+        private route: ActivatedRoute
     ) {}
     ngOnInit(): void {
+        firstValueFrom(this.route.queryParamMap).then((params) => {
+            if (params.get("id") === this.event.id) {
+                this.onCardClick();
+            }
+        });
         this.authStateSubsription = this.auth.authState$.subscribe(() => {
             // TODO: Debug why on logout the edit button does not disappear
             /**
@@ -283,7 +291,13 @@ export class EventCardComponent implements OnInit, OnDestroy {
     }
 
     onCardClick() {
-        this.modal.create({
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {
+                id: this.event.id,
+            },
+        });
+        const modalRef = this.modal.create({
             nzTitle: this.event.title,
             nzContent: EventDetailsComponent,
             nzData: {
@@ -294,6 +308,13 @@ export class EventCardComponent implements OnInit, OnDestroy {
             nzStyle: {
                 top: "20px",
             },
+        });
+
+        firstValueFrom(modalRef.afterClose).then(() => {
+            this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: {},
+            });
         });
     }
 }
