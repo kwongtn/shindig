@@ -17,3 +17,29 @@
     right: 30px;
     bottom: 30px;
 }
+
+.gradient-border {
+    background: linear-gradient(
+                to bottom,
+                oklch(0.1 0.2 240 / 0.95),
+                oklch(0.1 0.2 240 / 0.95)
+            )
+            padding-box,
+        linear-gradient(var(--angle), #ff0047, #0084ff) border-box;
+
+    border: 3px solid transparent;
+    border-radius: 5px;
+    animation: 3s rotate linear infinite;
+}
+
+@keyframes rotate {
+    to {
+        --angle: 360deg;
+    }
+}
+
+@property --angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}

@@ -2,7 +2,11 @@
 <nz-ribbon nzText="Needs Approval" nzColor="red">
     <ng-container [ngTemplateOutlet]="card"></ng-container> </nz-ribbon
 >} @else if (isHappeningNow) {
-<nz-ribbon nzText="Happening Now" nzColor="blue">
+<nz-ribbon
+    [class]="isHappeningNow ? 'gradient-border' : ''"
+    nzText="Happening Now"
+    nzColor="blue"
+>
     <ng-container [ngTemplateOutlet]="card"></ng-container>
 </nz-ribbon>
 
@@ -10,6 +14,7 @@
 
 <ng-template #card>
     <nz-card
+        [nzBodyStyle]="{ background: '#ffffff' }"
         [nzCover]="coverTemplate"
         [nzActions]="[actionSetting, actionEllipsis]"
         [nzHoverable]="true"
