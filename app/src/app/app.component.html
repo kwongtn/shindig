@@ -3,17 +3,22 @@
         <!-- <div class="logo">Shindig</div> -->
         <ul nz-menu nzTheme="dark" nzMode="horizontal">
             @for(header of headerMap; track header.href) {
-            <li nz-menu-item>
-                <a [href]="header.href" [routerLink]="header.href">
+            <li nz-menu-item [nzSelected]="rla.isActive">
+                <a
+                    [href]="header.href"
+                    [routerLink]="header.href"
+                    routerLinkActive
+                    #rla="routerLinkActive"
+                    ariaCurrentWhenActive="page"
+                >
                     <span nz-icon [nzType]="header.icon"></span>
                     <span class="icon-text">
                         {{ header.title }}
                     </span>
-                    
                 </a>
             </li>
             }
-            <li nz-menu-item style="float: right">
+            <li class="ant-menu-item login-button">
                 @defer { @if(authService.isLoggedIn()) {
                 <a nzGhost (click)="authService.logout()">
                     <span class="icon-text">
