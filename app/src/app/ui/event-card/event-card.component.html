@@ -3,7 +3,7 @@
     <ng-container [ngTemplateOutlet]="card"></ng-container> </nz-ribbon
 >} @else if (isHappeningNow) {
 <nz-ribbon
-    [class]="isHappeningNow ? 'gradient-border' : ''"
+    [class.gradient-border]="isHappeningNow"
     nzText="Happening Now"
     nzColor="blue"
 >
