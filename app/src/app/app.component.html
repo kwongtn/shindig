@@ -11,7 +11,11 @@
                     #rla="routerLinkActive"
                     ariaCurrentWhenActive="page"
                 >
+                    @if(header.loading) {
+                    <span nz-icon nzType="loading"></span>
+                    }@else {
                     <span nz-icon [nzType]="header.icon"></span>
+                    }
                     <span class="icon-text">
                         {{ header.title }}
                     </span>
