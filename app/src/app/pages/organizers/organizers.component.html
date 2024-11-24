@@ -1,5 +1,6 @@
 <ui-search
     searchPlaceholder="Type anything to search organizers"
+    (onInputTextChange)="filterOrganizers($event)"
 ></ui-search>
 <div
     class="add-event-button-container"

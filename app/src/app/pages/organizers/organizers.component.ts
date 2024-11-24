@@ -17,10 +17,11 @@ import {
     HostListener,
     inject,
     Inject,
+    OnInit,
     TemplateRef,
     ViewChild,
 } from "@angular/core";
-import { Firestore } from "@angular/fire/firestore";
+import { collection, Firestore, getDocs, query } from "@angular/fire/firestore";
 
 import { FormProps } from "../../form-classes";
 import { NotificationService } from "../../services/notification.service";
@@ -50,33 +51,17 @@ type DrawerReturnData = any;
     templateUrl: "./organizers.component.html",
     styleUrl: "./organizers.component.less",
 })
-export class OrganizersComponent {
+export class OrganizersComponent implements OnInit {
     private firestore = inject(Firestore);
-    organizers: IOrganizer[] = [
-        {
-            name: "CNCF KL",
-            profilePictureUri:
-                "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png",
-            subtitle:
-                "Ant Design, a design language for background applications, is refined by Ant UED Team.",
-            description:
-                "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            officialPageUrls: ["1", "2", "3"],
-            leaders: [],
-            commitees: [],
-            subscribers: [],
-        },
-    ];
-    // isLoading: boolean = true;
-    isLoading: boolean = false;
-    // organizerCollectionRef = collection(this.firestore, "events");
-    // organizerQueryRef = query(
-    //     this.eventCollectionRef,
-    //     where("endDatetime", ">=", new Date()),
-    //     orderBy("startDatetime", "asc")
-    // );
+
+    oriOrganizers: IOrganizer[] = [];
+    organizers: IOrganizer[] = [];
+
+    currInputText = "";
+
+    isLoading: boolean = true;
+    organizerCollectionRef = collection(this.firestore, "organizers");
+    organizerQueryRef = query(this.organizerCollectionRef);
 
     drawerRef: NzDrawerRef<EventFormComponent, DrawerReturnData> | undefined =
         undefined;
@@ -94,6 +79,56 @@ export class OrganizersComponent {
         private notification: NotificationService,
         @Inject(DOCUMENT) private document: Document
     ) {}
+
+    filterOrganizers(inputText: string) {
+        if (inputText === "") {
+            this.organizers = [...this.oriOrganizers];
+            return;
+        }
+
+        const caseInsensitiveLowerCase = inputText.toLowerCase();
+        this.organizers = this.oriOrganizers.filter((data) => {
+            return (
+                data.name.toLowerCase().indexOf(caseInsensitiveLowerCase) >
+                    -1 ||
+                (data.subtitle
+                    ?.toLowerCase()
+                    .indexOf(caseInsensitiveLowerCase) ?? -1) > -1
+            );
+        });
+
+        this.currInputText = inputText;
+    }
+
+    runQuery() {
+        this.isLoading = true;
+        getDocs(this.organizerQueryRef)
+            .then((data) => {
+                const currArray: IOrganizer[] = [];
+                data.forEach((elem) => {
+                    currArray.push({
+                        ...(elem.data() as IOrganizer),
+                        id: elem.id,
+                    });
+                });
+
+                this.oriOrganizers = currArray;
+                if (this.currInputText) {
+                    this.filterOrganizers(this.currInputText);
+                } else {
+                    this.organizers = [...this.oriOrganizers];
+                }
+                this.isLoading = false;
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    }
+
+    ngOnInit(): void {
+        this.resize();
+        this.runQuery();
+    }
 
     openDrawer() {
         this.drawerRef = this.drawerService.create<
