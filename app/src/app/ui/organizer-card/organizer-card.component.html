@@ -4,6 +4,7 @@
     [nzHoverable]="true"
 >
     <nz-card-meta
+        (click)="onCardClick()"
         [nzTitle]="organizer.name"
         [nzDescription]="organizer.subtitle ?? null"
         [nzAvatar]="avatarTemplate"
@@ -18,7 +19,7 @@
     </nz-avatar-group> -->
 </ng-template>
 <ng-template #coverTemplate>
-    <span class="banner-image-container">
+    <span class="banner-image-container" (click)="onCardClick()">
         <img
             class="banner-image"
             [alt]="

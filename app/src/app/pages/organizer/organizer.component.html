@@ -1,0 +1,48 @@
+@if(organizerPanelLoading){
+<nz-space nzSize="middle">
+    <nz-skeleton-element
+        *nzSpaceItem
+        nzType="input"
+        [nzActive]="true"
+        nzSize="large"
+    ></nz-skeleton-element>
+</nz-space>
+}@else {
+<nz-card [nzTitle]="organizerHeader" class="header-card">
+    {{ organizer.description }}
+</nz-card>
+
+<ng-template #organizerHeader>
+    <h1>{{ organizer.name }}</h1>
+</ng-template>
+}
+
+<nz-spin
+    [nzSpinning]="isLoading"
+    nzTip="Loading..."
+    [class.loading-spinner]="isLoading"
+>
+    <div
+        class="list-container"
+        nz-row
+        [nzGutter]="[
+            { xs: 8, sm: 16, md: 24, lg: 32 },
+            { xs: 8, sm: 16, md: 24, lg: 32 }
+        ]"
+    >
+        @for(event of events; track event) {
+        <div
+            nz-col
+            class="gutter-row"
+            [nzXs]="24"
+            [nzSm]="12"
+            [nzMd]="8"
+            [nzLg]="6"
+        >
+            <ui-event-card class="inner-box" [event]="event"></ui-event-card>
+        </div>
+        }@empty { @if(!isLoading) {
+        <nz-empty nzNotFoundImage="simple" class="no-data-image"></nz-empty>
+        } }
+    </div>
+</nz-spin>

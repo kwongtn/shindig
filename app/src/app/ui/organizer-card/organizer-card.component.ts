@@ -8,6 +8,7 @@ import { Subscription } from "rxjs";
 
 import { CommonModule } from "@angular/common";
 import { Component, Input, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 
 import { ExtractDomainPipe } from "../../pipes/extract-domain.pipe";
 import { AuthService } from "../../services/auth.service";
@@ -34,7 +35,11 @@ export class OrganizerCardComponent implements OnInit {
 
     authStateSubsription!: Subscription;
 
-    constructor(public auth: AuthService) {}
+    constructor(
+        public auth: AuthService,
+        private router: Router,
+        private route: ActivatedRoute
+    ) {}
 
     canEdit: boolean = false;
     ngOnInit() {
@@ -48,4 +53,14 @@ export class OrganizerCardComponent implements OnInit {
     }
 
     openDrawer() {}
+
+    onCardClick() {
+        this.router.navigate([this.organizer.id], {
+            relativeTo: this.route,
+            state: {
+                // We pass the organizer here to reduce the need to re-query
+                organizer: this.organizer,
+            },
+        });
+    }
 }

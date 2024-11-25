@@ -27,6 +27,14 @@ export const routes: Routes = [
         },
     },
     {
+        path: "organizers/:organizerId",
+        loadComponent: async () => {
+            return import("./pages/organizer/organizer.component").then((c) => {
+                return c.OrganizerComponent;
+            });
+        },
+    },
+    {
         path: "welcome",
         loadChildren: () =>
             import("./pages/welcome/welcome.routes").then(
