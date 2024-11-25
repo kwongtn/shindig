@@ -23,6 +23,7 @@ export interface IUser {
 }
 
 export interface IOrganizer {
+    id: string;
     name: string;
     subtitle?: string;
     profilePictureUri?: string;

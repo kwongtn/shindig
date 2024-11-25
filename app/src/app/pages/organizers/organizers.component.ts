@@ -10,6 +10,7 @@ import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzListModule } from "ng-zorro-antd/list";
 import { NzSpinModule } from "ng-zorro-antd/spin";
+import { Subscription } from "rxjs";
 
 import { DOCUMENT } from "@angular/common";
 import {
@@ -17,13 +18,24 @@ import {
     HostListener,
     inject,
     Inject,
+    OnDestroy,
     OnInit,
     TemplateRef,
     ViewChild,
 } from "@angular/core";
-import { collection, Firestore, getDocs, query } from "@angular/fire/firestore";
+import {
+    and,
+    collection,
+    Firestore,
+    getDocs,
+    orderBy,
+    query,
+    QueryFilterConstraint,
+    where,
+} from "@angular/fire/firestore";
 
 import { FormProps } from "../../form-classes";
+import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
 import { IOrganizer } from "../../types";
 import { EventFormComponent } from "../../ui/event-form/event-form.component";
@@ -51,17 +63,17 @@ type DrawerReturnData = any;
     templateUrl: "./organizers.component.html",
     styleUrl: "./organizers.component.less",
 })
-export class OrganizersComponent implements OnInit {
+export class OrganizersComponent implements OnInit, OnDestroy {
     private firestore = inject(Firestore);
 
     oriOrganizers: IOrganizer[] = [];
     organizers: IOrganizer[] = [];
 
     currInputText = "";
+    authStateSubscription!: Subscription;
 
     isLoading: boolean = true;
     organizerCollectionRef = collection(this.firestore, "organizers");
-    organizerQueryRef = query(this.organizerCollectionRef);
 
     drawerRef: NzDrawerRef<EventFormComponent, DrawerReturnData> | undefined =
         undefined;
@@ -77,6 +89,7 @@ export class OrganizersComponent implements OnInit {
     constructor(
         private drawerService: NzDrawerService,
         private notification: NotificationService,
+        public auth: AuthService,
         @Inject(DOCUMENT) private document: Document
     ) {}
 
@@ -102,7 +115,19 @@ export class OrganizersComponent implements OnInit {
 
     runQuery() {
         this.isLoading = true;
-        getDocs(this.organizerQueryRef)
+        const queryList: QueryFilterConstraint[] = [];
+
+        if (!this.auth.isAdmin()) {
+            queryList.push(where("isApproved", "==", true));
+        }
+
+        const queryRef = query(
+            this.organizerCollectionRef,
+            and(...queryList),
+            orderBy("name", "asc")
+        );
+
+        getDocs(queryRef)
             .then((data) => {
                 const currArray: IOrganizer[] = [];
                 data.forEach((elem) => {
@@ -127,7 +152,13 @@ export class OrganizersComponent implements OnInit {
 
     ngOnInit(): void {
         this.resize();
-        this.runQuery();
+        this.authStateSubscription = this.auth.authState$.subscribe(() => {
+            this.runQuery();
+        });
+    }
+    
+    ngOnDestroy(): void {
+        this.authStateSubscription?.unsubscribe();
     }
 
     openDrawer() {
@@ -169,6 +200,11 @@ export class OrganizersComponent implements OnInit {
                         fieldType: "markdown",
                         required: true,
                         helpText: "You can use markdown here 😎",
+                    }),
+                    new FormProps("Is Approved", "isApproved", {
+                        fieldType: "checkbox",
+                        display: this.auth.isAdmin(),
+                        default: false,
                     }),
                 ],
                 submissionModifier: (data: any) => {

@@ -18,16 +18,31 @@
     </nz-avatar-group> -->
 </ng-template>
 <ng-template #coverTemplate>
-    <img
-        class="banner-image"
-        [alt]="
-            (organizer.bannerUri ? organizer.name : 'Default') + ' Event Banner'
-        "
-        [src]="
-            organizer.bannerUri ??
-            'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png'
-        "
-    />
+    <span class="banner-image-container">
+        <img
+            class="banner-image"
+            [alt]="
+                (organizer.bannerUri ? organizer.name : 'Default') +
+                ' Event Banner'
+            "
+            [src]="
+                organizer.bannerUri ??
+                'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png'
+            "
+        />
+        @if(canEdit){
+        <button
+            nz-button
+            nzType="primary"
+            nzSize="large"
+            nzShape="circle"
+            (click)="openDrawer()"
+            class="edit-icon"
+        >
+            <span nz-icon nzType="edit"> </span>
+        </button>
+        }
+    </span>
 </ng-template>
 <ng-template #actionSetting>
     <a nz-dropdown [nzDropdownMenu]="menu" nz-tooltip nzTooltipTitle="Socials">
