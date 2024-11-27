@@ -43,9 +43,9 @@ export class EventQueries {
     isLoading: boolean = true;
     displaySegmentOptions = { ...segmentOptions };
     segmentSelection: number = 1;
-    showUnapprovedOnly = false;
 
     currInputText = "";
+    showUnapprovedOnly = false;
 
     eventCollectionRef = collection(this.firestore, "events");
 
