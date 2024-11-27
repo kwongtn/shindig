@@ -25,25 +25,14 @@ import {
     TemplateRef,
     ViewChild,
 } from "@angular/core";
-import {
-    and,
-    collection,
-    doc,
-    Firestore,
-    getDocs,
-    or,
-    orderBy,
-    query,
-    QueryFilterConstraint,
-    where,
-} from "@angular/fire/firestore";
+import { doc } from "@angular/fire/firestore";
 import { FormGroup, FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 
+import { EventQueries } from "../../common/event-queries";
 import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
-import { IEvent } from "../../types";
 import { EventCardComponent } from "../../ui/event-card/event-card.component";
 import { EventFormComponent } from "../../ui/event-form/event-form.component";
 import { SearchComponent } from "../../ui/search/search.component";
@@ -85,18 +74,9 @@ const segmentOptions: NzSegmentedOption[] = [
     templateUrl: "./events.component.html",
     styleUrl: "./events.component.less",
 })
-export class EventsComponent implements OnInit, OnDestroy {
-    private firestore = inject(Firestore);
+export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
     private document = inject(DOCUMENT);
 
-    events: IEvent[] = [];
-    oriEvents: IEvent[] = [];
-
-    currInputText = "";
-    showUnapprovedOnly = false;
-
-    isLoading: boolean = true;
-    eventCollectionRef = collection(this.firestore, "events");
     isSmallScreen: boolean = false;
 
     authStateSubscription!: Subscription;
@@ -123,81 +103,10 @@ export class EventsComponent implements OnInit, OnDestroy {
     constructor(
         private drawerService: NzDrawerService,
         private notification: NotificationService,
-        public auth: AuthService,
-        private router: Router
-    ) {}
-
-    runQuery() {
-        this.isLoading = true;
-
-        const showFuture =
-            segmentOptions[this.segmentSelection].value === "upcoming";
-        const queryList: QueryFilterConstraint[] = [
-            where("endDatetime", showFuture ? ">=" : "<=", new Date()),
-        ];
-
-        if (!this.auth.isLoggedIn()) {
-            queryList.push(where("isApproved", "==", true));
-        } else {
-            if (!this.auth.isAdmin()) {
-                /**
-                 * If show all:
-                 * isApproved = true +
-                 * isApproved = false , author = me
-                 *
-                 * If show unapproved only:
-                 * isApproved = false , author = me
-                 */
-                const orClause = [];
-
-                if (!this.showUnapprovedOnly) {
-                    orClause.push(where("isApproved", "==", true));
-                }
-                orClause.push(
-                    and(
-                        where("isApproved", "==", false),
-                        where(
-                            "authorId",
-                            "==",
-                            doc(
-                                this.firestore,
-                                "users",
-                                `${this.auth.userData.value?.uid}`
-                            )
-                        )
-                    )
-                );
-
-                queryList.push(or(...orClause));
-            } else {
-                if (this.showUnapprovedOnly) {
-                    queryList.push(where("isApproved", "==", false));
-                }
-            }
-        }
-
-        const queryRef = query(
-            this.eventCollectionRef,
-            and(...queryList),
-            orderBy("startDatetime", showFuture ? "asc" : "desc")
-        );
-        getDocs(queryRef)
-            .then((data) => {
-                const currArray: IEvent[] = [];
-                data.forEach((elem) => {
-                    currArray.push({ ...(elem.data() as IEvent), id: elem.id });
-                });
-                this.oriEvents = currArray;
-                if (this.currInputText) {
-                    this.filterEvents(this.currInputText);
-                } else {
-                    this.events = [...this.oriEvents];
-                }
-                this.isLoading = false;
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+        public override auth: AuthService,
+        public override router: Router
+    ) {
+        super(auth, router);
     }
 
     @Input()
@@ -225,52 +134,6 @@ export class EventsComponent implements OnInit, OnDestroy {
     onShowUnapprovedChange(showUnapprovedOnly: boolean) {
         this.showUnapprovedOnly = showUnapprovedOnly;
         this.runQuery();
-    }
-
-    displaySegmentOptions = { ...segmentOptions };
-    segmentSelection: number = 1;
-    onSegmentChange(index: number) {
-        if (index < 0) {
-            return;
-        }
-
-        this.router
-            .navigate(["events", segmentOptions[index].value, 1], {
-                queryParamsHandling: "preserve",
-            })
-            .then(() => {
-                this.segmentSelection = index;
-                this.runQuery();
-            });
-    }
-
-    filterEvents(inputText: string) {
-        if (inputText === "") {
-            this.events = [...this.oriEvents];
-            return;
-        }
-
-        const caseInsensitiveLowerCase = inputText.toLowerCase();
-        this.events = this.oriEvents.filter((data) => {
-            // console.log(
-            //     caseInsensitiveLowerCase,
-            //     data.title,
-            //     data.title.toLowerCase().indexOf(caseInsensitiveLowerCase),
-            //     data.subtitle,
-            //     data.subtitle
-            //         ?.toLowerCase()
-            //         .indexOf(caseInsensitiveLowerCase) ?? false
-            // );
-            return (
-                data.title.toLowerCase().indexOf(caseInsensitiveLowerCase) >
-                    -1 ||
-                (data.subtitle
-                    ?.toLowerCase()
-                    .indexOf(caseInsensitiveLowerCase) ?? -1) > -1
-            );
-        });
-
-        this.currInputText = inputText;
     }
 
     openDrawer() {
