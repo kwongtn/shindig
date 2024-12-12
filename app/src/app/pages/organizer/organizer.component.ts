@@ -5,6 +5,7 @@ import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzSkeletonModule } from "ng-zorro-antd/skeleton";
 import { NzSpaceModule } from "ng-zorro-antd/space";
 import { NzSpinModule } from "ng-zorro-antd/spin";
+import { MarkdownService } from "ngx-markdown";
 import { firstValueFrom } from "rxjs";
 
 import { DOCUMENT } from "@angular/common";
@@ -40,7 +41,10 @@ export class OrganizerComponent extends EventQueries implements OnInit {
     organizerPanelLoading = true;
     organizerCollectionRef = collection(this.firestore, "organizers");
 
+    renderedHtml: string = "";
+
     constructor(
+        private markdownService: MarkdownService,
         public override auth: AuthService,
         private route: ActivatedRoute,
         public override router: Router
@@ -58,9 +62,15 @@ export class OrganizerComponent extends EventQueries implements OnInit {
         }
     }
 
-    ngOnInit(): void {
+    async renderOrganizerDetailsHtml() {
+        this.renderedHtml = await this.markdownService.parse(
+            this.organizer.description
+        );
+    }
+
+    async ngOnInit() {
         firstValueFrom(this.route.paramMap)
-            .then((params) => {
+            .then(async (params) => {
                 const organizerId = params.get("organizerId");
                 if (organizerId) {
                     this.baseQueryFilter = [
@@ -78,7 +88,7 @@ export class OrganizerComponent extends EventQueries implements OnInit {
 
                 if (!this.organizer) {
                     getDoc(doc(this.firestore, "organizers", organizerId)).then(
-                        (val) => {
+                        async (val) => {
                             const data = val.data();
                             if (!data) {
                                 throw new Error(
@@ -87,10 +97,14 @@ export class OrganizerComponent extends EventQueries implements OnInit {
                             }
 
                             this.organizer = { ...(data as IOrganizer) };
+                            await this.renderOrganizerDetailsHtml();
+
                             this.organizerPanelLoading = false;
                         }
                     );
                     collection(this.firestore, "organizers");
+                } else {
+                    await this.renderOrganizerDetailsHtml();
                 }
 
                 // Run event selection query

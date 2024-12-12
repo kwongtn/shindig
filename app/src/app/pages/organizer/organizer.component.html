@@ -9,7 +9,7 @@
 </nz-space>
 }@else {
 <nz-card [nzTitle]="organizerHeader" class="header-card">
-    {{ organizer.description }}
+    <div [innerHTML]="renderedHtml"></div>
 </nz-card>
 
 <ng-template #organizerHeader>
