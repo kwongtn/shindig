@@ -29,7 +29,7 @@ import { doc } from "@angular/fire/firestore";
 import { FormGroup, FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 
-import { EventQueries } from "../../common/event-queries";
+import { EventQueries, segmentOptions } from "../../common/event-queries";
 import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
@@ -38,19 +38,6 @@ import { EventFormComponent } from "../../ui/event-form/event-form.component";
 import { SearchComponent } from "../../ui/search/search.component";
 
 type DrawerReturnData = any;
-
-const segmentOptions: NzSegmentedOption[] = [
-    {
-        label: "Past Events",
-        value: "past",
-        icon: "history",
-    },
-    {
-        label: "Upcoming Events",
-        value: "upcoming",
-        icon: "calendar",
-    },
-];
 
 @Component({
     selector: "app-events",

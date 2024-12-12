@@ -18,7 +18,7 @@ import { Router } from "@angular/router";
 import { AuthService } from "../services/auth.service";
 import { IEvent } from "../types";
 
-const segmentOptions: NzSegmentedOption[] = [
+export const segmentOptions: NzSegmentedOption[] = [
     {
         label: "Past Events",
         value: "past",
