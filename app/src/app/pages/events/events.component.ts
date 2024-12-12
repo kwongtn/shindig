@@ -27,7 +27,7 @@ import {
 } from "@angular/core";
 import { doc } from "@angular/fire/firestore";
 import { FormGroup, FormsModule } from "@angular/forms";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 
 import { EventQueries, segmentOptions } from "../../common/event-queries";
 import { FormProps } from "../../form-classes";
@@ -72,6 +72,8 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
         undefined;
     @ViewChild("drawerFooter") drawerFooter!: TemplateRef<any>;
 
+    override baseUrlArr: string[] = ["events"];
+
     width: string = "700px";
     @HostListener("window:resize")
     resize(): void {
@@ -91,7 +93,8 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
         private drawerService: NzDrawerService,
         private notification: NotificationService,
         public override auth: AuthService,
-        public override router: Router
+        public override router: Router,
+        public route: ActivatedRoute
     ) {
         super(auth, router);
     }
@@ -107,7 +110,7 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
     @Input()
     set page(page: number) {}
 
-    ngOnInit(): void {
+    async ngOnInit() {
         this.resize();
         this.authStateSubscription = this.auth.authState$.subscribe(() => {
             this.runQuery();

@@ -48,6 +48,7 @@ export class EventQueries {
     showUnapprovedOnly = false;
 
     eventCollectionRef = collection(this.firestore, "events");
+    baseUrlArr: string[] = [];
 
     constructor(public auth: AuthService, public router: Router) {}
 
@@ -131,7 +132,7 @@ export class EventQueries {
         }
 
         this.router
-            .navigate(["events", segmentOptions[index].value, 1], {
+            .navigate([...this.baseUrlArr, segmentOptions[index].value, 1], {
                 queryParamsHandling: "preserve",
             })
             .then(() => {

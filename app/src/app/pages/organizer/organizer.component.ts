@@ -47,6 +47,9 @@ export class OrganizerComponent extends EventQueries implements OnInit {
     organizerPanelLoading = true;
     organizerCollectionRef = collection(this.firestore, "organizers");
 
+    organizerId: string = "";
+    override baseUrlArr: string[] = [];
+
     renderedHtml: string = "";
 
     width: string = "700px";
@@ -67,7 +70,7 @@ export class OrganizerComponent extends EventQueries implements OnInit {
     constructor(
         private markdownService: MarkdownService,
         public override auth: AuthService,
-        private route: ActivatedRoute,
+        public route: ActivatedRoute,
         public override router: Router
     ) {
         super(auth, router);
@@ -84,6 +87,7 @@ export class OrganizerComponent extends EventQueries implements OnInit {
     }
 
     async renderOrganizerDetailsHtml() {
+        this.baseUrlArr = ["organizers", this.organizerId];
         this.renderedHtml = await this.markdownService.parse(
             this.organizer.description
         );
@@ -93,37 +97,41 @@ export class OrganizerComponent extends EventQueries implements OnInit {
         this.resize();
         firstValueFrom(this.route.paramMap)
             .then(async (params) => {
-                const organizerId = params.get("organizerId");
-                if (organizerId) {
+                this.organizerId = params.get("organizerId") ?? "";
+                if (this.organizerId) {
                     this.baseQueryFilter = [
                         where(
                             "organizerIds",
                             "array-contains",
-                            doc(this.firestore, "organizers", `${organizerId}`)
+                            doc(
+                                this.firestore,
+                                "organizers",
+                                `${this.organizerId}`
+                            )
                         ),
                     ];
                 } else {
                     throw new Error(
-                        `Organizer ${organizerId} not found. Navigating back to organizer page.`
+                        `Organizer ${this.organizerId} not found. Navigating back to organizer page.`
                     );
                 }
 
                 if (!this.organizer) {
-                    getDoc(doc(this.firestore, "organizers", organizerId)).then(
-                        async (val) => {
-                            const data = val.data();
-                            if (!data) {
-                                throw new Error(
-                                    `Organizer ${organizerId} not found. Navigating back to organizer page.`
-                                );
-                            }
-
-                            this.organizer = { ...(data as IOrganizer) };
-                            await this.renderOrganizerDetailsHtml();
-
-                            this.organizerPanelLoading = false;
+                    getDoc(
+                        doc(this.firestore, "organizers", this.organizerId)
+                    ).then(async (val) => {
+                        const data = val.data();
+                        if (!data) {
+                            throw new Error(
+                                `Organizer ${this.organizerId} not found. Navigating back to organizer page.`
+                            );
                         }
-                    );
+
+                        this.organizer = { ...(data as IOrganizer) };
+                        await this.renderOrganizerDetailsHtml();
+
+                        this.organizerPanelLoading = false;
+                    });
                     collection(this.firestore, "organizers");
                 } else {
                     await this.renderOrganizerDetailsHtml();

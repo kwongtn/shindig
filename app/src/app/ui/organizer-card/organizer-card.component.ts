@@ -55,7 +55,7 @@ export class OrganizerCardComponent implements OnInit {
     openDrawer() {}
 
     onCardClick() {
-        this.router.navigate([this.organizer.id], {
+        this.router.navigate([this.organizer.id, "upcoming", 1], {
             relativeTo: this.route,
             state: {
                 // We pass the organizer here to reduce the need to re-query
