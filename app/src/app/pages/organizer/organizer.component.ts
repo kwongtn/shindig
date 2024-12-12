@@ -2,6 +2,7 @@ import { NzCardModule } from "ng-zorro-antd/card";
 import { NzDrawerModule } from "ng-zorro-antd/drawer";
 import { NzEmptyModule } from "ng-zorro-antd/empty";
 import { NzGridModule } from "ng-zorro-antd/grid";
+import { NzSegmentedModule } from "ng-zorro-antd/segmented";
 import { NzSkeletonModule } from "ng-zorro-antd/skeleton";
 import { NzSpaceModule } from "ng-zorro-antd/space";
 import { NzSpinModule } from "ng-zorro-antd/spin";
@@ -9,11 +10,12 @@ import { MarkdownService } from "ngx-markdown";
 import { firstValueFrom } from "rxjs";
 
 import { DOCUMENT } from "@angular/common";
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, HostListener, inject, OnInit } from "@angular/core";
 import { collection, doc, getDoc, where } from "@angular/fire/firestore";
+import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 
-import { EventQueries } from "../../common/event-queries";
+import { EventQueries, segmentOptions } from "../../common/event-queries";
 import { AuthService } from "../../services/auth.service";
 import { IOrganizer } from "../../types";
 import { EventCardComponent } from "../../ui/event-card/event-card.component";
@@ -22,11 +24,13 @@ import { EventCardComponent } from "../../ui/event-card/event-card.component";
     selector: "app-organizer",
     standalone: true,
     imports: [
+        FormsModule,
         EventCardComponent,
         NzCardModule,
         NzDrawerModule,
         NzEmptyModule,
         NzGridModule,
+        NzSegmentedModule,
         NzSkeletonModule,
         NzSpaceModule,
         NzSpinModule,
@@ -38,10 +42,27 @@ export class OrganizerComponent extends EventQueries implements OnInit {
     protected document = inject(DOCUMENT);
     organizer!: IOrganizer;
 
+    isSmallScreen: boolean = false;
+
     organizerPanelLoading = true;
     organizerCollectionRef = collection(this.firestore, "organizers");
 
     renderedHtml: string = "";
+
+    width: string = "700px";
+    @HostListener("window:resize")
+    resize(): void {
+        const clientWidth = this.document.body.clientWidth;
+        this.width = clientWidth < 700 ? "100vw" : "700px";
+        this.isSmallScreen = clientWidth < 1240;
+
+        this.displaySegmentOptions = segmentOptions.map((elem) => {
+            return {
+                ...(elem as any),
+                label: this.isSmallScreen ? undefined : elem.label,
+            };
+        });
+    }
 
     constructor(
         private markdownService: MarkdownService,
@@ -69,6 +90,7 @@ export class OrganizerComponent extends EventQueries implements OnInit {
     }
 
     async ngOnInit() {
+        this.resize();
         firstValueFrom(this.route.paramMap)
             .then(async (params) => {
                 const organizerId = params.get("organizerId");

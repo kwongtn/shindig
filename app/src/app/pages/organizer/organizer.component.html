@@ -17,6 +17,21 @@
 </ng-template>
 }
 
+<div
+    class="add-event-button-container"
+    nz-flex
+    nzJustify="space-between"
+    nzAlign="flex-start"
+>
+    @defer {
+    <nz-segmented
+        [nzOptions]="displaySegmentOptions"
+        [ngModel]="segmentSelection"
+        (nzValueChange)="onSegmentChange($event)"
+        nzSize="large"
+    ></nz-segmented>
+    }
+</div>
 <nz-spin
     [nzSpinning]="isLoading"
     nzTip="Loading..."
