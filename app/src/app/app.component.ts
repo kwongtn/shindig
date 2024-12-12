@@ -81,7 +81,10 @@ export class AppComponent implements OnInit {
                     );
                 }),
                 tap((event) => {
-                    if (event instanceof NavigationStart) {
+                    const index = this.getMapIndex(event.url);
+                    if (index < 0) {
+                        return;
+                    } else if (event instanceof NavigationStart) {
                         this.headerMap[this.getMapIndex(event.url)].loading =
                             true;
                     } else if (
