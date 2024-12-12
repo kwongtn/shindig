@@ -52,7 +52,7 @@ export class AppComponent implements OnInit {
         {
             title: "Events",
             href: "/events",
-            icon: "calendar",
+            icon: "unordered-list",
             loading: false,
         },
     ];

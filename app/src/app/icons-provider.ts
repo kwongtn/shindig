@@ -13,6 +13,7 @@ import {
     SettingOutline,
     StarOutline,
     TeamOutline,
+    UnorderedListOutline,
     UserOutline,
 } from "@ant-design/icons-angular/icons";
 
@@ -31,5 +32,6 @@ export const icons = [
     SettingOutline,
     StarOutline,
     TeamOutline,
+    UnorderedListOutline,
     UserOutline,
 ];
