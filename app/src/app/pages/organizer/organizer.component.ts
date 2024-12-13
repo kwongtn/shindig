@@ -7,7 +7,7 @@ import { NzSkeletonModule } from "ng-zorro-antd/skeleton";
 import { NzSpaceModule } from "ng-zorro-antd/space";
 import { NzSpinModule } from "ng-zorro-antd/spin";
 import { MarkdownService } from "ngx-markdown";
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, Subscription } from "rxjs";
 
 import { DOCUMENT } from "@angular/common";
 import { Component, HostListener, inject, OnInit } from "@angular/core";
@@ -43,6 +43,7 @@ export class OrganizerComponent extends EventQueries implements OnInit {
     organizer!: IOrganizer;
 
     isSmallScreen: boolean = false;
+    authStateSubscription!: Subscription;
 
     organizerPanelLoading = true;
     organizerCollectionRef = collection(this.firestore, "organizers");
@@ -87,7 +88,6 @@ export class OrganizerComponent extends EventQueries implements OnInit {
     }
 
     async renderOrganizerDetailsHtml() {
-        this.baseUrlArr = ["organizers", this.organizerId];
         this.renderedHtml = await this.markdownService.parse(
             this.organizer.description
         );
@@ -95,9 +95,13 @@ export class OrganizerComponent extends EventQueries implements OnInit {
 
     async ngOnInit() {
         this.resize();
+        this.authStateSubscription = this.auth.authState$.subscribe(() => {
+            this.runQuery();
+        });
         firstValueFrom(this.route.paramMap)
             .then(async (params) => {
                 this.organizerId = params.get("organizerId") ?? "";
+                this.baseUrlArr = ["organizers", this.organizerId];
                 if (this.organizerId) {
                     this.baseQueryFilter = [
                         where(
@@ -132,7 +136,6 @@ export class OrganizerComponent extends EventQueries implements OnInit {
 
                         this.organizerPanelLoading = false;
                     });
-                    collection(this.firestore, "organizers");
                 } else {
                     await this.renderOrganizerDetailsHtml();
                 }
