@@ -9,7 +9,7 @@ import { NzEmptyModule } from "ng-zorro-antd/empty";
 import { NzFlexModule } from "ng-zorro-antd/flex";
 import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
-import { NzSegmentedModule, NzSegmentedOption } from "ng-zorro-antd/segmented";
+import { NzSegmentedModule } from "ng-zorro-antd/segmented";
 import { NzSpinModule } from "ng-zorro-antd/spin";
 import { NzSwitchModule } from "ng-zorro-antd/switch";
 import { Subscription } from "rxjs";
@@ -19,7 +19,6 @@ import {
     Component,
     HostListener,
     inject,
-    Input,
     OnDestroy,
     OnInit,
     TemplateRef,
@@ -99,16 +98,6 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
         super(auth, router);
     }
 
-    @Input()
-    set state(state: string) {
-        this.onSegmentChange(
-            segmentOptions.findIndex((val: NzSegmentedOption) => {
-                return val.value === state;
-            })
-        );
-    }
-    @Input()
-    set page(page: number) {}
 
     async ngOnInit() {
         this.resize();

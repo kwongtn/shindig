@@ -1,6 +1,6 @@
 import { NzSegmentedOption } from "ng-zorro-antd/segmented";
 
-import { Directive, inject } from "@angular/core";
+import { Directive, inject, Input } from "@angular/core";
 import {
     and,
     collection,
@@ -51,6 +51,17 @@ export class EventQueries {
     baseUrlArr: string[] = [];
 
     constructor(public auth: AuthService, public router: Router) {}
+
+    @Input()
+    set state(state: string) {
+        this.onSegmentChange(
+            segmentOptions.findIndex((val: NzSegmentedOption) => {
+                return val.value === state;
+            })
+        );
+    }
+    @Input()
+    set page(page: number) {}
 
     runQuery() {
         this.isLoading = true;
