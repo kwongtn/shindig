@@ -49,7 +49,7 @@ export class OrganizerComponent extends EventQueries implements OnInit {
     organizerCollectionRef = collection(this.firestore, "organizers");
 
     organizerId: string = "";
-    override baseUrlArr: string[] = [];
+    override baseUrlArr: string[] = ["organizers"];
 
     renderedHtml: string = "";
 
@@ -75,6 +75,7 @@ export class OrganizerComponent extends EventQueries implements OnInit {
         public override router: Router
     ) {
         super(auth, router);
+        this.baseUrlArr = this.router.url.split("/").slice(1, 3);
 
         let currentNavigation = this.router.getCurrentNavigation();
         if (
@@ -101,7 +102,6 @@ export class OrganizerComponent extends EventQueries implements OnInit {
         firstValueFrom(this.route.paramMap)
             .then(async (params) => {
                 this.organizerId = params.get("organizerId") ?? "";
-                this.baseUrlArr = ["organizers", this.organizerId];
                 if (this.organizerId) {
                     this.baseQueryFilter = [
                         where(
