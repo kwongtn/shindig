@@ -96,9 +96,6 @@ export class OrganizerComponent extends EventQueries implements OnInit {
 
     async ngOnInit() {
         this.resize();
-        this.authStateSubscription = this.auth.authState$.subscribe(() => {
-            this.runQuery();
-        });
         firstValueFrom(this.route.paramMap)
             .then(async (params) => {
                 this.organizerId = params.get("organizerId") ?? "";
@@ -141,7 +138,12 @@ export class OrganizerComponent extends EventQueries implements OnInit {
                 }
 
                 // Run event selection query
-                this.runQuery();
+
+                this.authStateSubscription = this.auth.authState$.subscribe(
+                    () => {
+                        this.runQuery();
+                    }
+                );
             })
             .catch((err) => {
                 this.router.navigate(["organizers"]);
