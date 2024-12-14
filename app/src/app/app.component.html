@@ -1,49 +1,52 @@
 <nz-layout>
-    <nz-header>
-        <!-- <div class="logo">Shindig</div> -->
-        <ul nz-menu nzTheme="dark" nzMode="horizontal">
-            @for(header of headerMap; track header.href) {
-            <li nz-menu-item [nzSelected]="rla.isActive">
-                <a
-                    [href]="header.href"
-                    [routerLink]="header.href"
-                    routerLinkActive
-                    #rla="routerLinkActive"
-                    ariaCurrentWhenActive="page"
-                >
-                    @if(header.loading) {
-                    <span nz-icon nzType="loading"></span>
-                    }@else {
-                    <span nz-icon [nzType]="header.icon"></span>
-                    }
-                    <span class="icon-text">
-                        {{ header.title }}
-                    </span>
-                </a>
-            </li>
-            }
-            <li class="ant-menu-item login-button">
-                @defer { @if(authService.isLoggedIn()) {
-                <a nzGhost (click)="authService.logout()">
-                    <span class="icon-text">
-                        Hi, {{ (authService.userData | async)?.displayName }}
-                    </span>
-                    <span nz-icon nzType="logout" nzTheme="outline"></span>
-                </a>
-                } @else if(authService.isLastLoggedIn){
-                <!--
+    <nz-anchor>
+        <nz-header  style="overflow: hidden">
+            <!-- <div class="logo">Shindig</div> -->
+            <ul nz-menu nzTheme="dark" nzMode="horizontal">
+                @for(header of headerMap; track header.href) {
+                <li nz-menu-item [nzSelected]="rla.isActive">
+                    <a
+                        [href]="header.href"
+                        [routerLink]="header.href"
+                        routerLinkActive
+                        #rla="routerLinkActive"
+                        ariaCurrentWhenActive="page"
+                    >
+                        @if(header.loading) {
+                        <span nz-icon nzType="loading"></span>
+                        }@else {
+                        <span nz-icon [nzType]="header.icon"></span>
+                        }
+                        <span class="icon-text">
+                            {{ header.title }}
+                        </span>
+                    </a>
+                </li>
+                }
+                <li class="ant-menu-item login-button">
+                    @defer { @if(authService.isLoggedIn()) {
+                    <a nzGhost (click)="authService.logout()">
+                        <span class="icon-text">
+                            Hi,
+                            {{ (authService.userData | async)?.displayName }}
+                        </span>
+                        <span nz-icon nzType="logout" nzTheme="outline"></span>
+                    </a>
+                    } @else if(authService.isLastLoggedIn){
+                    <!--
                     If previously logged in, display spinner while validation is being done
                   -->
-                <span nz-icon nzType="loading"></span>
-                } @else {
-                <a nzGhost (click)="authService.login()">
-                    <span class="icon-text"> Login </span>
-                    <span nz-icon nzType="login" nzTheme="outline"></span>
-                </a>
-                } }
-            </li>
-        </ul>
-    </nz-header>
+                    <span nz-icon nzType="loading"></span>
+                    } @else {
+                    <a nzGhost (click)="authService.login()">
+                        <span class="icon-text"> Login </span>
+                        <span nz-icon nzType="login" nzTheme="outline"></span>
+                    </a>
+                    } }
+                </li>
+            </ul>
+        </nz-header></nz-anchor
+    >
     <nz-content>
         <div class="inner-content">
             <router-outlet class="main-container"></router-outlet>
