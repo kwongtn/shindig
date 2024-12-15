@@ -2,12 +2,7 @@ import { Routes } from "@angular/router";
 
 export const routes: Routes = [
     { path: "", pathMatch: "full", redirectTo: "/events" },
-    { path: "events", pathMatch: "full", redirectTo: "/events/upcoming" },
-    {
-        path: "events/upcoming",
-        pathMatch: "full",
-        redirectTo: "/events/upcoming/1",
-    },
+    { path: "events", pathMatch: "full", redirectTo: "/events/upcoming/1" },
     {
         path: "events/:state/:page",
         loadComponent: async () => {
