@@ -1,6 +1,8 @@
 import { NzAlertModule } from "ng-zorro-antd/alert";
 import { NzBadgeModule } from "ng-zorro-antd/badge";
 import { NzCalendarModule } from "ng-zorro-antd/calendar";
+import { NzDrawerModule } from "ng-zorro-antd/drawer";
+import { NzEmptyModule } from "ng-zorro-antd/empty";
 import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzSpinModule } from "ng-zorro-antd/spin";
@@ -28,6 +30,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 
 import { AuthService } from "../../services/auth.service";
 import { IEvent } from "../../types";
+import { EventCardComponent } from "../../ui/event-card/event-card.component";
 import { getCurrentLocalDate } from "../../utils";
 
 @Component({
@@ -36,9 +39,12 @@ import { getCurrentLocalDate } from "../../utils";
     imports: [
         CommonModule,
         FormsModule,
+        EventCardComponent,
         NzAlertModule,
         NzBadgeModule,
         NzCalendarModule,
+        NzDrawerModule,
+        NzEmptyModule,
         NzGridModule,
         NzIconModule,
         NzSpinModule,
@@ -74,7 +80,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     constructor(
         public auth: AuthService,
         public route: ActivatedRoute,
-        public router: Router
+        public router: Router,
     ) {}
 
     async ngOnInit() {
@@ -117,6 +123,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
         getDocs(query(this.eventCollectionRef, and(...queryList)))
             .then((data) => {
+                this.events = {};
                 data.forEach((event) => {
                     const eventData = event.data() as IEvent;
                     const dateString = eventData.startDatetime

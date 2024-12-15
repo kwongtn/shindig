@@ -6,7 +6,7 @@
         { xs: 8, sm: 16, md: 24, lg: 32 }
     ]"
 >
-    <div nz-col [nzXs]="24" [nzXl]="18">
+    <div nz-col [nzXs]="24" [nzXl]="16">
         <nz-spin [nzSpinning]="showLoading">
             <nz-calendar
                 [(ngModel)]="selectedDate"
@@ -37,13 +37,49 @@
             </nz-calendar>
         </nz-spin>
     </div>
-    <div nz-col [nzXs]="24" [nzXl]="6">
+    <div nz-col [nzXs]="24" [nzXl]="8">
         @if(auth.isLoggedIn()){
         <nz-alert
             nzType="info"
             nzMessage="Only approved events will be shown."
             nzShowIcon
+            class="info-banner"
         />
         }
+        <nz-spin
+            [nzSpinning]="showLoading"
+            nzTip="Loading..."
+            [class.loading-spinner]="showLoading"
+        >
+            <div
+                class="list-container"
+                nz-row
+                [nzGutter]="[
+                    { xs: 8, sm: 16, md: 24, lg: 32 },
+                    { xs: 8, sm: 16, md: 24, lg: 32 }
+                ]"
+            >
+                @for(event of events[(selectedDate | date : 'yyyy-MM-dd') ??
+                '']; track event.id) {
+                <div
+                    nz-col
+                    class="gutter-row"
+                    [nzXs]="24"
+                    [nzMd]="12"
+                    [nzXXl]="12"
+                >
+                    <ui-event-card
+                        class="inner-box"
+                        [event]="event"
+                    ></ui-event-card>
+                </div>
+                }@empty { @if(!showLoading) {
+                <nz-empty
+                    nzNotFoundImage="simple"
+                    class="no-data-image"
+                ></nz-empty>
+                } }
+            </div>
+        </nz-spin>
     </div>
 </div>
