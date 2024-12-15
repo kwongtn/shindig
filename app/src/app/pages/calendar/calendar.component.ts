@@ -49,6 +49,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     private document = inject(DOCUMENT);
 
     selectedDate: Date = new Date();
+    prevSelectedDate: Date = new Date();
 
     eventCollectionRef = collection(this.firestore, "events");
 
@@ -123,7 +124,13 @@ export class CalendarComponent implements OnInit, OnDestroy {
                 console.error(err);
             });
     }
-    selectChange(event: any) {}
+
+    selectChange(event: Date) {
+        if (this.prevSelectedDate.getMonth() !== event.getMonth()) {
+            this.runQuery();
+        }
+        this.prevSelectedDate = event;
+    }
 
     ngOnDestroy(): void {
         this.authStateSubscription?.unsubscribe();
