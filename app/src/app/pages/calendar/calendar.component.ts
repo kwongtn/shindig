@@ -4,7 +4,7 @@ import { NzCalendarModule } from "ng-zorro-antd/calendar";
 import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzSpinModule } from "ng-zorro-antd/spin";
-import { Subscription } from "rxjs";
+import { firstValueFrom, Subscription } from "rxjs";
 
 import { CommonModule, DOCUMENT } from "@angular/common";
 import {
@@ -24,9 +24,11 @@ import {
     where,
 } from "@angular/fire/firestore";
 import { FormsModule } from "@angular/forms";
+import { ActivatedRoute, Router } from "@angular/router";
 
 import { AuthService } from "../../services/auth.service";
 import { IEvent } from "../../types";
+import { getCurrentLocalDate } from "../../utils";
 
 @Component({
     selector: "app-calendar",
@@ -54,9 +56,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
     eventCollectionRef = collection(this.firestore, "events");
 
     showLoading = false;
-    events: { [key: string]: IEvent[] } = {};
+    events: { [key: string]: IEvent[] | undefined } = {};
 
     authStateSubscription!: Subscription;
+
+    baseUrlArr: string[] = ["calendar"];
 
     width: string = "700px";
     isSmallScreen: boolean = false;
@@ -67,12 +71,21 @@ export class CalendarComponent implements OnInit, OnDestroy {
         this.isSmallScreen = clientWidth < 1240;
     }
 
-    constructor(public auth: AuthService) {}
+    constructor(
+        public auth: AuthService,
+        public route: ActivatedRoute,
+        public router: Router
+    ) {}
 
     async ngOnInit() {
         this.resize();
         this.authStateSubscription = this.auth.authState$.subscribe(() => {
             this.runQuery();
+        });
+        firstValueFrom(this.route.paramMap).then((params) => {
+            this.selectedDate = new Date(
+                params.get("date") ?? getCurrentLocalDate()
+            );
         });
     }
 
@@ -117,7 +130,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
                         this.events[dateString] = [eventData];
                     }
                 });
-                console.log(this.events);
                 this.showLoading = false;
             })
             .catch((err) => {
@@ -126,10 +138,16 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
 
     selectChange(event: Date) {
-        if (this.prevSelectedDate.getMonth() !== event.getMonth()) {
-            this.runQuery();
-        }
-        this.prevSelectedDate = event;
+        this.router
+            .navigate([...this.baseUrlArr, event.toISOString().split("T")[0]], {
+                queryParamsHandling: "preserve",
+            })
+            .then(() => {
+                if (this.prevSelectedDate.getMonth() !== event.getMonth()) {
+                    this.runQuery();
+                }
+                this.prevSelectedDate = event;
+            });
     }
 
     ngOnDestroy(): void {
