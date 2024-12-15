@@ -63,7 +63,7 @@ export function getIdealModalWidth(screenSize: number): string {
      * Lg   : ≥992px
      * Xl   : ≥1200px
      * XXl  : ≥1600px
-     * 
+     *
      * Logic table is verbosely written for ease of maintenance.
      */
     if (screenSize < 576) {
@@ -79,4 +79,12 @@ export function getIdealModalWidth(screenSize: number): string {
     } else {
         return "calc(100vw - 512px)";
     }
+}
+
+export function getCurrentLocalDate(): string {
+    return new Date(
+        new Date().valueOf() - new Date().getTimezoneOffset() * 60000
+    )
+        .toISOString()
+        .split("T")[0];
 }
