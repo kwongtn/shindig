@@ -60,7 +60,7 @@
                 ]"
             >
                 @for(event of events[(selectedDate | date : 'yyyy-MM-dd') ??
-                '']; track event.id) {
+                '']; track event) {
                 <div
                     nz-col
                     class="gutter-row"
