@@ -30,6 +30,14 @@ export const routes: Routes = [
         },
     },
     {
+        path: "calendar",
+        loadComponent: async () => {
+            return import("./pages/calendar/calendar.component").then((c) => {
+                return c.CalendarComponent;
+            });
+        },
+    },
+    {
         path: "welcome",
         loadChildren: () =>
             import("./pages/welcome/welcome.routes").then(

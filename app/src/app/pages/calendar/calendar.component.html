@@ -1,0 +1,49 @@
+<div
+    class="list-container"
+    nz-row
+    [nzGutter]="[
+        { xs: 8, sm: 16, md: 24, lg: 32 },
+        { xs: 8, sm: 16, md: 24, lg: 32 }
+    ]"
+>
+    <div nz-col [nzXs]="24" [nzXl]="18">
+        <nz-spin [nzSpinning]="showLoading">
+            <nz-calendar
+                [(ngModel)]="selectedDate"
+                (nzSelectChange)="selectChange($event)"
+            >
+                <ul *nzDateCell="let date" class="events">
+                    @switch (date | date: "yyyy-MM-dd") { @case (date | date:
+                    "yyyy-MM-dd") {
+                    <li>
+                        @if(isSmallScreen){
+                        <nz-badge
+                            class="count-badge"
+                            nzStandalone
+                            [nzCount]="
+                                events[(date | date : 'yyyy-MM-dd') ?? '']
+                                    ?.length
+                            "
+                        />
+                        }@else { @for ( item of events[ (date | date:
+                        "yyyy-MM-dd") ?? "" ] ; track item ) {
+                        <nz-badge
+                            [nzStatus]="'default'"
+                            [nzText]="item.title"
+                        />} }
+                    </li>
+                    } }
+                </ul>
+            </nz-calendar>
+        </nz-spin>
+    </div>
+    <div nz-col [nzXs]="24" [nzXl]="6">
+        @if(auth.isLoggedIn()){
+        <nz-alert
+            nzType="info"
+            nzMessage="Only approved events will be shown."
+            nzShowIcon
+        />
+        }
+    </div>
+</div>
