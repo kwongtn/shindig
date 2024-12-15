@@ -1,7 +1,5 @@
 import { Routes } from "@angular/router";
 
-import { getCurrentLocalDate } from "./utils";
-
 export const routes: Routes = [
     { path: "", pathMatch: "full", redirectTo: "/events" },
     { path: "events", pathMatch: "full", redirectTo: "/events/upcoming/1" },
@@ -33,8 +31,11 @@ export const routes: Routes = [
     },
     {
         path: "calendar",
-        pathMatch: "full",
-        redirectTo: `/calendar/${getCurrentLocalDate()}`,
+        loadComponent: async () => {
+            return import("./pages/calendar/calendar.component").then((c) => {
+                return c.CalendarComponent;
+            });
+        },
     },
     {
         path: "calendar/:date",
