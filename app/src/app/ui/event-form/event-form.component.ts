@@ -26,6 +26,9 @@ import {
 import { environment } from "../../../environments/environment";
 import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
+import {
+    ExtractWebpageBarComponent,
+} from "../extract-webpage-bar/extract-webpage-bar.component";
 
 @Component({
     selector: "ui-event-form",
@@ -39,6 +42,7 @@ import { AuthService } from "../../services/auth.service";
         NzSelectModule,
         ReactiveFormsModule,
         NzCodeEditorModule,
+        ExtractWebpageBarComponent,
     ],
     templateUrl: "./event-form.component.html",
     styleUrl: "./event-form.component.less",
@@ -62,6 +66,7 @@ export class EventFormComponent implements OnInit {
     submissionForm: FormGroup<any>;
 
     formProps: FormProps[];
+    showExtractWebpageBar: boolean = false;
 
     constructor(
         private fb: UntypedFormBuilder,
@@ -75,6 +80,8 @@ export class EventFormComponent implements OnInit {
             this.drawerData["onInputChange"] ?? this.onInputChange;
         this.submissionModifier =
             this.drawerData["submissionModifier"] ?? this.submissionModifier;
+        this.showExtractWebpageBar =
+            this.drawerData["showExtractWebpageBar"] ?? false;
 
         this.submissionForm = this.fb.group(
             Object.fromEntries(

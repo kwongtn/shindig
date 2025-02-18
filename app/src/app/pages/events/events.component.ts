@@ -128,6 +128,7 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
             nzContent: EventFormComponent,
             nzData: {
                 targetCollection: "events",
+                showExtractWebpageBar: true,
                 formProps: [
                     new FormProps("Title", "title", {
                         required: true,
