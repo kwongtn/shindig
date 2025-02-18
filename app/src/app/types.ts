@@ -72,6 +72,7 @@ export interface EventExtractedDataType {
     description: string;
     startTime: Date;
     endTime: Date;
+    bannerUri?: string;
 
     links: string[];
 }

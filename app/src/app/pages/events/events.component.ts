@@ -233,6 +233,7 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
                             startDatetime: new Date(data.startTime),
                             endDatetime: new Date(data.endTime),
                             eventLinks: (data.links ?? []).join("\n"),
+                            bannerUri: data.bannerUri,
                         },
                         { emitEvent: false }
                     );
