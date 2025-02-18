@@ -9,6 +9,9 @@ import { onRequest } from "firebase-functions/v2/https";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+import { luma, meetup } from "./customScrapers/events";
+import { extractDomain } from "./utils";
+
 const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
 
 initializeApp();
@@ -81,63 +84,97 @@ export const scrapeWebpage = onRequest(
             return;
         }
 
+        const domain = extractDomain(url);
+        let responseData: Object = {};
+
         try {
             const response = await axios.get(url);
             const html = response.data;
 
-            const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
-            const model = genAI.getGenerativeModel({
-                model: MODEL_NAME,
-                generationConfig: {
-                    responseMimeType: "application/json",
-                },
-            });
-
-            let prompt: string;
-            switch (scrapeType) {
-                case "events":
-                    prompt = `Extract content such that we know what the event is about. Do not change any words. Convert relevant content into markdown for display in webpages.
-                    Use the following format:
-                    {
+            let prompt: string = "";
+            if (scrapeType === "events") {
+                let format: string = `{
                         "title": string,
                         "startTime": Date,
                         "endTime": Date,
                         "description": string,
+                        "bannerUri": string,
+                    }`;
+
+                try {
+                    let res = { data: {}, promptOutputFormat: "" };
+                    if (domain === "lu.ma") {
+                        res = luma(html);
+
+                        responseData = res.data;
+                        format = res.promptOutputFormat;
+                    } else if (domain === "meetup.com") {
+                        res = meetup(html);
+
+                        responseData = res.data;
+                        format = res.promptOutputFormat;
                     }
+                } catch (error) {
+                    console.error(`Error scraping ${domain}: ${error}`);
+                }
+
+                if (format) {
+                    prompt = `Extract content such that we know what the event is about. Do not change any words. Convert relevant content into markdown for display in webpages. Use the following format:
+                        ${format}
                     `;
-                    break;
-
-                default:
-                    throw new Error(`Invalid scrape type: ${scrapeType}`);
+                }
+            } else {
+                throw new Error(`Invalid scrape type: ${scrapeType}`);
             }
 
-            const result = await model.generateContent(
-                `${prompt}\n---\n${html}`
-            );
-            if (
-                !result.response.candidates ||
-                result.response.candidates.length === 0
-            ) {
-                res.status(500).send("No candidates returned from Gemini.");
-                return;
-            }
+            // console.log(prompt);
 
-            try {
-                const text =
-                    result.response.candidates[0].content.parts[0].text;
-
-                const data = text ? JSON.parse(text)[0] : {};
-                data.links = [url];
-
-                res.status(200).json({
-                    data,
+            if (prompt) {
+                const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
+                const model = genAI.getGenerativeModel({
+                    model: MODEL_NAME,
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                    },
                 });
-            } catch (error) {
-                console.error("Response not in expected format: ", error);
-                res.status(500).send(
-                    `Response not in expected format: ${error}`
+
+                const result = await model.generateContent(
+                    `${prompt}\n---\n${html}`
                 );
+                if (
+                    !result.response.candidates ||
+                    result.response.candidates.length === 0
+                ) {
+                    res.status(500).send("No candidates returned from Gemini.");
+                    return;
+                }
+
+                let text: any = "";
+                try {
+                    text = JSON.parse(
+                        result.response.candidates[0].content.parts[0].text ??
+                            "{}"
+                    );
+
+                    if (text instanceof Array) {
+                        text = text[0];
+                    }
+
+                    responseData = {
+                        ...responseData,
+                        ...text,
+                    };
+                } catch (error) {
+                    console.error("Response not in expected format: ", error);
+                    res.status(500).send(
+                        `Response not in expected format: ${error}`
+                    );
+                }
             }
+
+            res.status(200).json({
+                data: responseData,
+            });
         } catch (error: any) {
             console.error(error);
             res.status(500).send(`Error scraping ${url}: ${error}`);
