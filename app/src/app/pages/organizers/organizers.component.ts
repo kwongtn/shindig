@@ -208,6 +208,8 @@ export class OrganizersComponent implements OnInit, OnDestroy {
                     }),
                 ],
                 submissionModifier: (data: any) => {
+                    data.createdAt = new Date();
+                    data.updatedAt = new Date();
                     data.officialPageUrls = (
                         data.officialPageUrls as string
                     ).split("\n");
