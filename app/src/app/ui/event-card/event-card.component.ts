@@ -26,10 +26,11 @@ import { ActivatedRoute, Router } from "@angular/router";
 
 import { environment } from "../../../environments/environment";
 import { FormProps } from "../../form-classes";
+import { DateRangeHumanizerPipe } from "../../pipes/date-range-humanizer.pipe";
 import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
 import { IEvent } from "../../types";
-import { dateRangeHumanizer, getIdealModalWidth } from "../../utils";
+import { getIdealModalWidth } from "../../utils";
 import {
     EventDetailsComponent,
 } from "../event-details/event-details.component";
@@ -41,6 +42,7 @@ type DrawerReturnData = any;
     standalone: true,
     imports: [
         CommonModule,
+        DateRangeHumanizerPipe,
         NgTemplateOutlet,
         NzAvatarModule,
         NzModalModule,
@@ -117,11 +119,6 @@ export class EventCardComponent implements OnInit, OnDestroy {
         this.timeout = setInterval(() => {
             this.setHappeningNow();
         }, 30e3);
-
-        this.dateRange = dateRangeHumanizer(
-            this.event.startDatetime,
-            this.event.endDatetime
-        );
     }
 
     setHappeningNow() {
