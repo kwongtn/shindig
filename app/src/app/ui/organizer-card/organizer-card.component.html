@@ -37,7 +37,7 @@
             nzType="primary"
             nzSize="large"
             nzShape="circle"
-            (click)="openDrawer()"
+            (click)="openDrawer(); $event.stopPropagation()"
             class="edit-icon"
         >
             <span nz-icon nzType="edit"> </span>
