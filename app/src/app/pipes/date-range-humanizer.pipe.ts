@@ -38,9 +38,14 @@ export class DateRangeHumanizerPipe implements PipeTransform {
         this.datePipe = new DatePipe(this.locale);
     }
 
-    transform(dates: [Timestamp, Timestamp], ...args: unknown[]): string {
-        const startDT = new Date(dates[0].toMillis());
-        const endDT = new Date(dates[1].toMillis());
+    transform(
+        dates: [Timestamp | Date, Timestamp | Date],
+        ...args: unknown[]
+    ): string {
+        const startDT =
+            dates[0] instanceof Date ? dates[0] : new Date(dates[0].toMillis());
+        const endDT =
+            dates[1] instanceof Date ? dates[1] : new Date(dates[1].toMillis());
 
         const cStartDT = new CDate(startDT, this.datePipe);
         const cEndDT = new CDate(endDT, this.datePipe);

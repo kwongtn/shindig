@@ -32,6 +32,7 @@ import { EventQueries, segmentOptions } from "../../common/event-queries";
 import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
+import { IEvent } from "../../types";
 import { EventCardComponent } from "../../ui/event-card/event-card.component";
 import { EventFormComponent } from "../../ui/event-form/event-form.component";
 import { SearchComponent } from "../../ui/search/search.component";
@@ -97,7 +98,6 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
     ) {
         super(auth, router);
     }
-
 
     async ngOnInit() {
         this.resize();
@@ -255,5 +255,15 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
                 this.notification.error("Unknown Error", reason.message);
                 contentComponent.showLoading = false;
             });
+    }
+
+    onCardContentEdit([event, id]: [IEvent, string]) {
+        console.log(event, id);
+        const index = this.oriEvents.findIndex((elem) => elem.id === id);
+
+        if (index >= 0) {
+            this.oriEvents[index] = { ...event, id };
+            this.filterEvents(this.currInputText);
+        }
     }
 }

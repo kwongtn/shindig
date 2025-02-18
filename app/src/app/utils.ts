@@ -1,3 +1,5 @@
+import { Timestamp } from "@angular/fire/firestore";
+
 export function getIdealModalWidth(screenSize: number): string {
     /**
      * Returns modal width size according to screen size.
@@ -32,4 +34,12 @@ export function getCurrentLocalDate(): string {
     )
         .toISOString()
         .split("T")[0];
+}
+
+export function unifyTimestampDate(a: Timestamp | Date): Date {
+    if (a instanceof Timestamp) {
+        return new Date(a.toMillis());
+    } else {
+        return a;
+    }
 }

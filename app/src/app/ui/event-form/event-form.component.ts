@@ -7,6 +7,7 @@ import { NzFormModule } from "ng-zorro-antd/form";
 import { NzInputModule } from "ng-zorro-antd/input";
 import { NzSelectModule } from "ng-zorro-antd/select";
 
+import { CommonModule } from "@angular/common";
 import { Component, Inject, OnInit } from "@angular/core";
 import {
     addDoc,
@@ -25,7 +26,6 @@ import {
 import { environment } from "../../../environments/environment";
 import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
-import { CommonModule } from "@angular/common";
 
 @Component({
     selector: "ui-event-form",
@@ -132,5 +132,14 @@ export class EventFormComponent implements OnInit {
                 ...this.submissionModifier({ ...this.submissionForm.value }),
             });
         }
+    }
+
+    getFormData() {
+        return {
+            ...this.submissionModifier({
+                ...this.submissionForm.value,
+                id: this.drawerData["formData"]?.id,
+            }),
+        };
     }
 }

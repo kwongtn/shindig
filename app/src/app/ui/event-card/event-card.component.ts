@@ -12,11 +12,13 @@ import { firstValueFrom, Subscription } from "rxjs";
 import { CommonModule, DOCUMENT, NgTemplateOutlet } from "@angular/common";
 import {
     Component,
+    EventEmitter,
     HostListener,
     inject,
     Input,
     OnDestroy,
     OnInit,
+    Output,
     TemplateRef,
     ViewChild,
 } from "@angular/core";
@@ -30,7 +32,7 @@ import { DateRangeHumanizerPipe } from "../../pipes/date-range-humanizer.pipe";
 import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
 import { IEvent } from "../../types";
-import { getIdealModalWidth } from "../../utils";
+import { getIdealModalWidth, unifyTimestampDate } from "../../utils";
 import {
     EventDetailsComponent,
 } from "../event-details/event-details.component";
@@ -62,6 +64,8 @@ export class EventCardComponent implements OnInit, OnDestroy {
 
     @Input() event!: IEvent;
     dateRange: string = "";
+
+    @Output() onEdit = new EventEmitter<[IEvent, string]>();
 
     env = environment;
     authStateSubsription!: Subscription;
@@ -126,8 +130,8 @@ export class EventCardComponent implements OnInit, OnDestroy {
 
         // TODO: Add happening today display
         this.isHappeningNow =
-            this.event.startDatetime.toMillis() < now &&
-            this.event.endDatetime.toMillis() > now;
+            unifyTimestampDate(this.event.startDatetime).valueOf() <= now &&
+            unifyTimestampDate(this.event.endDatetime).valueOf() >= now;
     }
 
     ngOnDestroy(): void {
@@ -259,7 +263,7 @@ export class EventCardComponent implements OnInit, OnDestroy {
         });
 
         this.drawerRef.afterClose.subscribe((data) => {
-            console.log(data);
+            // console.log(data);
         });
     }
     close() {
@@ -282,6 +286,10 @@ export class EventCardComponent implements OnInit, OnDestroy {
                     "Event modified successfully."
                 );
                 drawerRef.close();
+                this.onEdit.emit([
+                    contentComponent.getFormData(),
+                    this.event.id,
+                ]);
             })
             .catch((reason: any) => {
                 this.notification.error("Unknown Error", reason.message);
