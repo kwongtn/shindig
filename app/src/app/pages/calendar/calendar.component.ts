@@ -80,7 +80,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     constructor(
         public auth: AuthService,
         public route: ActivatedRoute,
-        public router: Router,
+        public router: Router
     ) {}
 
     async ngOnInit() {
@@ -92,6 +92,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
             this.selectedDate = new Date(
                 params.get("date") ?? getCurrentLocalDate()
             );
+            this.prevSelectedDate = this.selectedDate;
         });
     }
 
