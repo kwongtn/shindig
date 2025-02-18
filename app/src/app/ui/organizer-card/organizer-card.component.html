@@ -37,7 +37,7 @@
             nzType="primary"
             nzSize="large"
             nzShape="circle"
-            (click)="openDrawer()"
+            (click)="openDrawer(); $event.stopPropagation()"
             class="edit-icon"
         >
             <span nz-icon nzType="edit"> </span>
@@ -73,4 +73,13 @@
     @if (organizer.isInactive) {
     <span nz-icon nzType="close-circle" nzTheme="twotone"></span>
     }
+</ng-template>
+
+<ng-template #drawerFooter>
+    <div style="float: right">
+        <button nz-button style="margin-right: 8px" (click)="close()">
+            Cancel
+        </button>
+        <button nz-button nzType="primary" (click)="submit()">Submit</button>
+    </div>
 </ng-template>

@@ -88,7 +88,11 @@
             [nzMd]="8"
             [nzLg]="6"
         >
-            <ui-event-card class="inner-box" [event]="event"></ui-event-card>
+            <ui-event-card
+                class="inner-box"
+                [event]="event"
+                (onEdit)="onCardContentEdit($event)"
+            ></ui-event-card>
         </div>
         }@empty { @if(!isLoading) {
         <nz-empty nzNotFoundImage="simple" class="no-data-image"></nz-empty>

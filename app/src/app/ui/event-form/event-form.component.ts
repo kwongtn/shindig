@@ -7,6 +7,7 @@ import { NzFormModule } from "ng-zorro-antd/form";
 import { NzInputModule } from "ng-zorro-antd/input";
 import { NzSelectModule } from "ng-zorro-antd/select";
 
+import { CommonModule } from "@angular/common";
 import { Component, Inject, OnInit } from "@angular/core";
 import {
     addDoc,
@@ -25,7 +26,9 @@ import {
 import { environment } from "../../../environments/environment";
 import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
-import { CommonModule } from "@angular/common";
+import {
+    ExtractWebpageBarComponent,
+} from "../extract-webpage-bar/extract-webpage-bar.component";
 
 @Component({
     selector: "ui-event-form",
@@ -39,11 +42,12 @@ import { CommonModule } from "@angular/common";
         NzSelectModule,
         ReactiveFormsModule,
         NzCodeEditorModule,
+        ExtractWebpageBarComponent,
     ],
     templateUrl: "./event-form.component.html",
     styleUrl: "./event-form.component.less",
 })
-export class EventFormComponent implements OnInit {
+export class EventFormComponent<ExtractedDataType = any> implements OnInit {
     codeEditorOptions: editor.IStandaloneEditorConstructionOptions =
         environment.form.codeEditorOptions;
 
@@ -59,9 +63,15 @@ export class EventFormComponent implements OnInit {
         rootForm: FormGroup<any>
     ) => any = (data) => {};
 
+    onCompleteExtract: (
+        data: ExtractedDataType,
+        rootForm: FormGroup<any>
+    ) => any = (data) => {};
+
     submissionForm: FormGroup<any>;
 
     formProps: FormProps[];
+    showExtractWebpageBar: boolean = false;
 
     constructor(
         private fb: UntypedFormBuilder,
@@ -75,6 +85,10 @@ export class EventFormComponent implements OnInit {
             this.drawerData["onInputChange"] ?? this.onInputChange;
         this.submissionModifier =
             this.drawerData["submissionModifier"] ?? this.submissionModifier;
+        this.onCompleteExtract =
+            this.drawerData["onCompleteExtract"] ?? this.onCompleteExtract;
+        this.showExtractWebpageBar =
+            this.drawerData["showExtractWebpageBar"] ?? false;
 
         this.submissionForm = this.fb.group(
             Object.fromEntries(
@@ -132,5 +146,19 @@ export class EventFormComponent implements OnInit {
                 ...this.submissionModifier({ ...this.submissionForm.value }),
             });
         }
+    }
+
+    getFormData() {
+        return {
+            ...this.submissionModifier({
+                ...this.submissionForm.value,
+                id: this.drawerData["formData"]?.id,
+            }),
+        };
+    }
+
+    onExtract(data: ExtractedDataType) {
+        console.log("Extracted data:", data);
+        this.onCompleteExtract(data, this.submissionForm);
     }
 }

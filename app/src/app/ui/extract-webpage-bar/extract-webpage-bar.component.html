@@ -1,0 +1,26 @@
+
+<nz-spin nzTip="Please wait..." [nzSpinning]="isLoading">
+    <nz-alert nzType="info" [nzMessage]="content"> </nz-alert>
+</nz-spin>
+
+<ng-template #content>
+    <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+        <input
+            type="text"
+            nz-input
+            placeholder="Input URL to extract event data using Gemini ✨"
+            [(ngModel)]="url"
+        />
+    </nz-input-group>
+    <ng-template #suffixIconButton>
+        <button
+            nz-button
+            nzType="primary"
+            nzSize="large"
+            nzSearch
+            (click)="runExtract()"
+        >
+            Extract
+        </button>
+    </ng-template>
+</ng-template>

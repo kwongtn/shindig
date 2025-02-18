@@ -55,7 +55,6 @@ export interface IEvent {
     bannerUri?: string;
     locationId: string;
 
-    
     tagIds: string[];
     isWalkInAvailable: boolean;
     isConfirmed: boolean;
@@ -66,4 +65,14 @@ export interface IEvent {
 
     createdAt: Timestamp;
     updatedAt: Timestamp;
+}
+
+export interface EventExtractedDataType {
+    title: string;
+    description: string;
+    startTime: Date;
+    endTime: Date;
+    bannerUri?: string;
+
+    links: string[];
 }

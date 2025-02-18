@@ -4,20 +4,19 @@ import { MarkdownService } from "ngx-markdown";
 import { CommonModule } from "@angular/common";
 import { Component, Inject, OnInit } from "@angular/core";
 
+import { DateRangeHumanizerPipe } from "../../pipes/date-range-humanizer.pipe";
 import { IEvent } from "../../types";
-import { dateRangeHumanizer } from "../../utils";
 
 @Component({
     selector: "app-event-details",
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, DateRangeHumanizerPipe],
     templateUrl: "./event-details.component.html",
     styleUrl: "./event-details.component.less",
 })
 export class EventDetailsComponent implements OnInit {
     renderedHtml: string = "";
     event!: IEvent;
-    dateRange: string = "";
 
     constructor(
         private markdownService: MarkdownService,
@@ -29,10 +28,6 @@ export class EventDetailsComponent implements OnInit {
         this.event = this.modalData["event"];
         this.renderedHtml = await this.markdownService.parse(
             this.event.description
-        );
-        this.dateRange = dateRangeHumanizer(
-            this.event.startDatetime,
-            this.event.endDatetime
         );
     }
 }

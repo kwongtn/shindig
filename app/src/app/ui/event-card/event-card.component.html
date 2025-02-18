@@ -68,7 +68,10 @@
     @if(event.subtitle) {
     {{ event.subtitle }} <br />
     }<i>
-        {{ dateRange }}
+        {{
+            [this.event.startDatetime, this.event.endDatetime]
+                | dateRangeHumanizer
+        }}
     </i>
 </ng-template>
 <ng-template #actionSetting>

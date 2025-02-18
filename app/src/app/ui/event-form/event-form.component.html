@@ -1,3 +1,10 @@
+@if(showExtractWebpageBar) {
+<ui-extract-webpage-bar
+    [scrapeType]="targetCollection"
+    (onExtract)="onExtract($event)"
+></ui-extract-webpage-bar>
+}
+
 <form nz-form [formGroup]="submissionForm">
     @for(prop of formProps; track prop.controlName) { @if(prop.extra.display) {
     <nz-form-item>
@@ -66,26 +73,24 @@
                     onInputChange(prop.controlName, $event, submissionForm)
                 "
             ></span>
-            } @case ("multiSelect") {
-              @if (!(prop.$isLoading | async)) {
-                <nz-select
-                    nzMode="multiple"
-                    nzPlaceHolder="Select organizer"
-                    nzShowSearch
-                    nz-input
-                    [nzLoading]="prop.$isLoading | async"
-                    [formControlName]="prop.controlName"
-                    (ngModelChange)="
-                        onInputChange(prop.controlName, $event, submissionForm)
-                    "
-                >
-                    @for (o of prop.options; track o.value) {
-                      <nz-option [nzValue]="o.value" [nzLabel]="o.label"></nz-option>
-                    }@empty { }
-                </nz-select>
+            } @case ("multiSelect") { @if (!(prop.$isLoading | async)) {
+            <nz-select
+                nzMode="multiple"
+                nzPlaceHolder="Select organizer"
+                nzShowSearch
+                nz-input
+                [nzLoading]="prop.$isLoading | async"
+                [formControlName]="prop.controlName"
+                (ngModelChange)="
+                    onInputChange(prop.controlName, $event, submissionForm)
+                "
+            >
+                @for (o of prop.options; track o.value) {
+                <nz-option [nzValue]="o.value" [nzLabel]="o.label"></nz-option>
+                }@empty { }
+            </nz-select>
 
-              }
-            }}
+            } }}
         </nz-form-control>
     </nz-form-item>
 
