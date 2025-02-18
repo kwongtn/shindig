@@ -32,7 +32,7 @@ import { EventQueries, segmentOptions } from "../../common/event-queries";
 import { FormProps } from "../../form-classes";
 import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
-import { IEvent } from "../../types";
+import { EventExtractedDataType, IEvent } from "../../types";
 import { EventCardComponent } from "../../ui/event-card/event-card.component";
 import { EventFormComponent } from "../../ui/event-form/event-form.component";
 import { SearchComponent } from "../../ui/search/search.component";
@@ -68,8 +68,12 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
 
     authStateSubscription!: Subscription;
 
-    drawerRef: NzDrawerRef<EventFormComponent, DrawerReturnData> | undefined =
-        undefined;
+    drawerRef:
+        | NzDrawerRef<
+              EventFormComponent<EventExtractedDataType>,
+              DrawerReturnData
+          >
+        | undefined = undefined;
     @ViewChild("drawerFooter") drawerFooter!: TemplateRef<any>;
 
     override baseUrlArr: string[] = ["events"];
@@ -217,6 +221,21 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
                             rootForm.patchValue({ endDatetime: data });
                         }
                     }
+                },
+                onCompleteExtract: (
+                    data: EventExtractedDataType,
+                    rootForm: FormGroup<any>
+                ) => {
+                    rootForm.patchValue(
+                        {
+                            title: data.title,
+                            description: data.description,
+                            startDatetime: new Date(data.startTime),
+                            endDatetime: new Date(data.endTime),
+                            eventLinks: (data.links ?? []).join("\n"),
+                        },
+                        { emitEvent: false }
+                    );
                 },
             },
         });

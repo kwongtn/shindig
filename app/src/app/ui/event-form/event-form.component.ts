@@ -47,7 +47,7 @@ import {
     templateUrl: "./event-form.component.html",
     styleUrl: "./event-form.component.less",
 })
-export class EventFormComponent implements OnInit {
+export class EventFormComponent<ExtractedDataType = any> implements OnInit {
     codeEditorOptions: editor.IStandaloneEditorConstructionOptions =
         environment.form.codeEditorOptions;
 
@@ -60,6 +60,11 @@ export class EventFormComponent implements OnInit {
     onInputChange: (
         controlName: string,
         data: any,
+        rootForm: FormGroup<any>
+    ) => any = (data) => {};
+
+    onCompleteExtract: (
+        data: ExtractedDataType,
         rootForm: FormGroup<any>
     ) => any = (data) => {};
 
@@ -80,6 +85,8 @@ export class EventFormComponent implements OnInit {
             this.drawerData["onInputChange"] ?? this.onInputChange;
         this.submissionModifier =
             this.drawerData["submissionModifier"] ?? this.submissionModifier;
+        this.onCompleteExtract =
+            this.drawerData["onCompleteExtract"] ?? this.onCompleteExtract;
         this.showExtractWebpageBar =
             this.drawerData["showExtractWebpageBar"] ?? false;
 
@@ -148,5 +155,10 @@ export class EventFormComponent implements OnInit {
                 id: this.drawerData["formData"]?.id,
             }),
         };
+    }
+
+    onExtract(data: ExtractedDataType) {
+        console.log("Extracted data:", data);
+        this.onCompleteExtract(data, this.submissionForm);
     }
 }

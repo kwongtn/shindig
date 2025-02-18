@@ -74,6 +74,7 @@ export const scrapeWebpage = onRequest(
     },
     async (req, res) => {
         const url = req.body.data.url as string;
+        const scrapeType = req.body.data.scrapeType as string;
 
         if (!url) {
             res.status(400).send("Please provide a URL as a query parameter.");
@@ -92,15 +93,23 @@ export const scrapeWebpage = onRequest(
                 },
             });
 
-            const prompt = `Extract content such that we know what the event is about. Do not change any words. Convert relevant content into markdown for display in webpages.
-                Use the following format:
-                {
-                    "title": string,
-                    "startTime": Date,
-                    "endTime": Date,
-                    "description": string,
-                }
-                `;
+            let prompt: string;
+            switch (scrapeType) {
+                case "events":
+                    prompt = `Extract content such that we know what the event is about. Do not change any words. Convert relevant content into markdown for display in webpages.
+                    Use the following format:
+                    {
+                        "title": string,
+                        "startTime": Date,
+                        "endTime": Date,
+                        "description": string,
+                    }
+                    `;
+                    break;
+
+                default:
+                    throw new Error(`Invalid scrape type: ${scrapeType}`);
+            }
 
             const result = await model.generateContent(
                 `${prompt}\n---\n${html}`
@@ -116,8 +125,12 @@ export const scrapeWebpage = onRequest(
             try {
                 const text =
                     result.response.candidates[0].content.parts[0].text;
+
+                const data = text ? JSON.parse(text)[0] : {};
+                data.links = [url];
+
                 res.status(200).json({
-                    data: text ? JSON.parse(text)[0] : undefined,
+                    data,
                 });
             } catch (error) {
                 console.error("Response not in expected format: ", error);

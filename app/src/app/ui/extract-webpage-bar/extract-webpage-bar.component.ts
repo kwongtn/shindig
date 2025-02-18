@@ -3,7 +3,7 @@ import { NzButtonModule } from "ng-zorro-antd/button";
 import { NzInputModule } from "ng-zorro-antd/input";
 import { NzSpinModule } from "ng-zorro-antd/spin";
 
-import { Component, EventEmitter, inject, Output } from "@angular/core";
+import { Component, EventEmitter, inject, Input, Output } from "@angular/core";
 import { Functions, httpsCallable } from "@angular/fire/functions";
 import { FormsModule } from "@angular/forms";
 
@@ -23,7 +23,8 @@ import { FormsModule } from "@angular/forms";
 export class ExtractWebpageBarComponent {
     private functions = inject(Functions);
 
-    @Output() onExtract = new EventEmitter<object>();
+    @Input() scrapeType: string = "";
+    @Output() onExtract = new EventEmitter<any>();
 
     url: string = "";
     isLoading: boolean = false;
@@ -32,10 +33,10 @@ export class ExtractWebpageBarComponent {
         this.isLoading = true;
 
         const scrapeWebpage = httpsCallable(this.functions, "scrapeWebpage");
-        scrapeWebpage({ url: this.url })
+        scrapeWebpage({ url: this.url, scrapeType: this.scrapeType })
             .then((result) => {
                 console.log(result.data);
-                this.onExtract.emit(result.data as object);
+                this.onExtract.emit(result.data as any);
             })
             .finally(() => {
                 this.isLoading = false;

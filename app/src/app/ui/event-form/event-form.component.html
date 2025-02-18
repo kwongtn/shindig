@@ -1,5 +1,8 @@
 @if(showExtractWebpageBar) {
-    <ui-extract-webpage-bar></ui-extract-webpage-bar>
+<ui-extract-webpage-bar
+    [scrapeType]="targetCollection"
+    (onExtract)="onExtract($event)"
+></ui-extract-webpage-bar>
 }
 
 <form nz-form [formGroup]="submissionForm">
