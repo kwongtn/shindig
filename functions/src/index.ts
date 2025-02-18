@@ -73,7 +73,7 @@ export const scrapeWebpage = onRequest(
         secrets: ["GEMINI_API_KEY"],
     },
     async (req, res) => {
-        const url = req.query.url as string;
+        const url = req.body.data.url as string;
 
         if (!url) {
             res.status(400).send("Please provide a URL as a query parameter.");
@@ -116,7 +116,9 @@ export const scrapeWebpage = onRequest(
             try {
                 const text =
                     result.response.candidates[0].content.parts[0].text;
-                res.status(200).json(JSON.parse(text ?? "")[0]);
+                res.status(200).json({
+                    data: text ? JSON.parse(text)[0] : undefined,
+                });
             } catch (error) {
                 console.error("Response not in expected format: ", error);
                 res.status(500).send(
