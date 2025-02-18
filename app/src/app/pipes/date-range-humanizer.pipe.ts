@@ -21,6 +21,7 @@ class CDate {
 
 @Pipe({
     name: "dateRangeHumanizer",
+    standalone: true,
 })
 export class DateRangeHumanizerPipe implements PipeTransform {
     locale!: string;
