@@ -1,4 +1,7 @@
-<nz-alert nzType="info" [nzMessage]="content"> </nz-alert>
+
+<nz-spin nzTip="Please wait..." [nzSpinning]="isLoading">
+    <nz-alert nzType="info" [nzMessage]="content"> </nz-alert>
+</nz-spin>
 
 <ng-template #content>
     <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
