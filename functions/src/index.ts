@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
+import { getAuth, UserRecord } from "firebase-admin/auth";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import * as functions from "firebase-functions";
 import { onDocumentUpdated } from "firebase-functions/v2/firestore";
@@ -17,7 +17,7 @@ interface UserFirestoreInitialData {
 
 export const createUserFirestoreEntry = functions.auth
     .user()
-    .onCreate(async (user) => {
+    .onCreate(async (user: UserRecord) => {
         const uid = user.uid;
         const userFirestoreData: UserFirestoreInitialData = {
             uid,
