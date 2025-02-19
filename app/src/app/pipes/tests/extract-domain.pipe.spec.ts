@@ -1,4 +1,4 @@
-import { ExtractDomainPipe } from "../extract-domain.pipe";
+import { ExtractDomainPipe } from "./extract-domain.pipe";
 
 describe("ExtractDomainPipe", () => {
     it("create an instance", () => {

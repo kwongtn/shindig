@@ -61,8 +61,6 @@ export class AuthService {
     ) {
         if (isPlatformBrowser(this.platformId)) {
             this.isLastLoggedIn = !!localStorage.getItem("isLastLoggedIn");
-        } else {
-            this.isLastLoggedIn = false;
         }
 
         this.authState$ = authState(this.auth);
@@ -70,18 +68,16 @@ export class AuthService {
             (user: User | null) => {
                 if (user) {
                     this.userData.next(user);
-                    if (isPlatformBrowser(this.platformId)) {
+                    isPlatformBrowser(this.platformId) ??
                         localStorage.setItem("isLastLoggedIn", "true");
-                    }
                     this.isLastLoggedIn = true;
 
                     user.getIdTokenResult().then((token) => {
                         this.customClaims.next(token.claims);
                     });
                 } else {
-                    if (isPlatformBrowser(this.platformId)) {
+                    isPlatformBrowser(this.platformId) ??
                         localStorage.removeItem("isLastLoggedIn");
-                    }
 
                     this.isLastLoggedIn = false;
                 }

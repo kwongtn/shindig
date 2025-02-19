@@ -5,8 +5,7 @@
   "compilerOptions": {
     "outDir": "./out-tsc/app",
     "types": [
-      "node",
-      "@angular/ssr"
+      "node"
     ]
   },
   "files": [
