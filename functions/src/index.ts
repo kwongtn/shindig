@@ -2,13 +2,16 @@ import axios from "axios";
 import { initializeApp } from "firebase-admin/app";
 import { getAuth, UserRecord } from "firebase-admin/auth";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
 import { defineSecret } from "firebase-functions/params";
 import { auth } from "firebase-functions/v1";
 import { onDocumentUpdated } from "firebase-functions/v2/firestore";
 import { onRequest } from "firebase-functions/v2/https";
+import ical from "ical-generator";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+import { IEvent } from "../../app/src/app/types";
 import { luma, meetup } from "./customScrapers/events";
 import { extractDomain } from "./utils";
 
@@ -182,3 +185,48 @@ export const scrapeWebpage = onRequest(
         }
     }
 );
+
+export const calendar = onDocumentUpdated("events/{eventId}", async (event) => {
+    const cal = ical({
+        prodId: {
+            company: "KwongTN",
+            product: "Shindig-IT",
+            language: "en",
+        },
+        name: "Shindig-IT Calendar",
+        timezone: "Asia/Kuala_Lumpur",
+        url: "https://shindig-it.kwongtn.xyz",
+        ttl: 60 * 60 * 24,
+    });
+
+    const events = await getFirestore()
+        .collection("events")
+        .where("isApproved", "==", true)
+        .get();
+
+    events.forEach((doc) => {
+        const eventData = doc.data() as IEvent;
+
+        cal.createEvent({
+            id: eventData.id,
+            start: eventData.startDatetime.toDate(),
+            end: eventData.endDatetime?.toDate(),
+            summary: eventData.title,
+            description: eventData.description,
+            // location: eventData.location,
+            url: eventData.eventLinks[0],
+        });
+    });
+
+    // console.log(cal.toString());
+
+    const bucket = getStorage().bucket();
+    const file = bucket.file("calendar.ics");
+
+    await file.save(cal.toString(), {
+        contentType: "text/calendar",
+        public: true,
+    });
+
+    console.log("Calendar updated successfully!");
+});
