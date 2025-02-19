@@ -74,6 +74,7 @@ const MODEL_NAME = "gemini-2.0-flash-001";
 export const scrapeWebpage = onRequest(
     {
         secrets: ["GEMINI_API_KEY"],
+        cors: true,
     },
     async (req, res) => {
         const url = req.body.data.url as string;

@@ -11,7 +11,10 @@ export function luma(html: string) {
     return {
         data: {
             title: data.name,
-            bannerUri: data.image[0] ?? "",
+            bannerUri:
+                $('meta[property="og:image"]').attr("content") ??
+                data.image[0] ??
+                "",
             startTime: data.startDate,
             endTime: data.endDate,
             links: [data["@id"]],
