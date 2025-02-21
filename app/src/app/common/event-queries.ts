@@ -116,6 +116,7 @@ export class EventQueries {
         const queryRef = query(
             this.eventCollectionRef,
             and(...queryList),
+            orderBy("isApproved", "asc"),
             orderBy("startDatetime", showFuture ? "asc" : "desc")
         );
         getDocs(queryRef)
