@@ -7,7 +7,7 @@ import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzSpinModule } from "ng-zorro-antd/spin";
 import { firstValueFrom, Subscription } from "rxjs";
-
+import { NzDropDownModule } from "ng-zorro-antd/dropdown";
 import { CommonModule, DOCUMENT } from "@angular/common";
 import {
     Component,
@@ -47,6 +47,7 @@ import { getCurrentLocalDate } from "../../utils";
         NzButtonModule,
         NzCalendarModule,
         NzDrawerModule,
+        NzDropDownModule,
         NzEmptyModule,
         NzGridModule,
         NzIconModule,
@@ -74,6 +75,25 @@ export class CalendarComponent implements OnInit, OnDestroy {
     width: string = "700px";
     isSmallScreen: boolean = false;
     showCheckmark = false;
+
+    calendarTypes = [
+        {
+            label: "Google",
+            href: "https://calendar.google.com/calendar/r/settings/addbyurl",
+        },
+        {
+            label: "Outlook",
+            href: "https://support.microsoft.com/en-us/office/import-calendars-into-outlook-8e8364e1-400e-4c0f-a573-fe76b5a2d379#ID0EDFBD",
+        },
+        {
+            label: "Apple",
+            href: "https://support.apple.com/en-us/102301",
+        },
+        {
+            label: "iCal",
+            href: environment.calendar.publicUrl,
+        },
+    ];
 
     @HostListener("window:resize")
     resize(): void {
@@ -170,8 +190,5 @@ export class CalendarComponent implements OnInit, OnDestroy {
     copyToCalendar() {
         navigator.clipboard.writeText(environment.calendar.publicUrl);
         this.showCheckmark = true;
-        setTimeout(() => {
-            this.showCheckmark = false;
-        }, 10000);
     }
 }

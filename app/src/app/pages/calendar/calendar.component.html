@@ -50,6 +50,24 @@
                 nzTwotoneColor="#52c41a"
                 class="checkmark"
             ></span>
+
+            Done! Now
+
+            <a nz-dropdown [nzDropdownMenu]="menu">
+                add to Calendar
+                <span nz-icon nzType="down"></span>
+            </a>
+            <nz-dropdown-menu #menu="nzDropdownMenu">
+                <ul nz-menu nzSelectable>
+                    @for(elem of calendarTypes; track elem.label) {
+                    <li nz-menu-item>
+                        <a [href]="elem.href" target="_blank">
+                            {{ elem.label }}
+                        </a>
+                    </li>
+                    }
+                </ul>
+            </nz-dropdown-menu>
             }
         </div>
         @if(auth.isLoggedIn()){
