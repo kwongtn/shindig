@@ -38,38 +38,7 @@
         </nz-spin>
     </div>
     <div nz-col [nzXs]="24" [nzXl]="8">
-        <div class="copy-to-clipboard-button-area">
-            <button nz-button nzType="primary" (click)="copyToCalendar()">
-                Copy Calendar URL
-            </button>
-            @if(showCheckmark){
-            <span
-                nz-icon
-                nzType="check-circle"
-                nzTheme="twotone"
-                nzTwotoneColor="#52c41a"
-                class="checkmark"
-            ></span>
-
-            Done! Now
-
-            <a nz-dropdown [nzDropdownMenu]="menu">
-                add to Calendar
-                <span nz-icon nzType="down"></span>
-            </a>
-            <nz-dropdown-menu #menu="nzDropdownMenu">
-                <ul nz-menu nzSelectable>
-                    @for(elem of calendarTypes; track elem.label) {
-                    <li nz-menu-item>
-                        <a [href]="elem.href" target="_blank">
-                            {{ elem.label }}
-                        </a>
-                    </li>
-                    }
-                </ul>
-            </nz-dropdown-menu>
-            }
-        </div>
+        <ui-copy-calendar-url-button> </ui-copy-calendar-url-button>
         @if(auth.isLoggedIn()){
         <nz-alert
             nzType="info"

@@ -34,20 +34,20 @@ import { AuthService } from "../../services/auth.service";
 import { IEvent } from "../../types";
 import { EventCardComponent } from "../../ui/event-card/event-card.component";
 import { getCurrentLocalDate } from "../../utils";
+import { CopyCalendarUrlButtonComponent } from "../../ui/copy-calendar-url-button/copy-calendar-url-button.component";
 
 @Component({
     selector: "app-calendar",
     standalone: true,
     imports: [
         CommonModule,
+        CopyCalendarUrlButtonComponent,
         EventCardComponent,
         FormsModule,
         NzAlertModule,
         NzBadgeModule,
-        NzButtonModule,
         NzCalendarModule,
         NzDrawerModule,
-        NzDropDownModule,
         NzEmptyModule,
         NzGridModule,
         NzIconModule,
@@ -74,26 +74,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     width: string = "700px";
     isSmallScreen: boolean = false;
-    showCheckmark = false;
 
-    calendarTypes = [
-        {
-            label: "Google",
-            href: "https://calendar.google.com/calendar/r/settings/addbyurl",
-        },
-        {
-            label: "Outlook",
-            href: "https://support.microsoft.com/en-us/office/import-calendars-into-outlook-8e8364e1-400e-4c0f-a573-fe76b5a2d379#ID0EDFBD",
-        },
-        {
-            label: "Apple",
-            href: "https://support.apple.com/en-us/102301",
-        },
-        {
-            label: "iCal",
-            href: environment.calendar.publicUrl,
-        },
-    ];
 
     @HostListener("window:resize")
     resize(): void {
@@ -187,8 +168,4 @@ export class CalendarComponent implements OnInit, OnDestroy {
         this.authStateSubscription?.unsubscribe();
     }
 
-    copyToCalendar() {
-        navigator.clipboard.writeText(environment.calendar.publicUrl);
-        this.showCheckmark = true;
-    }
 }
