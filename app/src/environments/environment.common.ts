@@ -21,6 +21,9 @@ export interface IEnvironment {
         dsn?: string;
         environment: string;
     };
+    calendar: {
+        publicUrl: string;
+    }
 }
 
 export const CommonEnvironment = {
@@ -45,5 +48,9 @@ export const CommonEnvironment = {
     recaptcha: {
         key: "6LdqlGYqAAAAACqPN6d6ui4Apb6Us3uGq5TDcipa",
         isEnterprise: false,
+    },
+    calendar: {
+        publicUrl:
+            "https://firebasestorage.googleapis.com/v0/b/shindig-15693.firebasestorage.app/o/calendar.ics?alt=media",
     },
 };

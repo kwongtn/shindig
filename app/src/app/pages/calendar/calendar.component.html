@@ -38,6 +38,20 @@
         </nz-spin>
     </div>
     <div nz-col [nzXs]="24" [nzXl]="8">
+        <div class="copy-to-clipboard-button-area">
+            <button nz-button nzType="primary" (click)="copyToCalendar()">
+                Copy Calendar URL
+            </button>
+            @if(showCheckmark){
+            <span
+                nz-icon
+                nzType="check-circle"
+                nzTheme="twotone"
+                nzTwotoneColor="#52c41a"
+                class="checkmark"
+            ></span>
+            }
+        </div>
         @if(auth.isLoggedIn()){
         <nz-alert
             nzType="info"

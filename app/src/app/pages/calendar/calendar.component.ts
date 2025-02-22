@@ -28,6 +28,8 @@ import {
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 
+import { NzButtonModule } from "ng-zorro-antd/button";
+import { environment } from "../../../environments/environment";
 import { AuthService } from "../../services/auth.service";
 import { IEvent } from "../../types";
 import { EventCardComponent } from "../../ui/event-card/event-card.component";
@@ -38,10 +40,11 @@ import { getCurrentLocalDate } from "../../utils";
     standalone: true,
     imports: [
         CommonModule,
-        FormsModule,
         EventCardComponent,
+        FormsModule,
         NzAlertModule,
         NzBadgeModule,
+        NzButtonModule,
         NzCalendarModule,
         NzDrawerModule,
         NzEmptyModule,
@@ -70,6 +73,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     width: string = "700px";
     isSmallScreen: boolean = false;
+    showCheckmark = false;
+
     @HostListener("window:resize")
     resize(): void {
         const clientWidth = this.document.body.clientWidth;
@@ -160,5 +165,13 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.authStateSubscription?.unsubscribe();
+    }
+
+    copyToCalendar() {
+        navigator.clipboard.writeText(environment.calendar.publicUrl);
+        this.showCheckmark = true;
+        setTimeout(() => {
+            this.showCheckmark = false;
+        }, 10000);
     }
 }
