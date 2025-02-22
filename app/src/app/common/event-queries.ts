@@ -12,6 +12,10 @@ import {
     query,
     QueryFilterConstraint,
     where,
+    limit,
+    startAfter,
+    DocumentSnapshot,
+    QuerySnapshot,
 } from "@angular/fire/firestore";
 import { Router } from "@angular/router";
 
@@ -40,7 +44,7 @@ export class EventQueries {
 
     baseQueryFilter: QueryFilterConstraint[] = [];
 
-    isLoading: boolean = true;
+    isLoading: boolean = false;
     displaySegmentOptions = { ...segmentOptions };
     segmentSelection: number = 1;
 
@@ -49,6 +53,11 @@ export class EventQueries {
 
     eventCollectionRef = collection(this.firestore, "events");
     baseUrlArr: string[] = [];
+
+    pageSize: number = 25;
+
+    lastDocumentSnapshot: DocumentSnapshot<IEvent> | null = null;
+    hasNextPage: boolean = false;
 
     constructor(public auth: AuthService, public router: Router) {}
 
@@ -60,10 +69,11 @@ export class EventQueries {
             })
         );
     }
-    @Input()
-    set page(page: number) {}
 
     runQuery() {
+        if (this.isLoading) {
+            return;
+        }
         this.isLoading = true;
 
         const showFuture =
@@ -113,19 +123,43 @@ export class EventQueries {
             }
         }
 
-        const queryRef = query(
+        let queryRef = query(
             this.eventCollectionRef,
             and(...queryList),
             orderBy("isApproved", "asc"),
             orderBy("startDatetime", showFuture ? "asc" : "desc")
         );
-        getDocs(queryRef)
-            .then((data) => {
+        if (this.lastDocumentSnapshot) {
+            queryRef = query(queryRef, startAfter(this.lastDocumentSnapshot));
+        }
+
+        getDocs(query(queryRef, limit(this.pageSize + 1)))
+            .then((data: QuerySnapshot) => {
                 const currArray: IEvent[] = [];
                 data.forEach((elem) => {
                     currArray.push({ ...(elem.data() as IEvent), id: elem.id });
                 });
-                this.oriEvents = currArray;
+
+                /**
+                 * If returned array is more than the page size,
+                 * then we have more data to fetch
+                 */
+                if (currArray.length > this.pageSize) {
+                    this.hasNextPage = true;
+
+                    this.lastDocumentSnapshot = data.docs[
+                        currArray.length - 2
+                    ] as DocumentSnapshot<IEvent>;
+
+                    this.oriEvents = [...this.oriEvents, ...currArray].slice(
+                        0,
+                        -1
+                    );
+                } else {
+                    this.hasNextPage = false;
+                    this.oriEvents = [...this.oriEvents, ...currArray];
+                }
+
                 if (this.currInputText) {
                     this.filterEvents(this.currInputText);
                 } else {
@@ -149,6 +183,9 @@ export class EventQueries {
             })
             .then(() => {
                 this.segmentSelection = index;
+                this.lastDocumentSnapshot = null;
+                this.oriEvents = [];
+                this.events = [];
                 this.runQuery();
             });
     }
