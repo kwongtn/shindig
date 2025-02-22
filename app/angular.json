@@ -50,7 +50,10 @@
             "sourceMap": true,
             "ssr": {
               "entry": "server.ts"
-            }
+            },
+            "externalDependencies": [
+              ""
+            ]
           },
           "configurations": {
             "production": {
