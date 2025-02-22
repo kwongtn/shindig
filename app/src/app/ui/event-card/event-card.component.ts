@@ -31,11 +31,9 @@ import { FormProps } from "../../form-classes";
 import { DateRangeHumanizerPipe } from "../../pipes/date-range-humanizer.pipe";
 import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
-import { IEvent } from "../../types";
+import { EventExtractedDataType, IEvent } from "../../types";
 import { getIdealModalWidth, unifyTimestampDate } from "../../utils";
-import {
-    EventDetailsComponent,
-} from "../event-details/event-details.component";
+import { EventDetailsComponent } from "../event-details/event-details.component";
 import { EventFormComponent } from "../event-form/event-form.component";
 
 type DrawerReturnData = any;
@@ -152,6 +150,7 @@ export class EventCardComponent implements OnInit, OnDestroy {
             nzContent: EventFormComponent,
             nzData: {
                 targetCollection: "events",
+                showExtractWebpageBar: true,
                 formProps: [
                     new FormProps("Event ID", "id", {
                         required: true,
@@ -254,6 +253,22 @@ export class EventCardComponent implements OnInit, OnDestroy {
                     if (!this.auth.isAdmin()) {
                         rootForm.patchValue({ isApproved: false });
                     }
+                },
+                onCompleteExtract: (
+                    data: EventExtractedDataType,
+                    rootForm: FormGroup<any>
+                ) => {
+                    rootForm.patchValue(
+                        {
+                            title: data.title,
+                            description: data.description,
+                            startDatetime: new Date(data.startTime),
+                            endDatetime: new Date(data.endTime),
+                            eventLinks: (data.links ?? []).join("\n"),
+                            bannerUri: data.bannerUri,
+                        },
+                        { emitEvent: false }
+                    );
                 },
             },
         });
