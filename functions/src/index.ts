@@ -5,14 +5,17 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { defineSecret } from "firebase-functions/params";
 import { auth } from "firebase-functions/v1";
-import { onDocumentUpdated } from "firebase-functions/v2/firestore";
 import { onRequest } from "firebase-functions/v2/https";
 import ical from "ical-generator";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
+import {
+    onDocumentCreated,
+    onDocumentUpdated,
+} from "firebase-functions/v2/firestore";
 import { IEvent } from "../../app/src/app/types";
 import { luma, meetup } from "./customScrapers/events";
+import { sendDiscordWebhook } from "./events/onCreateSendWebhook";
 import { extractDomain } from "./utils";
 
 const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
@@ -230,3 +233,10 @@ export const calendar = onDocumentUpdated("events/{eventId}", async (event) => {
 
     console.log("Calendar updated successfully!");
 });
+
+export const onEventDocumentCreated = onDocumentCreated(
+    "events/{eventId}",
+    async (event) => {
+        await sendDiscordWebhook(event);
+    }
+);
