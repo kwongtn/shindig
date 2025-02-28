@@ -54,6 +54,7 @@ export async function sendDiscordWebhook(
         }
 
         const message = {
+            username: "Shindig-IT",
             embeds: [
                 {
                     title: eventData.title,
