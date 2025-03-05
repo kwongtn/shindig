@@ -33,15 +33,14 @@ export async function sendDiscordWebhook(
         return;
     }
 
-    if (!event.data) {
+    const eventData = event.data?.data() as IEvent;
+    if (!eventData) {
         console.log("No event data!");
         return;
     }
 
-    const eventData = event.data.data() as IEvent;
-
-    if (!eventData) {
-        console.log("No event data!");
+    if (eventData.startDatetime.toDate() < new Date()) {
+        console.log("Event is in the past, not sending notification.");
         return;
     }
 
