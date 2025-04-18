@@ -75,7 +75,21 @@
     </i>
 </ng-template>
 <ng-template #actionSetting>
-    @if(event.eventLinks.length > 1) { @defer {
+    @if(event.eventLinks.length == 1) {
+    <span nz-tooltip nzTooltipTitle="Click to open event page in a new tab">
+        <a
+            [href]="
+                event.eventLinks[0].startsWith('http')
+                    ? event.eventLinks[0]
+                    : 'https://' + event.eventLinks[0]
+            "
+            rel="noopener noreferrer"
+            target="_blank"
+        >
+            <span nz-icon nzType="link"></span>
+        </a>
+    </span>
+    } @else if(event.eventLinks.length > 1) { @defer {
     <a
         nz-dropdown
         [nzDropdownMenu]="menu"
@@ -104,19 +118,11 @@
     } @placeholder {
     <span nz-icon nzType="link"></span>
     <span nz-icon nzType="plus"></span>} } @else {
-
-    <span nz-tooltip nzTooltipTitle="Click to open event page in a new tab">
-        <a
-            [href]="
-                event.eventLinks[0].startsWith('http')
-                    ? event.eventLinks[0]
-                    : 'https://' + event.eventLinks[0]
-            "
-            rel="noopener noreferrer"
-            target="_blank"
-        >
-            <span nz-icon nzType="link"></span>
-        </a>
+    <span
+        nz-tooltip
+        nzTooltipTitle="Seems like there's error with the links, please check with the author."
+    >
+        <span nz-icon nzType="exclamation-circle" nzTheme="outline"></span>
     </span>
     }
 </ng-template>
