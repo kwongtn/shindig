@@ -16,7 +16,8 @@ interface IFormPropsExtra {
         | "markdown"
         | "datetime"
         | "checkbox"
-        | "multiSelect";
+        | "multiSelect"
+        | "tagSelect";
     helpText?: string;
     tooltip?: string;
     disabled: boolean;
@@ -86,9 +87,9 @@ export class FormProps {
                     return {
                         label: val.get(extra["labelField"]),
                         value: val.ref.id,
-                    }
+                    };
                 });
-              this.$isLoading.next(false);
+                this.$isLoading.next(false);
             });
         }
     }

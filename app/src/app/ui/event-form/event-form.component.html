@@ -90,7 +90,23 @@
                 }@empty { }
             </nz-select>
 
-            } }}
+            } } @case ("tagSelect") {
+            <nz-select
+                nzMode="multiple"
+                nzPlaceHolder="Add tags"
+                nzShowSearch
+                nz-input
+                [nzLoading]="prop.$isLoading | async"
+                [formControlName]="prop.controlName"
+                (ngModelChange)="
+                    onInputChange(prop.controlName, $event, submissionForm)
+                "
+            >
+                @for (o of prop.options; track o.value) {
+                <nz-option [nzValue]="o.value" [nzLabel]="o.label"></nz-option>
+                }
+            </nz-select>
+            } }
         </nz-form-control>
     </nz-form-item>
 

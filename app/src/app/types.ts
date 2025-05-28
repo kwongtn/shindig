@@ -9,10 +9,9 @@ export interface ILocation {
 }
 
 export interface ITag {
+    id: string;
     name: string;
-    description: string;
-    fontColor: string;
-    backgroundColor: string;
+    colorClass: string;
 }
 
 export interface IUser {
@@ -55,7 +54,7 @@ export interface IEvent {
     bannerUri?: string;
     locationId: string;
 
-    tagIds: string[];
+    tagIds: ITag[];
     isWalkInAvailable: boolean;
     isConfirmed: boolean;
     isPaid: boolean;

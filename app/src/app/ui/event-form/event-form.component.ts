@@ -6,6 +6,7 @@ import { NZ_DRAWER_DATA } from "ng-zorro-antd/drawer";
 import { NzFormModule } from "ng-zorro-antd/form";
 import { NzInputModule } from "ng-zorro-antd/input";
 import { NzSelectModule } from "ng-zorro-antd/select";
+import { NzTagModule } from "ng-zorro-antd/tag";
 
 import { CommonModule } from "@angular/common";
 import { Component, Inject, OnInit } from "@angular/core";
@@ -25,10 +26,7 @@ import {
 
 import { environment } from "../../../environments/environment";
 import { FormProps } from "../../form-classes";
-import { AuthService } from "../../services/auth.service";
-import {
-    ExtractWebpageBarComponent,
-} from "../extract-webpage-bar/extract-webpage-bar.component";
+import { ExtractWebpageBarComponent } from "../extract-webpage-bar/extract-webpage-bar.component";
 
 @Component({
     selector: "ui-event-form",
@@ -40,6 +38,7 @@ import {
         NzFormModule,
         NzInputModule,
         NzSelectModule,
+        NzTagModule,
         ReactiveFormsModule,
         NzCodeEditorModule,
         ExtractWebpageBarComponent,
@@ -75,7 +74,6 @@ export class EventFormComponent<ExtractedDataType = any> implements OnInit {
 
     constructor(
         private fb: UntypedFormBuilder,
-        private auth: AuthService,
         @Inject(NZ_DRAWER_DATA) private drawerData: { [key: string]: any },
         @Inject(Firestore) private firestore: Firestore
     ) {

@@ -174,6 +174,13 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
                     // new FormProps("", "tagIds", {
                     //     default: [],
                     // }),
+                    new FormProps("Tags", "tagIds", {
+                        firestore: this.firestore,
+                        fieldType: "tagSelect",
+                        collection: "tags",
+                        labelField: "name",
+                        default: [],
+                    }),
                     new FormProps("Is Paid Event", "isPaid", {
                         fieldType: "checkbox",
                     }),
@@ -204,6 +211,11 @@ export class EventsComponent extends EventQueries implements OnInit, OnDestroy {
                     data.organizerIds = data.organizerIds
                         ? data.organizerIds.map((id: string) => {
                               return doc(this.firestore, "organizers", id);
+                          })
+                        : [];
+                    data.tagIds = data.tagIds
+                        ? data.tagIds.map((id: string) => {
+                              return doc(this.firestore, "tags", id);
                           })
                         : [];
                     data.createdAt = new Date();

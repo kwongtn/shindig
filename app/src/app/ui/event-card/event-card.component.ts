@@ -31,7 +31,8 @@ import { FormProps } from "../../form-classes";
 import { DateRangeHumanizerPipe } from "../../pipes/date-range-humanizer.pipe";
 import { AuthService } from "../../services/auth.service";
 import { NotificationService } from "../../services/notification.service";
-import { EventExtractedDataType, IEvent } from "../../types";
+import { TagService } from "../../services/tag.service";
+import { EventExtractedDataType, IEvent, ITag } from "../../types";
 import { getIdealModalWidth, unifyTimestampDate } from "../../utils";
 import { EventDetailsComponent } from "../event-details/event-details.component";
 import { EventFormComponent } from "../event-form/event-form.component";
@@ -90,13 +91,16 @@ export class EventCardComponent implements OnInit, OnDestroy {
     canEdit: boolean = false;
     showDeleteConfirmation: boolean = false;
 
+    tags: ITag[] = [];
+
     constructor(
         private drawerService: NzDrawerService,
         public auth: AuthService,
         private notification: NotificationService,
         private modal: NzModalService,
         private router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private tagService: TagService
     ) {}
     ngOnInit(): void {
         firstValueFrom(this.route.queryParamMap).then((params) => {
@@ -123,6 +127,14 @@ export class EventCardComponent implements OnInit, OnDestroy {
         this.timeout = setInterval(() => {
             this.setHappeningNow();
         }, 30e3);
+
+        if (this.event.tagIds && this.event.tagIds.length > 0) {
+            this.tagService
+                .getTagsByIds(this.event.tagIds.map((elem) => elem.id))
+                .then((tags) => {
+                    this.tags = tags;
+                });
+        }
     }
 
     setHappeningNow() {
@@ -199,9 +211,13 @@ export class EventCardComponent implements OnInit, OnDestroy {
                         default: this.event.bannerUri ?? "undefined",
                     }),
                     // new FormProps("", "locationId"),
-                    // new FormProps("", "tagIds", {
-                    //     default: [],
-                    // }),
+                    new FormProps("Tags", "tagIds", {
+                        firestore: this.firestore,
+                        fieldType: "tagSelect",
+                        collection: "tags",
+                        labelField: "name",
+                        default: [],
+                    }),
                     new FormProps("Is Paid Event", "isPaid", {
                         fieldType: "checkbox",
                     }),
@@ -220,6 +236,12 @@ export class EventCardComponent implements OnInit, OnDestroy {
                     ...this.event,
                     organizerIds: this.event.organizerIds
                         ? this.event.organizerIds.map((doc) => {
+                              console.log(doc);
+                              return doc.id;
+                          })
+                        : [],
+                    tagIds: this.event.tagIds
+                        ? this.event.tagIds.map((doc) => {
                               console.log(doc);
                               return doc.id;
                           })
@@ -245,6 +267,9 @@ export class EventCardComponent implements OnInit, OnDestroy {
                     data.updatedAt = new Date();
                     data.organizerIds = data.organizerIds.map((id: string) => {
                         return doc(this.firestore, "organizers", id);
+                    });
+                    data.tagIds = data.tagIds.map((id: string) => {
+                        return doc(this.firestore, "tags", id);
                     });
                     delete data.id;
                     return data;
