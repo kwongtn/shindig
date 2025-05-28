@@ -22,7 +22,7 @@ import {
     TemplateRef,
     ViewChild,
 } from "@angular/core";
-import { doc, Firestore } from "@angular/fire/firestore";
+import { deleteDoc, doc, Firestore } from "@angular/fire/firestore";
 import { FormGroup } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 
@@ -88,6 +88,8 @@ export class EventCardComponent implements OnInit, OnDestroy {
     }
 
     canEdit: boolean = false;
+    showDeleteConfirmation: boolean = false;
+
     constructor(
         private drawerService: NzDrawerService,
         public auth: AuthService,
@@ -338,5 +340,45 @@ export class EventCardComponent implements OnInit, OnDestroy {
                 queryParams: {},
             });
         });
+    }
+
+    onDeleteClick() {
+        this.showDeleteConfirmation = !this.showDeleteConfirmation;
+    }
+
+    onConfirmDeleteClick() {
+        if (this.auth.isAdmin()) {
+            this.deleteEvent(this.event.id);
+        } else {
+            this.notification.error(
+                "Permission Denied",
+                "Only administrators can delete events."
+            );
+        }
+        this.showDeleteConfirmation = false; // Hide confirmation after attempt
+    }
+
+    private async deleteEvent(eventId: string) {
+        const drawerRef = this.drawerRef;
+        if (!drawerRef) return;
+
+        const contentComponent = drawerRef.getContentComponent();
+        if (!contentComponent) return;
+
+        contentComponent.showLoading = true;
+
+        try {
+            await deleteDoc(doc(this.firestore, "events", eventId));
+            this.notification.success("Success", "Event deleted successfully.");
+
+            drawerRef.close();
+        } catch (error: any) {
+            this.notification.error(
+                "Deletion Failed",
+                error.message || "An unknown error occurred during deletion."
+            );
+        } finally {
+            contentComponent.showLoading = false;
+        }
     }
 }

@@ -164,10 +164,36 @@
 </ng-template>
 
 <ng-template #drawerFooter>
-    <div style="float: right">
-        <button nz-button style="margin-right: 8px" (click)="close()">
-            Cancel
+    <div class="flex justify-between items-center w-full">
+        @if(auth.isAdmin()){
+        <button
+            *ngIf="!showDeleteConfirmation"
+            class="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded"
+            (click)="onDeleteClick()"
+        >
+            Delete Event
         </button>
-        <button nz-button nzType="primary" (click)="submit()">Submit</button>
+        <button
+            *ngIf="showDeleteConfirmation"
+            class="border border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600 px-4 py-2 rounded"
+            (click)="onConfirmDeleteClick()"
+        >
+            ⚠️ Confirm Delete
+        </button>
+        }
+        <div class="flex">
+            <button
+                class="bg-gray-200 text-gray-800 hover:bg-gray-300 mr-2 px-4 py-2 rounded"
+                (click)="close()"
+            >
+                Cancel
+            </button>
+            <button
+                class="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 rounded"
+                (click)="submit()"
+            >
+                Submit
+            </button>
+        </div>
     </div>
 </ng-template>
