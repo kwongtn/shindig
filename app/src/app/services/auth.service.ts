@@ -8,9 +8,11 @@ import {
     GoogleAuthProvider,
     ParsedToken,
     signInWithPopup,
+    signInWithRedirect,
     signOut,
     Unsubscribe,
     User,
+    UserCredential,
 } from "@angular/fire/auth";
 import { Firestore } from "@angular/fire/firestore";
 import { Router } from "@angular/router";
@@ -116,22 +118,38 @@ export class AuthService {
         });
     }
 
+    handlePostLogin(res: UserCredential) {
+        let toastMessage: string;
+        if (res.user.metadata.lastSignInTime) {
+            toastMessage = `Welcome back, ${
+                res.user.displayName ?? res.user.email
+            }`;
+        } else {
+            toastMessage = "Welcome!";
+        }
+
+        this.notification.success("Login Successful", toastMessage);
+
+        console.log(res);
+        this.userData.next(res.user);
+    }
+
     login() {
         signInWithPopup(this.auth, new GoogleAuthProvider())
             .then((res) => {
-                let toastMessage: string;
-                if (res.user.metadata.lastSignInTime) {
-                    toastMessage = `Welcome back, ${
-                        res.user.displayName ?? res.user.email
-                    }`;
+                this.handlePostLogin(res);
+            })
+            .catch((reason) => {
+                if ("auth/popup-blocked" === reason.code) {
+                    signInWithRedirect(
+                        this.auth,
+                        new GoogleAuthProvider()
+                    ).then((res) => {
+                        this.handlePostLogin(res);
+                    });
                 } else {
-                    toastMessage = "Welcome!";
+                    throw reason;
                 }
-
-                this.notification.success("Login Successful", toastMessage);
-
-                console.log(res);
-                this.userData.next(res.user);
             })
             .catch((reason) => {
                 console.log("Login failed: ", reason);

@@ -24,7 +24,10 @@
             }
             <li class="ant-menu-item login-button">
                 @defer { @if(authService.isLoggedIn()) {
-                <a nzGhost (click)="authService.logout()">
+                <a
+                    class="text-white hover:text-gray-300 px-4 py-2"
+                    (click)="authService.logout()"
+                >
                     <span class="icon-text">
                         Hi,
                         {{ (authService.userData | async)?.displayName }}
@@ -37,7 +40,10 @@
                   -->
                 <span nz-icon nzType="loading"></span>
                 } @else {
-                <a nzGhost (click)="authService.login()">
+                <a
+                    class="text-white hover:text-gray-300 px-4 py-2"
+                    (click)="authService.login()"
+                >
                     <span class="icon-text"> Login </span>
                     <span nz-icon nzType="login" nzTheme="outline"></span>
                 </a>
