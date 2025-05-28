@@ -8,6 +8,7 @@ import {
     getDoc,
     getDocs,
     query,
+    updateDoc,
     where,
 } from "@angular/fire/firestore";
 import { Observable } from "rxjs";
@@ -29,10 +30,9 @@ export class TagService {
         }) as Observable<ITag[]>;
     }
 
-    async createTag(name: string, colorClass: string): Promise<ITag> {
-        const newTag: Omit<ITag, "id"> = { name, colorClass };
-        const docRef = await addDoc(this.tagsCollection, newTag);
-        return { id: docRef.id, ...newTag } as ITag;
+    async addTag(tag: Omit<ITag, "id">): Promise<ITag> {
+        const docRef = await addDoc(this.tagsCollection, tag);
+        return { id: docRef.id, ...tag } as ITag;
     }
 
     async getTagById(id: string): Promise<ITag | undefined> {
@@ -58,5 +58,14 @@ export class TagService {
             (doc) =>
                 ({ id: doc.id, ...(doc.data() as Omit<ITag, "id">) } as ITag)
         );
+    }
+
+    async updateTag(tag: ITag): Promise<void> {
+        const tagDocRef = doc(this.firestore, "tags", tag.id);
+        await updateDoc(tagDocRef, {
+            name: tag.name,
+            colorClass: tag.colorClass,
+            details: tag.details,
+        });
     }
 }

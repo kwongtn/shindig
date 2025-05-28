@@ -1,0 +1,150 @@
+<div class="container mx-auto p-4">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold">Tag Management</h1>
+        <button class="btn btn-primary" (click)="addNewTag()">
+            Add New Tag
+        </button>
+    </div>
+
+    <div class="mb-4 p-4 border rounded-lg bg-base-100">
+        <h2 class="text-xl font-semibold mb-2">Badge Gallery</h2>
+        <div class="flex flex-wrap gap-2">
+            <span class="badge badge-soft badge-primary">Primary</span>
+            <span class="badge badge-soft badge-secondary">Secondary</span>
+            <span class="badge badge-soft badge-neutral">Neutral</span>
+            <span class="badge badge-soft badge-accent">Accent</span>
+            <span class="badge badge-soft badge-info">Info</span>
+            <span class="badge badge-soft badge-success">Success</span>
+            <span class="badge badge-soft badge-warning">Warning</span>
+            <span class="badge badge-soft badge-error">Error</span>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Details</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                    *ngFor="let tag of tags"
+                    class="cursor-pointer hover:bg-base-200"
+                >
+                    <td (click)="startEdit(tag)">
+                        @if(editingTagId === tag.id) {
+                        <input
+                            type="text"
+                            class="input input-bordered input-sm w-full max-w-xs badge badge-soft"
+                            [ngClass]="'badge-' + tag.colorClass"
+                            [(ngModel)]="editedTagName"
+                            (keydown.enter)="saveNameEdit(tag)"
+                            (keydown.escape)="cancelEdit(tag)"
+                        />
+                        }@else {
+                        <span
+                            class="badge badge-soft"
+                            [ngClass]="
+                                'badge-' +
+                                (appliedPreviewColorClass &&
+                                appliedPreviewColorClass.tagId === tag.id
+                                    ? appliedPreviewColorClass.colorClass
+                                    : tag.colorClass)
+                            "
+                            >{{ tag.name }}</span
+                        >
+                        }
+                    </td>
+                    <td>
+                        {{ tag.details || "No details available" }}
+                    </td>
+                    <td>
+                        @if(editingTagId === tag.id) {
+                        <button class="btn btn-sm" (click)="saveNameEdit(tag)">
+                            <i class="fas fa-check-circle text-success"></i>
+                        </button>
+                        <button class="btn btn-sm" (click)="cancelEdit(tag)">
+                            <i class="fas fa-times-circle text-error"></i>
+                        </button>
+                        }@else {
+                        <button class="btn btn-sm" (click)="openEditModal(tag)">
+                            Edit
+                        </button>
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Edit Tag Modal -->
+    <dialog id="edit_tag_modal" class="modal" [open]="isEditModalOpen">
+        @if(selectedTag) {
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Edit Tag</h3>
+            <div class="py-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Tag Name</span>
+                    </label>
+                    <input
+                        type="text"
+                        class="input input-bordered w-full"
+                        [(ngModel)]="selectedTag.name"
+                    />
+                </div>
+                <div class="form-control mt-4">
+                    <label class="label">
+                        <span class="label-text">Color Class</span>
+                    </label>
+                    <select
+                        class="select select-bordered w-full"
+                        [(ngModel)]="selectedTag.colorClass"
+                    >
+                        <option
+                            *ngFor="let color of colorClasses"
+                            [value]="color"
+                        >
+                            <span
+                                class="badge badge-soft cursor-pointer"
+                                [ngClass]="'badge-' + color"
+                                (click)="
+                                    applyTemporaryColorClass(
+                                        color,
+                                        $event,
+                                        selectedTag.id
+                                    )
+                                "
+                                >{{ color }}</span
+                            >
+                        </option>
+                    </select>
+                </div>
+                <div class="form-control mt-4">
+                    <label class="label">
+                        <span class="label-text">Details</span>
+                    </label>
+                    <textarea
+                        class="textarea textarea-bordered w-full"
+                        [(ngModel)]="selectedTag.details"
+                        placeholder="Enter tag details"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="modal-action">
+                <button class="btn" (click)="closeEditModal()">Cancel</button>
+                <button class="btn btn-primary" (click)="saveTag()">
+                    Save @if (saveSuccessTagId === selectedTag.id){
+                    <span class="ml-2 text-success">
+                        <i class="fas fa-check-circle"></i>
+                    </span>
+                    }
+                </button>
+            </div>
+        </div>
+        }
+    </dialog>
+</div>

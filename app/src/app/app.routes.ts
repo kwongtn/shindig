@@ -52,4 +52,14 @@ export const routes: Routes = [
                 (m) => m.WELCOME_ROUTES
             ),
     },
+    {
+        path: "tags",
+        loadComponent: async () => {
+            return import(
+                "./pages/tag-management/tag-management.component"
+            ).then((c) => {
+                return c.TagManagementComponent;
+            });
+        },
+    },
 ];

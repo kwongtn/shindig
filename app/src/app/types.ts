@@ -12,6 +12,7 @@ export interface ITag {
     id: string;
     name: string;
     colorClass: string;
+    details: string;
 }
 
 export interface IUser {
