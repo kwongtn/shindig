@@ -43,10 +43,7 @@
             [alt]="
                 (event.bannerUri ? event.title : 'Default') + ' Event Banner'
             "
-            [src]="
-                event.bannerUri ??
-                'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png'
-            "
+            [src]="event.bannerUri ?? 'https://i.imgur.com/o7fH8jn.png'"
             (click)="onCardClick()"
         />
         @if(canEdit){
