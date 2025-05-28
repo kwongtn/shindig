@@ -224,7 +224,9 @@ export class EventCardComponent implements OnInit, OnDestroy {
                               return doc.id;
                           })
                         : [],
-                    eventLinks: this.event.eventLinks.join("\n"),
+                    eventLinks: Array.isArray(this.event.eventLinks)
+                        ? this.event.eventLinks.join("\n")
+                        : "",
                     startDatetime: new Date(
                         this.event.startDatetime.seconds * 1000
                     ),
