@@ -48,12 +48,8 @@
         />
         @if(canEdit){
         <button
-            nz-button
-            nzType="primary"
-            nzSize="large"
-            nzShape="circle"
+            class="bg-blue-500 text-white hover:bg-blue-600 rounded-full p-3 text-lg edit-icon"
             (click)="openDrawer()"
-            class="edit-icon"
         >
             <span nz-icon nzType="edit"> </span>
         </button>

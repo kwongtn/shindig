@@ -33,12 +33,8 @@
         />
         @if(canEdit){
         <button
-            nz-button
-            nzType="primary"
-            nzSize="large"
-            nzShape="circle"
+            class="bg-blue-500 text-white hover:bg-blue-600 rounded-full p-3 text-lg edit-icon"
             (click)="openDrawer(); $event.stopPropagation()"
-            class="edit-icon"
         >
             <span nz-icon nzType="edit"> </span>
         </button>
@@ -77,9 +73,17 @@
 
 <ng-template #drawerFooter>
     <div style="float: right">
-        <button nz-button style="margin-right: 8px" (click)="close()">
+        <button
+            class="bg-gray-200 text-gray-800 hover:bg-gray-300 mr-2 px-4 py-2 rounded"
+            (click)="close()"
+        >
             Cancel
         </button>
-        <button nz-button nzType="primary" (click)="submit()">Submit</button>
+        <button
+            class="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 rounded"
+            (click)="submit()"
+        >
+            Submit
+        </button>
     </div>
 </ng-template>

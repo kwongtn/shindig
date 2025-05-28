@@ -9,10 +9,7 @@
     nzAlign="flex-start"
 >
     <button
-        nz-button
-        nzType="primary"
-        nzShape="round"
-        nzSize="large"
+        class="bg-blue-500 text-white hover:bg-blue-600 rounded-full px-6 py-3"
         (click)="openDrawer()"
     >
         <span nz-icon nzType="plus"></span>
@@ -37,7 +34,10 @@
             [nzMd]="8"
             [nzLg]="6"
         >
-            <ui-organizer-card class="inner-box" [organizer]="item"></ui-organizer-card>
+            <ui-organizer-card
+                class="inner-box"
+                [organizer]="item"
+            ></ui-organizer-card>
         </div>
         }@empty { @if(!isLoading) {
         <nz-empty nzNotFoundImage="simple" class="no-data-image"></nz-empty>
@@ -47,9 +47,17 @@
 
 <ng-template #drawerFooter>
     <div style="float: right">
-        <button nz-button style="margin-right: 8px" (click)="close()">
+        <button
+            class="bg-gray-200 text-gray-800 hover:bg-gray-300 mr-2 px-4 py-2 rounded"
+            (click)="close()"
+        >
             Cancel
         </button>
-        <button nz-button nzType="primary" (click)="submit()">Submit</button>
+        <button
+            class="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 rounded"
+            (click)="submit()"
+        >
+            Submit
+        </button>
     </div>
 </ng-template>
