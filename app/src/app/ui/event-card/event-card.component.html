@@ -1,4 +1,4 @@
-@if(!event.isApproved){
+<!-- @if(!event.isApproved){
 <nz-ribbon nzText="Needs Approval" nzColor="red">
     <ng-container [ngTemplateOutlet]="card"></ng-container> </nz-ribbon
 >} @else if (isHappeningNow) {
@@ -10,7 +10,7 @@
     <ng-container [ngTemplateOutlet]="card"></ng-container>
 </nz-ribbon>
 
-}@else {<ng-container [ngTemplateOutlet]="card"></ng-container> }
+}@else {<ng-container [ngTemplateOutlet]="card"></ng-container> } -->
 
 <ng-template #card>
     <nz-card
@@ -158,22 +158,23 @@
 
 <ng-template #drawerFooter>
     <div class="flex justify-between items-center w-full">
-        @if(auth.isAdmin()){
+        @if(auth.isAdmin()){ @if(showDeleteConfirmation){
         <button
-            *ngIf="!showDeleteConfirmation"
-            class="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded"
-            (click)="onDeleteClick()"
-        >
-            Delete Event
-        </button>
-        <button
-            *ngIf="showDeleteConfirmation"
             class="border border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600 px-4 py-2 rounded"
             (click)="onConfirmDeleteClick()"
         >
             ⚠️ Confirm Delete
         </button>
-        }
+
+        } @else {
+        <button
+            class="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded"
+            (click)="onDeleteClick()"
+        >
+            Delete Event
+        </button>
+
+        } }
         <div class="flex">
             <button
                 class="bg-gray-200 text-gray-800 hover:bg-gray-300 mr-2 px-4 py-2 rounded"
@@ -190,3 +191,87 @@
         </div>
     </div>
 </ng-template>
+
+<div class="card bg-white shadow-sm">
+    <figure class="px-3 pt-3">
+        <img
+            class="banner-image"
+            [class.gradient-border]="isHappeningNow"
+            [alt]="
+                (event.bannerUri ? event.title : 'Default') + ' Event Banner'
+            "
+            [src]="event.bannerUri ?? 'https://i.imgur.com/o7fH8jn.png'"
+            (click)="onCardClick()"
+        />
+    </figure>
+
+    <div class="card-body">
+        <h2 class="card-title">
+            {{ event.title }}
+            @if(canEdit){
+            <button
+                class="badge badge-outline badge-primary"
+                (click)="openDrawer()"
+            >
+                <span nz-icon nzType="edit"> </span>
+            </button>
+            }
+        </h2>
+        @if(event.subtitle) {
+        {{ event.subtitle }} <br />
+        }<i>
+            {{
+                [this.event.startDatetime, this.event.endDatetime]
+                    | dateRangeHumanizer
+            }}
+        </i>
+        <div class="card-actions event-properties-container">
+            <div class="event-icons">
+                @if (!event.isConfirmed || !event.isWalkInAvailable) {
+                @if(!event.isConfirmed) {
+                <span
+                    nz-icon
+                    nzType="question-circle"
+                    nz-tooltip
+                    nzTooltipTitle="Event not confirmed"
+                ></span>
+                } @if(!event.isWalkInAvailable) {
+                <span
+                    nz-icon
+                    nzType="form"
+                    nz-tooltip
+                    nzTooltipTitle="You must register to join. Walk-ins not accepted."
+                ></span>
+                } } @else {
+                <span
+                    nz-icon
+                    [nzType]="'check-circle'"
+                    [nzTheme]="'twotone'"
+                    [nzTwotoneColor]="'#52c41a'"
+                    nz-tooltip
+                    nzTooltipTitle="Event is both confirmed & accepts walk-ins."
+                ></span>
+                } @if(event.isPaid) {
+                <span
+                    nz-icon
+                    nzType="dollar"
+                    nz-tooltip
+                    nzTooltipTitle="This event is paid"
+                ></span>
+                }
+            </div>
+            <div class="event-tags">
+                @for (tag of tags; track tag.id) {
+                <div
+                    [class]="
+                        'badge badge-soft badge-' +
+                        (tag.colorClass ? '' + tag.colorClass : 'primary')
+                    "
+                >
+                    {{ tag.name }}
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
