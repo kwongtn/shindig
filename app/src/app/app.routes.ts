@@ -1,4 +1,5 @@
 import { Routes } from "@angular/router";
+import { AdminGuard } from "./guards/admin.guard";
 
 export const routes: Routes = [
     { path: "", pathMatch: "full", redirectTo: "/events" },
@@ -54,6 +55,7 @@ export const routes: Routes = [
     },
     {
         path: "tags",
+        canActivate: [AdminGuard],
         loadComponent: async () => {
             return import(
                 "./pages/tag-management/tag-management.component"
