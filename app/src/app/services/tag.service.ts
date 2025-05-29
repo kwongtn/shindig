@@ -4,6 +4,7 @@ import {
     addDoc,
     collection,
     collectionData,
+    deleteDoc,
     doc,
     getDoc,
     getDocs,
@@ -67,5 +68,10 @@ export class TagService {
             colorClass: tag.colorClass,
             details: tag.details,
         });
+    }
+
+    async deleteTag(id: string): Promise<void> {
+        const tagDocRef = doc(this.firestore, "tags", id);
+        await deleteDoc(tagDocRef);
     }
 }

@@ -20,6 +20,12 @@
         </div>
     </div>
 
+    @if (isLoading) {
+    <div class="flex justify-center items-center h-48 gap-2">
+        <span class="loading loading-spinner loading-lg"></span>
+        <p class="loading-text">Loading tags...</p>
+    </div>
+    } @else {
     <div class="overflow-x-auto">
         <table class="table w-full">
             <thead>
@@ -30,10 +36,8 @@
                 </tr>
             </thead>
             <tbody>
-                <tr
-                    *ngFor="let tag of tags"
-                    class="cursor-pointer hover:bg-base-200"
-                >
+                @for (tag of tags; track tag.id) {
+                <tr class="cursor-pointer hover:bg-base-200">
                     <td (click)="startEdit(tag)">
                         @if(editingTagId === tag.id) {
                         <input
@@ -73,12 +77,29 @@
                         <button class="btn btn-sm" (click)="openEditModal(tag)">
                             Edit
                         </button>
+                        <button
+                            class="btn btn-sm btn-delete-tag"
+                            [ngClass]="{
+                                'btn-outline btn-error': confirmingDelete.get(
+                                    tag.id
+                                )
+                            }"
+                            (click)="confirmAndDeleteTag(tag)"
+                        >
+                            {{
+                                confirmingDelete.get(tag.id)
+                                    ? "⚠️ Confirm Delete?"
+                                    : "Delete"
+                            }}
+                        </button>
                         }
                     </td>
                 </tr>
+                }
             </tbody>
         </table>
     </div>
+    }
 
     <!-- Edit Tag Modal -->
     <dialog id="edit_tag_modal" class="modal" [open]="isEditModalOpen">
@@ -104,10 +125,8 @@
                         class="select select-bordered w-full"
                         [(ngModel)]="selectedTag.colorClass"
                     >
-                        <option
-                            *ngFor="let color of colorClasses"
-                            [value]="color"
-                        >
+                        @for(color of colorClasses; track color) {
+                        <option [value]="color">
                             <span
                                 class="badge badge-soft cursor-pointer"
                                 [ngClass]="'badge-' + color"
@@ -121,6 +140,7 @@
                                 >{{ color }}</span
                             >
                         </option>
+                        }
                     </select>
                 </div>
                 <div class="form-control mt-4">

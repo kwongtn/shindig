@@ -15,3 +15,29 @@
     outline: none;
     box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5); /* Example focus ring */
 }
+
+.loading-text {
+    margin: 0;
+    line-height: 1;
+}
+
+.btn-delete-tag {
+    background-color: #ef4444; /* Red-500 */
+    color: white;
+    &:hover {
+        background-color: #dc2626; /* Red-600 */
+    }
+}
+
+/* Styling for the confirmation state of the delete button */
+.btn-outline.btn-error {
+    border-color: #ef4444; /* Red-500 for outline */
+    color: #ef4444; /* Red-500 for text */
+    background-color: transparent; /* Transparent background */
+
+    &:hover {
+        background-color: #fee2e2; /* Red-100 for hover background */
+        color: #dc2626; /* Red-600 for hover text */
+        border-color: #dc2626; /* Red-600 for hover border */
+    }
+}

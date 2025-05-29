@@ -23,8 +23,10 @@ export class TagManagementComponent implements OnInit {
     originalTagName: string = ""; // Added for cancel functionality
     saveSuccessTagId: string | null = null;
     isAdmin: boolean = false;
+    isLoading: boolean = false;
     appliedPreviewColorClass: { colorClass: string; tagId: string } | null =
         null;
+    confirmingDelete: Map<string, boolean> = new Map();
 
     colorClasses = [
         "primary",
@@ -48,8 +50,20 @@ export class TagManagementComponent implements OnInit {
     }
 
     loadTags(): void {
-        this.tagService.getAllTags().subscribe((tags) => {
-            this.tags = tags;
+        this.isLoading = true;
+        this.tagService.getAllTags().subscribe({
+            next: (tags) => {
+                this.tags = tags;
+                this.isLoading = false; // Ensure isLoading is set to false on successful data load
+            },
+            error: (err) => {
+                this.isLoading = false;
+            },
+            complete: () => {
+                if (this.isLoading) {
+                    this.isLoading = false;
+                }
+            },
         });
     }
 
@@ -65,10 +79,17 @@ export class TagManagementComponent implements OnInit {
 
     async saveTag(): Promise<void> {
         if (this.selectedTag) {
-            await this.tagService.updateTag(this.selectedTag);
-            this.loadTags(); // Reload tags after update
-            this.closeEditModal();
-            this.showSaveSuccessFeedback(this.selectedTag.id);
+            this.isLoading = true;
+            try {
+                await this.tagService.updateTag(this.selectedTag);
+                this.loadTags(); // Reload tags after update
+                this.closeEditModal();
+                this.showSaveSuccessFeedback(this.selectedTag.id);
+            } catch (error) {
+                console.error("saveTag: Error updating tag:", error);
+            } finally {
+                this.isLoading = false;
+            }
         }
     }
 
@@ -84,27 +105,41 @@ export class TagManagementComponent implements OnInit {
 
     async saveNameEdit(tag: ITag): Promise<void> {
         if (this.editedTagName.trim() && this.editedTagName !== tag.name) {
-            const updatedTag: ITag = {
-                ...tag,
-                name: this.editedTagName.trim(),
-                details: tag.details, // Ensure details are carried over
-            };
-            await this.tagService.updateTag(updatedTag);
-            this.loadTags();
-            this.showSaveSuccessFeedback(tag.id);
+            this.isLoading = true;
+            try {
+                const updatedTag: ITag = {
+                    ...tag,
+                    name: this.editedTagName.trim(),
+                    details: tag.details, // Ensure details are carried over
+                };
+                await this.tagService.updateTag(updatedTag);
+                this.loadTags();
+                this.showSaveSuccessFeedback(tag.id);
+            } catch (error) {
+                console.error("saveNameEdit: Error updating tag name:", error);
+            } finally {
+                this.isLoading = false;
+            }
         }
         this.editingTagId = null;
         this.editedTagName = "";
     }
 
     async addNewTag(): Promise<void> {
-        const newTag: Omit<ITag, "id"> = {
-            name: "New Tag",
-            colorClass: "default",
-            details: "Enter details here",
-        };
-        await this.tagService.addTag(newTag);
-        this.loadTags();
+        this.isLoading = true;
+        try {
+            const newTag: Omit<ITag, "id"> = {
+                name: "New Tag",
+                colorClass: "default",
+                details: "Enter details here",
+            };
+            await this.tagService.addTag(newTag);
+            this.loadTags();
+        } catch (error) {
+            console.error("addNewTag: Error adding new tag:", error);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     cancelEdit(tag: ITag): void {
@@ -140,5 +175,30 @@ export class TagManagementComponent implements OnInit {
 
     clearTemporaryColorClass(): void {
         this.appliedPreviewColorClass = null;
+    }
+
+    async confirmAndDeleteTag(tag: ITag): Promise<void> {
+        if (this.confirmingDelete.get(tag.id)) {
+            // Second click: confirm delete
+            this.isLoading = true;
+            try {
+                await this.tagService.deleteTag(tag.id);
+                this.loadTags(); // Reload tags after deletion
+            } catch (error) {
+                console.error("Error deleting tag:", error);
+            } finally {
+                this.isLoading = false;
+                this.confirmingDelete.delete(tag.id); // Reset confirmation state
+            }
+        } else {
+            // First click: show confirmation
+            this.confirmingDelete.set(tag.id, true);
+            // Reset confirmation for other tags
+            this.tags.forEach((t) => {
+                if (t.id !== tag.id) {
+                    this.confirmingDelete.delete(t.id);
+                }
+            });
+        }
     }
 }
