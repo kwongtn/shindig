@@ -192,7 +192,16 @@
     </div>
 </ng-template>
 
-<div class="card bg-white shadow-sm">
+<div class="card bg-white shadow-sm relative">
+    @if(!event.isApproved || isHappeningNow) {
+    <div class="absolute top-6 right-0 z-10 -mr-1 -mt-1">
+        @if(!event.isApproved) {
+        <div class="badge badge-md badge-secondary">Pending Approval</div>
+        } @else if(isHappeningNow) {
+        <div class="badge badge-md badge-primary">Happening Now</div>
+        }
+    </div>
+    }
     <figure class="px-3 pt-3">
         <img
             class="banner-image"
