@@ -9,7 +9,7 @@ import { NzModalModule, NzModalService } from "ng-zorro-antd/modal";
 import { NzToolTipModule } from "ng-zorro-antd/tooltip";
 import { firstValueFrom, Subscription } from "rxjs";
 
-import { CommonModule, DOCUMENT, NgTemplateOutlet } from "@angular/common";
+import { CommonModule, DOCUMENT } from "@angular/common";
 import {
     Component,
     EventEmitter,
@@ -44,7 +44,6 @@ type DrawerReturnData = any;
     imports: [
         CommonModule,
         DateRangeHumanizerPipe,
-        NgTemplateOutlet,
         NzAvatarModule,
         NzModalModule,
         NzBadgeModule,
@@ -339,6 +338,11 @@ export class EventCardComponent implements OnInit, OnDestroy {
                 this.notification.error("Unknown Error", reason.message);
                 contentComponent.showLoading = false;
             });
+    }
+
+    onTitleLinkClick(event: Event) {
+        // Prevent onCardClick from being triggered if the title link is clicked
+        event.stopPropagation();
     }
 
     onCardClick() {

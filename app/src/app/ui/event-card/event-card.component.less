@@ -1,3 +1,28 @@
+.link-icon-container {
+    position: relative;
+    display: inline-block; /* Ensures the container only takes up as much space as its content */
+}
+
+.link-count-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translate(-10%, -15%);
+    z-index: 0;
+    color: oklch(78.9% 0.154 211.53);
+    --size: calc(var(--size-selector, 0.25rem) * 4);
+    font-size: 0.625rem;
+    padding-inline: calc(0.25rem * 2 - var(--border));
+}
+
+.link-icon-inner {
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    position: relative; /* Establish a stacking context for z-index */
+    z-index: 1;
+}
+
 .event-properties-container {
     display: flex;
     justify-content: space-between; /* Aligns icons to left and tags to right */
@@ -15,10 +40,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: 5px; /* Spacing between tags */
-}
-
-[nz-icon] {
-    margin: 0px 5px;
 }
 
 .banner-image {
@@ -44,11 +65,12 @@
     padding: 10px;
 }
 
-.event-title {
+.event-title-text {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin-right: 10px; /* Add some spacing between the title and the edit icon */
+    flex-grow: 1; /* Allow the title to take available space */
+    min-width: 0; /* Important for flex items with overflow */
 }
 
 .gradient-border {
