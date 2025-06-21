@@ -1,13 +1,3 @@
-import { NzAlertModule } from "ng-zorro-antd/alert";
-import { NzBadgeModule } from "ng-zorro-antd/badge";
-import { NzCalendarModule } from "ng-zorro-antd/calendar";
-import { NzDrawerModule } from "ng-zorro-antd/drawer";
-import { NzEmptyModule } from "ng-zorro-antd/empty";
-import { NzGridModule } from "ng-zorro-antd/grid";
-import { NzIconModule } from "ng-zorro-antd/icon";
-import { NzSpinModule } from "ng-zorro-antd/spin";
-import { firstValueFrom, Subscription } from "rxjs";
-import { NzDropDownModule } from "ng-zorro-antd/dropdown";
 import { CommonModule, DOCUMENT } from "@angular/common";
 import {
     Component,
@@ -27,14 +17,22 @@ import {
 } from "@angular/fire/firestore";
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
+import { NzAlertModule } from "ng-zorro-antd/alert";
+import { NzBadgeModule } from "ng-zorro-antd/badge";
+import { NzCalendarModule } from "ng-zorro-antd/calendar";
+import { NzDrawerModule } from "ng-zorro-antd/drawer";
+import { NzEmptyModule } from "ng-zorro-antd/empty";
+import { NzGridModule } from "ng-zorro-antd/grid";
+import { NzIconModule } from "ng-zorro-antd/icon";
+import { NzSpinModule } from "ng-zorro-antd/spin";
+import { firstValueFrom, Subscription } from "rxjs";
 
 import { NzButtonModule } from "ng-zorro-antd/button";
-import { environment } from "../../../environments/environment";
 import { AuthService } from "../../services/auth.service";
 import { IEvent } from "../../types";
+import { CopyCalendarUrlButtonComponent } from "../../ui/copy-calendar-url-button/copy-calendar-url-button.component";
 import { EventCardComponent } from "../../ui/event-card/event-card.component";
 import { getCurrentLocalDate } from "../../utils";
-import { CopyCalendarUrlButtonComponent } from "../../ui/copy-calendar-url-button/copy-calendar-url-button.component";
 
 @Component({
     selector: "app-calendar",
@@ -52,6 +50,7 @@ import { CopyCalendarUrlButtonComponent } from "../../ui/copy-calendar-url-butto
         NzGridModule,
         NzIconModule,
         NzSpinModule,
+        NzButtonModule, // Added NzButtonModule
     ],
     templateUrl: "./calendar.component.html",
     styleUrl: "./calendar.component.less",
@@ -62,6 +61,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     selectedDate: Date = new Date();
     prevSelectedDate: Date = new Date();
+    calendarMode: "month" | "year" = "month";
+    monthEvents: IEvent[] = [];
+    monthEventCounts: Map<number, number> = new Map();
 
     eventCollectionRef = collection(this.firestore, "events");
 
@@ -74,7 +76,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     width: string = "700px";
     isSmallScreen: boolean = false;
-
 
     @HostListener("window:resize")
     resize(): void {
@@ -105,32 +106,27 @@ export class CalendarComponent implements OnInit, OnDestroy {
     runQuery() {
         this.showLoading = true;
 
-        // Gets anything after 14th of last month, and before 14th of next month
+        const startOfMonth = new Date(
+            this.selectedDate.getFullYear(),
+            this.selectedDate.getMonth(),
+            1
+        );
+        const endOfMonth = new Date(
+            this.selectedDate.getFullYear(),
+            this.selectedDate.getMonth() + 1,
+            0
+        );
+
         const queryList: QueryFilterConstraint[] = [
-            where(
-                "startDatetime",
-                ">=",
-                new Date(
-                    this.selectedDate.getFullYear(),
-                    this.selectedDate.getMonth(),
-                    -14
-                )
-            ),
-            where(
-                "startDatetime",
-                "<=",
-                new Date(
-                    this.selectedDate.getFullYear(),
-                    this.selectedDate.getMonth() + 1,
-                    14
-                )
-            ),
+            where("startDatetime", ">=", startOfMonth),
+            where("startDatetime", "<=", endOfMonth),
             where("isApproved", "==", true),
         ];
 
         getDocs(query(this.eventCollectionRef, and(...queryList)))
             .then((data) => {
                 this.events = {};
+                this.monthEvents = []; // Clear previous month events
                 data.forEach((event) => {
                     const eventData = event.data() as IEvent;
                     const dateString = eventData.startDatetime
@@ -143,12 +139,25 @@ export class CalendarComponent implements OnInit, OnDestroy {
                     } else {
                         this.events[dateString] = [eventData];
                     }
+                    this.monthEvents.push(eventData); // Add to monthEvents
                 });
+                this.calculateMonthEventCounts(); // Calculate event counts after fetching
                 this.showLoading = false;
             })
             .catch((err) => {
                 console.error(err);
             });
+    }
+
+    calculateMonthEventCounts(): void {
+        this.monthEventCounts.clear();
+        this.monthEvents.forEach((event) => {
+            const month = event.startDatetime.toDate().getMonth();
+            this.monthEventCounts.set(
+                month,
+                (this.monthEventCounts.get(month) || 0) + 1
+            );
+        });
     }
 
     selectChange(event: Date) {
@@ -157,15 +166,50 @@ export class CalendarComponent implements OnInit, OnDestroy {
                 queryParamsHandling: "preserve",
             })
             .then(() => {
-                if (this.prevSelectedDate.getMonth() !== event.getMonth()) {
+                // Only run query if month changes or if mode is year and a new year is selected
+                if (
+                    this.prevSelectedDate.getMonth() !== event.getMonth() ||
+                    this.calendarMode === "year"
+                ) {
                     this.runQuery();
                 }
                 this.prevSelectedDate = event;
             });
     }
 
+    calendarModeChange(mode: "month" | "year"): void {
+        this.calendarMode = mode;
+        if (mode === "year") {
+            // When switching to year view, automatically select the first day of the current month
+            this.selectedDate = new Date(
+                this.selectedDate.getFullYear(),
+                this.selectedDate.getMonth(),
+                1
+            );
+            this.runQuery(); // Fetch events for the selected month
+        } else {
+            // When switching to month view, ensure selectedDate is the first day of the month
+            this.selectedDate = new Date(
+                this.selectedDate.getFullYear(),
+                this.selectedDate.getMonth(),
+                1
+            );
+            this.runQuery(); // Fetch events for the selected month
+        }
+    }
+
+    navigateCalendar(direction: number) {
+        const newDate = new Date(this.selectedDate);
+        if (this.calendarMode === "month") {
+            newDate.setMonth(newDate.getMonth() + direction);
+        } else if (this.calendarMode === "year") {
+            newDate.setFullYear(newDate.getFullYear() + direction);
+        }
+        this.selectedDate = newDate;
+        this.selectChange(this.selectedDate);
+    }
+
     ngOnDestroy(): void {
         this.authStateSubscription?.unsubscribe();
     }
-
 }

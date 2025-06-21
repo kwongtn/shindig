@@ -11,7 +11,24 @@
             <nz-calendar
                 [(ngModel)]="selectedDate"
                 (nzSelectChange)="selectChange($event)"
+                (nzModeChange)="calendarModeChange($event)"
             >
+                <ng-template #monthCellRender let-month>
+                    <div
+                        class="relative flex flex-col items-center justify-center h-full"
+                    >
+                        <div class="text-lg font-semibold">
+                            {{ month | date : "MMM" }}
+                        </div>
+                        @if (monthEventCounts.get(month.getMonth())) {
+                        <div
+                            class="badge badge-primary badge-lg absolute top-1 right-1"
+                        >
+                            {{ monthEventCounts.get(month.getMonth()) }}
+                        </div>
+                        }
+                    </div>
+                </ng-template>
                 <ul *nzDateCell="let date" class="events">
                     @switch (date | date: "yyyy-MM-dd") { @case (date | date:
                     "yyyy-MM-dd") {
@@ -34,7 +51,35 @@
                     </li>
                     } }
                 </ul>
+                <ng-template #monthFullCellRender let-month>
+                    <div class="ant-fullcalendar-month">
+                        <div class="ant-fullcalendar-value">
+                            {{ month | date : "MMM" }}
+                        </div>
+                        <div class="ant-fullcalendar-content">
+                            @if (monthEventCounts.get(month.getMonth())) {
+                            <div class="badge badge-primary badge-lg">
+                                {{ monthEventCounts.get(month.getMonth()) }}
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </ng-template>
             </nz-calendar>
+            <div class="flex justify-end gap-4 mt-4">
+                <button
+                    class="btn btn-soft btn-primary"
+                    (click)="navigateCalendar(-1)"
+                >
+                    <
+                </button>
+                <button
+                    class="btn btn-soft btn-primary"
+                    (click)="navigateCalendar(1)"
+                >
+                    >
+                </button>
+            </div>
         </nz-spin>
     </div>
     <div nz-col [nzXs]="24" [nzXl]="8">
@@ -60,8 +105,7 @@
                     { xs: 8, sm: 16, md: 24, lg: 32 }
                 ]"
             >
-                @for(event of events[(selectedDate | date : 'yyyy-MM-dd') ??
-                '']; track event) {
+                @for(event of monthEvents; track event) {
                 <div
                     nz-col
                     class="gutter-row"
