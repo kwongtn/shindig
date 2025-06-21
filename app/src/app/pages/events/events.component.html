@@ -97,17 +97,16 @@
     </div>
 
     @if(!isLoading) {
-        <div class="load-more-button">
-            @if(hasNextPage){
-            <button nz-button nzType="primary" (click)="runQuery()" nzSize="large">
-                Load More
-            </button>
-            }@else {
-            <button nz-button nzType="primary" nzSize="large" disabled>
-                Nothing else to see 😉
-            </button>
-            }
-        </div>
+    <div class="load-more-button">
+        @if(hasNextPage){
+        <button
+            class="bg-blue-500 text-white hover:bg-blue-600 px-6 py-3 rounded"
+            (click)="runQuery()"
+        >
+            Load More
+        </button>
+        }
+    </div>
     }
 </nz-spin>
 
