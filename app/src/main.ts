@@ -8,6 +8,7 @@ import { environment } from "./environments/environment";
 Sentry.init({
     dsn: environment.sentry.dsn,
     environment: environment.sentry.environment,
+    replaysOnErrorSampleRate: 1.0,
     integrations: [
         Sentry.browserTracingIntegration(),
         Sentry.replayIntegration(),
