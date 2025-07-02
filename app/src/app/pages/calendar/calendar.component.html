@@ -11,6 +11,8 @@
             <nz-calendar
                 [(ngModel)]="selectedDate"
                 (nzSelectChange)="selectChange($event)"
+                (nzPanelChange)="panelChange($event)"
+                [(nzMode)]="nzMode"
             >
                 <ul *nzDateCell="let date" class="events">
                     @switch (date | date: "yyyy-MM-dd") { @case (date | date:
@@ -27,6 +29,28 @@
                         />
                         }@else { @for ( item of events[ (date | date:
                         "yyyy-MM-dd") ?? "" ] ; track item ) {
+                        <nz-badge
+                            [nzStatus]="'default'"
+                            [nzText]="item.title"
+                        />} }
+                    </li>
+                    } }
+                </ul>
+
+                <ul *nzMonthCell="let date" class="events">
+                    @switch (date | date: "yyyy-MM") { @case (date | date:
+                    "yyyy-MM") {
+                    <li>
+                        @if(isSmallScreen){
+                        <nz-badge
+                            class="count-badge"
+                            nzStandalone
+                            [nzCount]="
+                                events[(date | date : 'yyyy-MM') ?? '']?.length
+                            "
+                        />
+                        }@else { @for ( item of events[ (date | date: "yyyy-MM")
+                        ?? "" ] ; track item ) {
                         <nz-badge
                             [nzStatus]="'default'"
                             [nzText]="item.title"
@@ -60,8 +84,8 @@
                     { xs: 8, sm: 16, md: 24, lg: 32 }
                 ]"
             >
-                @for(event of events[(selectedDate | date : 'yyyy-MM-dd') ??
-                '']; track event) {
+                @for(event of events[(selectedDate | date : nzMode === 'month' ?
+                'yyyy-MM-dd' : 'yyyy-MM') ?? '']; track event) {
                 <div
                     nz-col
                     class="gutter-row"
