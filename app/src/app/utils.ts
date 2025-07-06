@@ -28,12 +28,44 @@ export function getIdealModalWidth(screenSize: number): string {
     }
 }
 
-export function getCurrentLocalDate(): string {
-    return new Date(
-        new Date().valueOf() - new Date().getTimezoneOffset() * 60000
+export class CustomDate {
+    constructor(
+        public year: number,
+        public month: number,
+        public day: number | undefined
+    ) {}
+
+    toDate(): Date {
+        return new Date(this.year, this.month, this.day);
+    }
+
+    toString(): string {
+        const yearStr = this.year.toString();
+        const monthStr = (this.month + 1).toString().padStart(2, "0");
+        if (this.day === undefined) {
+            return `${yearStr}-${monthStr}`;
+        }
+
+        const dayStr = this.day.toString().padStart(2, "0");
+        return `${yearStr}-${monthStr}-${dayStr}`;
+    }
+
+    get type(): "year" | "month" | "day" {
+        if (this.day === undefined) {
+            return this.month === undefined ? "year" : "month";
+        }
+        return "day";
+    }
+}
+
+export function getCurrentLocalDate(date: Date = new Date()): CustomDate {
+    const customDate = new Date(
+        date.valueOf() - new Date().getTimezoneOffset() * 60000
     )
         .toISOString()
         .split("T")[0];
+    const [year, month, day] = customDate.split("-").map(Number);
+    return new CustomDate(year, month - 1, day);
 }
 
 export function unifyTimestampDate(a: Timestamp | Date): Date {
