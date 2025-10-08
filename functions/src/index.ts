@@ -75,7 +75,7 @@ export const updateAdminToken = onDocumentUpdated(
     }
 );
 
-const MODEL_NAME = "gemini-2.0-flash-001";
+const MODEL_NAME = "gemini-2.5-flash-lite";
 
 export const scrapeWebpage = onRequest(
     {
