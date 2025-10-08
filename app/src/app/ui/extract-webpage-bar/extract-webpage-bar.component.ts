@@ -35,8 +35,23 @@ export class ExtractWebpageBarComponent {
         const scrapeWebpage = httpsCallable(this.functions, "scrapeWebpage");
         scrapeWebpage({ url: this.url, scrapeType: this.scrapeType })
             .then((result) => {
-                console.log(result.data);
-                this.onExtract.emit(result.data as any);
+                const data: { [key: string]: any } = result.data as any;
+
+                this.onExtract.emit(
+                    Object.keys(data).reduce<{
+                        [key: string]: any;
+                    }>(
+                        (acc, key) => {
+                            if (data[key]) {
+                                acc[key] = data[key];
+                            }
+                            return acc;
+                        },
+                        {
+                            eventLinks: this.url,
+                        }
+                    )
+                );
             })
             .finally(() => {
                 this.isLoading = false;
