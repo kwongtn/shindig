@@ -48,7 +48,7 @@ export class ExtractWebpageBarComponent {
                             return acc;
                         },
                         {
-                            eventLinks: this.url,
+                            links: [this.url],
                         }
                     )
                 );

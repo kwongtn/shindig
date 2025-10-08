@@ -286,17 +286,20 @@ export class EventCardComponent implements OnInit, OnDestroy {
                     data: EventExtractedDataType,
                     rootForm: FormGroup<any>
                 ) => {
-                    rootForm.patchValue(
-                        {
-                            title: data.title,
-                            description: data.description,
-                            startDatetime: new Date(data.startTime),
-                            endDatetime: new Date(data.endTime),
-                            eventLinks: (data.links ?? []).join("\n"),
-                            bannerUri: data.bannerUri,
-                        },
-                        { emitEvent: false }
-                    );
+                    const patchValue: { [key: string]: any } = {
+                        title: data.title,
+                        description: data.description,
+                        eventLinks: (data.links ?? []).join("\n"),
+                        bannerUri: data.bannerUri,
+                    };
+
+                    if (data.startTime) {
+                        patchValue["startDatetime"] = new Date(data.startTime);
+                    }
+                    if (data.endTime) {
+                        patchValue["endDatetime"] = new Date(data.endTime);
+                    }
+                    rootForm.patchValue(patchValue, { emitEvent: false });
                 },
             },
         });
