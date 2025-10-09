@@ -8,7 +8,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:app": "node dist/app/server/server.mjs",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org kwongtn --project shindig-angular ./dist && sentry-cli sourcemaps upload --org kwongtn --project shindig-angular ./dist"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org kwongtn --project shindig-angular ./dist && sentry-cli sourcemaps upload --org kwongtn --project shindig-angular ./dist",
+    "explore": "source-map-explorer dist/app/browser/*.js",
+    "analyze": "webpack-bundle-analyzer dist/app/stats.json"
   },
   "private": true,
   "dependencies": {
@@ -51,7 +53,9 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "postcss": "^8.5.3",
+    "source-map-explorer": "^2.5.3",
     "tailwindcss": "^3.4.17",
-    "typescript": "~5.5.2"
+    "typescript": "~5.5.2",
+    "webpack-bundle-analyzer": "^4.10.2"
   }
 }
