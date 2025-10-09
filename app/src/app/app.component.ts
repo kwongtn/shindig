@@ -20,6 +20,7 @@ import {
     RouterOutlet,
 } from "@angular/router";
 
+import { AnalyticsService } from "./services/analytics.service";
 import { AuthService } from "./services/auth.service";
 
 @Component({
@@ -66,6 +67,7 @@ export class AppComponent implements OnInit {
     constructor(
         public authService: AuthService,
         private router: Router,
+        private analytics: AnalyticsService,
         @Inject(DOCUMENT) private document: Document
     ) {}
 
@@ -76,6 +78,16 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.router.events
+            .pipe(
+                filter((event) => event instanceof NavigationEnd),
+                tap((event) => {
+                    const navEndEvent = event as NavigationEnd;
+                    this.analytics.trackPageview(navEndEvent.urlAfterRedirects);
+                })
+            )
+            .subscribe();
+
         this.router.events
             .pipe(
                 filter((event) => {

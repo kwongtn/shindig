@@ -80,6 +80,7 @@ export const appConfig: ApplicationConfig = {
                 measurementId: "G-BP5DDM9KKB",
             })
         ),
+        provideAnalytics(() => getAnalytics()),
         provideAuth(() => {
             const auth = getAuth();
             if (environment.firebase.useEmulators) {
@@ -87,7 +88,6 @@ export const appConfig: ApplicationConfig = {
             }
             return auth;
         }),
-        provideAnalytics(() => getAnalytics()),
         ScreenTrackingService,
         UserTrackingService,
         provideAppCheck(() => {
