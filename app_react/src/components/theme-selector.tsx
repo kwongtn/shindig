@@ -97,7 +97,7 @@ export default function ThemeSelector() {
     <div className="form-control">
       <div className="dropdown dropdown-end">
         <div tabIndex={0} role="button" className="btn m-1 select select-bordered max-w-xs ">
-          {selectedTheme === 'system' ? '🖥️ System' : ALL_THEMES.find(t => t.value === selectedTheme)?.label || 'Theme'}
+          Theme
         </div>
         <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-2">
           {DEFAULT_THEMES.map((theme) => (
