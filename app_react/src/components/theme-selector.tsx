@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
-// List of available DaisyUI themes with emojis (excluding system theme)
-const THEMES = [
-  { value: 'light', label: '⚪ Light' },
-  { value: 'dark', label: '⚫ Dark' },
+// List of all available DaisyUI themes with emojis
+const ALL_THEMES = [
   { value: 'cupcake', label: '🧁 Cupcake' },
   { value: 'bumblebee', label: '🐝 Bumblebee' },
   { value: 'emerald', label: '💚 Emerald' },
@@ -35,9 +33,17 @@ const THEMES = [
   { value: 'winter', label: '❄️ Winter' },
 ];
 
+// List of default themes to show
+const DEFAULT_THEMES = [
+  { value: 'system', label: '🖥️ System' },
+  { value: 'light', label: '⚪ Light' },
+  { value: 'dark', label: '⚫ Dark' },
+];
+
 export default function ThemeSelector() {
   const [selectedTheme, setSelectedTheme] = useState('system');
   const [mounted, setMounted] = useState(false);
+  const [showAllThemes, setShowAllThemes] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -83,34 +89,60 @@ export default function ThemeSelector() {
     }
   }, [selectedTheme]);
 
+  const handleShowAllThemes = () => {
+    setShowAllThemes(!showAllThemes);
+  };
+
   return (
     <div className="form-control">
       <div className="dropdown dropdown-end">
-        <div tabIndex={0} role="button" className="btn m-1 select select-bordered max-w-xs">
-          {selectedTheme === 'system' ? '🖥️ System' : THEMES.find(t => t.value === selectedTheme)?.label || 'Theme'}
+        <div tabIndex={0} role="button" className="btn m-1 select select-bordered max-w-xs ">
+          {selectedTheme === 'system' ? '🖥️ System' : ALL_THEMES.find(t => t.value === selectedTheme)?.label || 'Theme'}
         </div>
         <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-2">
-          <li>
-            <button
-              onClick={() => setSelectedTheme('system')}
-              className={selectedTheme === 'system' ? 'active' : ''}
-            >
-              🖥️ System
-            </button>
-          </li>
-          <li className="divider" style={{ "height": "1px", "margin": "5px 0px" }}></li>
-          {THEMES.map((theme) => (
+          {DEFAULT_THEMES.map((theme) => (
             <li key={theme.value}>
               <button
-                onClick={() => setSelectedTheme(theme.value)}
+                onClick={() => {
+                  setSelectedTheme(theme.value);
+                  setShowAllThemes(false); // Close dropdown after selection
+                }}
                 className={selectedTheme === theme.value ? 'active' : ''}
               >
                 {theme.label}
               </button>
             </li>
           ))}
+
+          {showAllThemes && (
+            <>
+              <li className="divider" style={{ "height": "1px", "margin": "5px 0px" }}></li>
+              {ALL_THEMES.map((theme) => (
+                <li key={theme.value}>
+                  <button
+                    onClick={() => {
+                      setSelectedTheme(theme.value);
+                      setShowAllThemes(false); // Close dropdown after selection
+                    }}
+                    className={selectedTheme === theme.value ? 'active' : ''}
+                  >
+                    {theme.label}
+                  </button>
+                </li>
+              ))}
+            </>
+          )}
+
+          <li className="mt-1">
+            <button
+              onClick={handleShowAllThemes}
+              className="w-full text-center justify-center"
+            >
+              {showAllThemes ? 'Show Less ↑' : 'More Themes ↓'}
+            </button>
+          </li>
         </ul>
       </div>
-    </div >
+    </div>
   );
 }
