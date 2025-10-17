@@ -1,7 +1,9 @@
-import type { Config } from 'tailwindcss';
 import daisyui from 'daisyui';
+import type { Config } from 'tailwindcss';
 
-const config: Config = {
+type CustomConfig = Config & { daisyui: { [key: string]: unknown } }
+
+const config: CustomConfig = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
