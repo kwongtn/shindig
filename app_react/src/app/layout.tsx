@@ -1,4 +1,4 @@
-import ThemeSelector from "@/components/theme-selector";
+import Navigation from "@/components/navigation";
 import { mdiRobotHappy } from '@mdi/js';
 import Icon from '@mdi/react';
 import type { Metadata } from "next";
@@ -30,14 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header className="navbar bg-base-100 p-4 sticky top-0 z-10">
-          <div className="flex-1">
-            <a className="btn btn-ghost text-xl">Shindig</a>
-          </div>
-          <div className="flex-none">
-            <ThemeSelector />
-          </div>
-        </header>
+        <Navigation />
         <main>
           {children}
         </main>
