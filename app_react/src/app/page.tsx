@@ -1,5 +1,7 @@
 
 
+// Commenting out the original Home page content
+/*
 export default function Home() {
   return (
     <div className="min-h-screen bg-base-200">
@@ -142,4 +144,12 @@ export default function Home() {
 
     </div>
   );
+}
+*/
+
+import { redirect } from 'next/navigation';
+
+// Redirect to events/upcoming/1
+export default function Home() {
+  redirect('/events/upcoming/1');
 }
