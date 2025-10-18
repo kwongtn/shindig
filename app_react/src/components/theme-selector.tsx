@@ -105,7 +105,6 @@ export default function ThemeSelector() {
               <button
                 onClick={() => {
                   setSelectedTheme(theme.value);
-                  setShowAllThemes(false); // Close dropdown after selection
                 }}
                 className={selectedTheme === theme.value ? 'active' : ''}
               >
@@ -122,7 +121,6 @@ export default function ThemeSelector() {
                   <button
                     onClick={() => {
                       setSelectedTheme(theme.value);
-                      setShowAllThemes(false); // Close dropdown after selection
                     }}
                     className={selectedTheme === theme.value ? 'active' : ''}
                   >

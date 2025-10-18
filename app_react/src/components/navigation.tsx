@@ -4,14 +4,17 @@ import { auth } from '@/utils/firebase';
 import { CalendarIcon, ListBulletIcon, UserGroupIcon, UserIcon } from '@heroicons/react/24/outline';
 import { mdiFaceManProfile } from '@mdi/js';
 import Icon from '@mdi/react';
-import { GoogleAuthProvider, signInWithPopup, signOut, User } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut, User } from 'firebase/auth';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import ThemeSelector from './theme-selector';
+import * as Sentry from '@sentry/nextjs';
+import { showToast } from '@/utils/toast';
 
 const Navigation = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -22,21 +25,70 @@ const Navigation = () => {
   }, []);
 
   const handleLogin = async () => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
-    } catch (error) {
+      const user = result.user;
+      
+      // Set Sentry user
+      Sentry.setUser({
+        email: user.email ?? undefined,
+        id: user.uid,
+        ip_address: '{{auto}}',
+      });
+      
+      // Determine if new user based on metadata
+      const isNewUser = !user.metadata.lastSignInTime || user.metadata.creationTime === user.metadata.lastSignInTime;
+      const userString = user.displayName || user.email || 'User';
+      
+      if (isNewUser) {
+        showToast(`Welcome, ${userString}`, 'success');
+      } else {
+        showToast(`Welcome back, ${userString}`, 'success');
+      }
+      
+      setUser(user);
+    } catch (error: any) {
       console.error('Error during Google login:', error);
+      
+      if (error.code === 'auth/popup-blocked') {
+        // Handle popup blocked error by using redirect
+        try {
+          await signInWithRedirect(auth, new GoogleAuthProvider());
+        } catch (redirectError: any) {
+          console.error('Redirect error:', redirectError);
+          showToast(`Error: ${redirectError.message || redirectError.code}`, 'error');
+        }
+      } else if (error.code === 'auth/user-disabled') {
+        showToast('Your account has been banned by an administrator. If you think this is an error, please contact us at \'tungnan5636@gmail.com\'.', 'error');
+      } else {
+        showToast(`Error: ${error.code || error.message}`, 'error');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleLogout = async () => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
     try {
       await signOut(auth);
       setUser(null);
-    } catch (error) {
+      
+      // Unset Sentry user
+      Sentry.setUser(null);
+      
+      showToast('Logout Successful, hope to see you again soon!', 'success');
+    } catch (error: any) {
       console.error('Error during logout:', error);
+      showToast(`Error: ${error.code || error.message}`, 'error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -126,10 +178,18 @@ const Navigation = () => {
 
         <div
           role="button"
-          className="btn btn-ghost btn-circle avatar"
-          onClick={() => user ? handleLogout() : handleLogin()}
+          className={`tooltip tooltip-left btn btn-ghost btn-circle avatar ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+          data-tip={user ? "Click to logout" : "Click to login"}
+          onClick={() => {
+            if (isLoading) return;
+            user ? handleLogout() : handleLogin();
+          }}
         >
-          {user ? (
+          {isLoading ? (
+            <div className="w-10 rounded-full flex items-center justify-center">
+              <span className="loading loading-spinner loading-md"></span>
+            </div>
+          ) : user ? (
             <div className="w-10 rounded-full">
               <ProfileImage 
                 src={user.photoURL} 
@@ -137,8 +197,8 @@ const Navigation = () => {
               />
             </div>
           ) : (
-            <div className="w-10 rounded-full">
-              <UserIcon className="text-gray-500" />
+            <div className="w-10 rounded-full flex items-center justify-center">
+              <UserIcon className="text-gray-500 w-6 h-6" />
             </div>
           )}
         </div>
