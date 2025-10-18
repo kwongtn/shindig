@@ -48,17 +48,17 @@ const EventPage = () => {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 px-4">
+      <div className="flex flex-nowrap justify-between items-center mb-8 gap-4 px-4 overflow-x-auto">
         {/* Past/Upcoming Menu */}
-        <div className="flex flex-row">
+        <div className="flex flex-row flex-shrink-0">
           <ul className="menu menu-horizontal bg-base-100 rounded-box p-2">
             <li>
               <Link
                 href="/events/past/1"
                 className={`flex items-center ${isActive('past') ? 'active bg-primary text-primary-content' : 'hover:bg-base-200'}`}
               >
-                <ArchiveBoxIcon className="h-5 w-5 mr-2" />
-                <span>Past Events</span>
+                <ArchiveBoxIcon className="h-5 w-10 sm:w-5 sm:mr-2" />
+                <span className="hidden sm:inline">Past Events</span>
               </Link>
             </li>
             <li>
@@ -66,18 +66,18 @@ const EventPage = () => {
                 href="/events/upcoming/1"
                 className={`flex items-center ${isActive('upcoming') ? 'active bg-primary text-primary-content' : 'hover:bg-base-200'}`}
               >
-                <CalendarDateRangeIcon className="h-5 w-5 mr-2" />
-                <span>Upcoming Events</span>
+                <CalendarDateRangeIcon className="h-5 w-10 sm:w-5 sm:mr-2" />
+                <span className="hidden sm:inline">Upcoming Events</span>
               </Link>
             </li>
           </ul>
         </div>
 
         {/* Add Event Button */}
-        <div className="w-full md:w-auto">
-          <button className="btn btn-primary w-full flex items-center justify-center gap-2">
-            <PlusIcon className="h-5 w-5" />
-            <span>Add Event</span>
+        <div className="flex-shrink-0">
+          <button className="btn btn-primary flex items-center justify-center gap-2">
+            <PlusIcon className="h-5 w-10 sm:w-5" />
+            <span className="hidden sm:inline">Add Event</span>
           </button>
         </div>
       </div>
