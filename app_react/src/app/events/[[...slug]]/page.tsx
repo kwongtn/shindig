@@ -1,13 +1,17 @@
 'use client';
 
+import { auth } from '@/utils/firebase';
 import { ArchiveBoxIcon, CalendarDateRangeIcon, MagnifyingGlassIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, User } from 'firebase/auth';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const EventPage = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Check if we're at the base /events route (no slug provided), redirect to /events/upcoming/1
   React.useEffect(() => {
@@ -15,6 +19,15 @@ const EventPage = () => {
       router.push('/events/upcoming/1');
     }
   }, [pathname, router]);
+
+  // Subscribe to authentication state
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Extract slug from pathname (e.g. for /events/upcoming/1, slug would be 'upcoming')
   const pathParts = pathname?.split('/').filter(part => part) || [];
@@ -31,6 +44,31 @@ const EventPage = () => {
   if (pathname === '/events') {
     return null;
   }
+
+  const handleLogin = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      console.error('Error during Google login:', error);
+
+      if (error.code === 'auth/popup-blocked') {
+        // Handle popup blocked error by using redirect
+        try {
+          await signInWithRedirect(auth, new GoogleAuthProvider());
+        } catch (redirectError: any) {
+          console.error('Redirect error:', redirectError);
+        }
+      } else {
+        console.error(`Login error: ${error.code || error.message}`);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-base-200 p-4">
@@ -75,10 +113,29 @@ const EventPage = () => {
 
         {/* Add Event Button */}
         <div className="flex-shrink-0">
-          <button className="btn btn-primary flex items-center justify-center gap-2">
-            <PlusIcon className="h-5 w-10 sm:w-5" />
-            <span className="hidden sm:inline">Add Event</span>
-          </button>
+          {!user ? (
+            <button
+              onClick={handleLogin}
+              className="btn btn-outline flex items-center justify-center gap-2"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <span className="loading loading-spinner loading-xs"></span>
+                  <span>Logging in...</span>
+                </>
+              ) : (
+                <>
+                  <span>Click here to login and add events</span>
+                </>
+              )}
+            </button>
+          ) : (
+            <button className="btn btn-primary flex items-center justify-center gap-2">
+              <PlusIcon className="h-5 w-10 sm:w-5" />
+              <span className="hidden sm:inline">Add Event</span>
+            </button>
+          )}
         </div>
       </div>
 
