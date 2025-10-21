@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS='--inspect' next dev --turbopack",
+    "dev": "NODE_OPTIONS='--inspect' NEXT_PUBLIC_USE_EMULATORS='true' NODE_ENV='development' next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"
@@ -13,10 +13,13 @@
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
     "@sentry/nextjs": "^10.20.0",
+    "dayjs": "^1.11.18",
+    "easymde": "^2.18.0",
     "firebase": "^12.4.0",
     "next": "15.5.5",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-simplemde-editor": "^5.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

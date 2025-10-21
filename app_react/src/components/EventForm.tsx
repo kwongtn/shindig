@@ -16,6 +16,23 @@ const SimpleMDE = dynamic(
   { ssr: false }
 );
 
+// Utility functions for timezone-aware datetime conversion
+const convertToLocalISOString = (date: Date): string => {
+  const offsetMinutes = date.getTimezoneOffset();
+  const localDate = new Date(date.getTime() - offsetMinutes * 60 * 1000);
+  return localDate.toISOString().slice(0, 16);
+};
+
+const convertToLocalISOStringForFirestore = (dateString: string): Date => {
+  // Create a date in the browser's local timezone
+  const [datePart, timePart] = dateString.split('T');
+  const [year, month, day] = datePart.split('-').map(Number);
+  const [hours, minutes] = timePart.split(':').map(Number);
+  
+  // Create a new Date object using local time components
+  return new Date(year, month - 1, day, hours, minutes);
+};
+
 interface EventFormProps {
   mode: 'add' | 'edit';
   eventId?: string;
@@ -122,7 +139,7 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
       }));
 
       // Check for validation errors before submission
-      const validationErrors = {};
+      const validationErrors: Partial<Record<keyof FormValues, unknown>> = {};
       if (!values.title.trim()) {
         validationErrors.title = 'Title is required';
       }
@@ -133,7 +150,7 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
         validationErrors.endDatetime = 'End datetime is required';
       }
       if (values.startDatetime && values.endDatetime) {
-        if (new Date(values.startDatetime) >= new Date(values.endDatetime)) {
+        if (convertToLocalISOStringForFirestore(values.startDatetime) >= convertToLocalISOStringForFirestore(values.endDatetime)) {
           validationErrors.endDatetime = 'End datetime must be after start datetime';
         }
       }
@@ -169,12 +186,14 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
           console.log('EventForm: Connected to Firestore emulator');
         }
 
-        // Prepare data for Firestore
+        // Prepare data for Firestore - use local timezone when converting datetime values to Timestamps
         const eventData = {
           ...values,
           authorId: doc(db, `users/${userId}`),
           organizerIds: values.organizerIds.map(id => doc(db, `organizers/${id}`)),
           tagIds: values.tagIds.map(id => doc(db, `tags/${id}`)),
+          startDatetime: values.startDatetime ? Timestamp.fromDate(convertToLocalISOStringForFirestore(values.startDatetime)) : null,
+          endDatetime: values.endDatetime ? Timestamp.fromDate(convertToLocalISOStringForFirestore(values.endDatetime)) : null,
           createdAt: mode === 'add' ? Timestamp.fromDate(new Date()) :
             values.createdAt ? Timestamp.fromDate(new Date(values.createdAt)) :
               Timestamp.fromDate(new Date()),
@@ -231,7 +250,7 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
       }
 
       if (values.startDatetime && values.endDatetime) {
-        if (new Date(values.startDatetime) >= new Date(values.endDatetime)) {
+        if (convertToLocalISOStringForFirestore(values.startDatetime) >= convertToLocalISOStringForFirestore(values.endDatetime)) {
           newErrors.endDatetime = 'End datetime must be after start datetime';
         }
       }
@@ -293,10 +312,10 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
                 subtitle: eventData.subtitle || '',
                 description: eventData.description || '',
                 startDatetime: eventData.startDatetime && typeof eventData.startDatetime.toDate === 'function'
-                  ? eventData.startDatetime.toDate().toISOString().slice(0, 16)
+                  ? convertToLocalISOString(eventData.startDatetime.toDate())
                   : eventData.startDatetime || '',
                 endDatetime: eventData.endDatetime && typeof eventData.endDatetime.toDate === 'function'
-                  ? eventData.endDatetime.toDate().toISOString().slice(0, 16)
+                  ? convertToLocalISOString(eventData.endDatetime.toDate())
                   : eventData.endDatetime || '',
                 eventLinks: eventData.eventLinks || [],
                 organizerIds: eventData.organizerIds?.map((ref: { id: string }) => ref.id) || [],
@@ -396,10 +415,10 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
 
   // Handle date changes - set endDatetime to 3 hours after startDatetime if endDatetime is empty or before startDatetime
   useEffect(() => {
-    if (values.startDatetime && (!values.endDatetime || new Date(values.startDatetime) > new Date(values.endDatetime))) {
-      const startDate = new Date(values.startDatetime);
+    if (values.startDatetime && (!values.endDatetime || convertToLocalISOStringForFirestore(values.startDatetime) > convertToLocalISOStringForFirestore(values.endDatetime))) {
+      const startDate = convertToLocalISOStringForFirestore(values.startDatetime);
       const endDate = new Date(startDate.getTime() + 3 * 60 * 60 * 1000); // Add 3 hours
-      setField('endDatetime', endDate.toISOString().slice(0, 16));
+      setField('endDatetime', convertToLocalISOString(endDate));
     }
   }, [values.startDatetime, setField]);
 
@@ -582,7 +601,7 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
   }, [errors]);
 
   // Function to handle AI data extraction
-  const handleAIDataExtract = (data: Record<string, any> | null) => {
+  const handleAIDataExtract = (data: Record<string, unknown> | null) => {
     // Check if data exists
     if (!data) {
       return;
@@ -592,32 +611,32 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
     const updatedValues: Partial<FormValues> = {};
 
     // Map the extracted data to form fields, only if they exist in the data
-    if (data.title !== undefined && data.title !== null && data.title !== '') {
+    if (typeof data.title === 'string' && data.title !== null && data.title !== '') {
       updatedValues.title = data.title;
     }
 
     if (data.startTime !== undefined && data.startTime !== null) {
-      // Convert to the correct format for datetime-local input
-      const startTime = new Date(data.startTime);
-      updatedValues.startDatetime = startTime.toISOString().slice(0, 16);
+      // Convert to the correct format for datetime-local input using local timezone
+      const startTime = new Date(data.startTime as string);
+      updatedValues.startDatetime = convertToLocalISOString(startTime);
     }
 
     if (data.endTime !== undefined && data.endTime !== null) {
-      // Convert to the correct format for datetime-local input
-      const endTime = new Date(data.endTime);
-      updatedValues.endDatetime = endTime.toISOString().slice(0, 16);
+      // Convert to the correct format for datetime-local input using local timezone
+      const endTime = new Date(data.endTime as string);
+      updatedValues.endDatetime = convertToLocalISOString(endTime);
     }
 
-    if (data.description !== undefined && data.description !== null && data.description !== '') {
+    if (typeof data.description === 'string' && data.description !== null && data.description !== '') {
       updatedValues.description = data.description;
     }
 
-    if (data.bannerUri !== undefined && data.bannerUri !== null && data.bannerUri !== '') {
+    if (typeof data.bannerUri === 'string' && data.bannerUri !== null && data.bannerUri !== '') {
       updatedValues.bannerUri = data.bannerUri;
     }
 
     // Add the URL to eventLinks if it's not already in the array
-    if (data.url) {
+    if (data.url && typeof data.url === 'string') {
       const eventLinks = [...values.eventLinks];
       if (!eventLinks.includes(data.url)) {
         eventLinks.push(data.url);
