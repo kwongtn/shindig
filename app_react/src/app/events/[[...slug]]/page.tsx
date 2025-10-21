@@ -4,14 +4,19 @@ import { auth } from '@/utils/firebase';
 import { ArchiveBoxIcon, CalendarDateRangeIcon, MagnifyingGlassIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, User } from 'firebase/auth';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import EventDrawer from '@/components/EventDrawer';
 
 const EventPage = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<'add' | 'edit'>('add');
+  const [eventId, setEventId] = useState<string | undefined>(undefined);
 
   // Check if we're at the base /events route (no slug provided), redirect to /events/upcoming/1
   React.useEffect(() => {
@@ -39,6 +44,24 @@ const EventPage = () => {
 
   // Determine if we're on the past or upcoming events page
   const isActive = (path: string) => slug === path;
+
+  // Handle URL parameters for drawer state
+  useEffect(() => {
+    const drawerParam = searchParams.get('drawer');
+    const idParam = searchParams.get('id');
+    
+    if (drawerParam === 'addEvent') {
+      setDrawerMode('add');
+      setEventId(undefined);
+      setDrawerOpen(true);
+    } else if (drawerParam === 'editEvent' && idParam) {
+      setDrawerMode('edit');
+      setEventId(idParam);
+      setDrawerOpen(true);
+    } else {
+      setDrawerOpen(false);
+    }
+  }, [searchParams.toString()]);
 
   // Don't render anything while redirecting
   if (pathname === '/events') {
@@ -68,6 +91,34 @@ const EventPage = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleAddEvent = () => {
+    if (!user) return;
+    
+    // Update URL to include drawer=addEvent parameter
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.set('drawer', 'addEvent');
+    router.push(`${pathname}?${newSearchParams.toString()}`);
+  };
+
+  const handleDrawerClose = () => {
+    // Remove drawer parameter from URL
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.delete('drawer');
+    newSearchParams.delete('id');
+    router.push(`${pathname}?${newSearchParams.toString()}`);
+    setDrawerOpen(false);
+  };
+
+  const handleEditEvent = (eventId: string) => {
+    if (!user) return;
+    
+    // Update URL to include drawer=editEvent and id parameters
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.set('drawer', 'editEvent');
+    newSearchParams.set('id', eventId);
+    router.push(`${pathname}?${newSearchParams.toString()}`);
   };
 
   return (
@@ -131,7 +182,10 @@ const EventPage = () => {
               )}
             </button>
           ) : (
-            <button className="btn btn-primary flex items-center justify-center gap-2">
+            <button 
+              className="btn btn-primary flex items-center justify-center gap-2"
+              onClick={handleAddEvent}
+            >
               <PlusIcon className="h-5 w-10 sm:w-5" />
               <span className="hidden sm:inline">Add Event</span>
             </button>
@@ -158,12 +212,29 @@ const EventPage = () => {
                 <p>Placeholder event description</p>
                 <div className="card-actions justify-end">
                   <button className="btn btn-primary btn-sm">Details</button>
+                  {user && (
+                    <button 
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => handleEditEvent(`event-${index}`)}
+                    >
+                      Edit
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Event Drawer */}
+      <EventDrawer
+        isOpen={drawerOpen}
+        mode={drawerMode}
+        eventId={eventId}
+        onClose={handleDrawerClose}
+        onOpenChange={setDrawerOpen}
+      />
     </div>
   );
 };
