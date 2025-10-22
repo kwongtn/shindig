@@ -91,6 +91,9 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
   // Check if user is admin
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // State for the new event link input field
+  const [newEventLink, setNewEventLink] = useState('');
+
   // Memoized SimpleMDE options to prevent re-renders
   const memoizedSimpleMDEOptions = useMemo(() => ({
     minHeight: '150px',
@@ -121,7 +124,27 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
   const { values, errors, handleChange, handleBlur, handleSubmit, setValues, setField, isDirty } = useForm<FormValues>({
     initialValues: initialFormValues,
     onSubmit: async (values) => {
-      console.log('EventForm: onSubmit handler called', { values, userId, mode, eventId });
+      // Check if the event links array is empty and there's a value in the input field
+      let updatedValues = { ...values };
+      if ((!values.eventLinks || values.eventLinks.length === 0) && newEventLink && newEventLink.trim() !== '') {
+        // Validate the URL
+        try {
+          new URL(newEventLink.trim());
+          
+          // Add the input value to the event links array
+          updatedValues.eventLinks = [newEventLink.trim()];
+        } catch (err) {
+          // URL is invalid
+          showToast('Please enter a valid URL in the event link field', 'error');
+          return;
+        }
+      } else if ((values.eventLinks && values.eventLinks.length === 0) && (!newEventLink || newEventLink.trim() === '')) {
+        // If both array and input field are empty, show error
+        showToast('At least one event link is required', 'error');
+        return;
+      }
+
+      console.log('EventForm: onSubmit handler called', { values: updatedValues, userId, mode, eventId });
       // Mark ALL fields as visited to ensure validation on submit
       setFieldVisited(prev => ({
         ...prev,
@@ -142,21 +165,21 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
 
       // Check for validation errors before submission
       const validationErrors: Partial<Record<keyof FormValues, unknown>> = {};
-      if (!values.title.trim()) {
+      if (!updatedValues.title.trim()) {
         validationErrors.title = 'Title is required';
       }
-      if (!values.startDatetime) {
+      if (!updatedValues.startDatetime) {
         validationErrors.startDatetime = 'Start datetime is required';
       }
-      if (!values.endDatetime) {
+      if (!updatedValues.endDatetime) {
         validationErrors.endDatetime = 'End datetime is required';
       }
-      if (values.startDatetime && values.endDatetime) {
-        if (convertToLocalISOStringForFirestore(values.startDatetime) >= convertToLocalISOStringForFirestore(values.endDatetime)) {
+      if (updatedValues.startDatetime && updatedValues.endDatetime) {
+        if (convertToLocalISOStringForFirestore(updatedValues.startDatetime) >= convertToLocalISOStringForFirestore(updatedValues.endDatetime)) {
           validationErrors.endDatetime = 'End datetime must be after start datetime';
         }
       }
-      if (!values.eventLinks || values.eventLinks.length === 0) {
+      if (!updatedValues.eventLinks || updatedValues.eventLinks.length === 0) {
         validationErrors.eventLinks = ['At least one event link is required'];
       }
 
@@ -180,14 +203,14 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
       try {
         // Prepare data for Firestore - use local timezone when converting datetime values to Timestamps
         const eventData = {
-          ...values,
+          ...updatedValues,
           authorId: doc(db, `users/${userId}`),
-          organizerIds: values.organizerIds.map(id => doc(db, `organizers/${id}`)),
-          tagIds: values.tagIds.map(id => doc(db, `tags/${id}`)),
-          startDatetime: values.startDatetime ? Timestamp.fromDate(convertToLocalISOStringForFirestore(values.startDatetime)) : null,
-          endDatetime: values.endDatetime ? Timestamp.fromDate(convertToLocalISOStringForFirestore(values.endDatetime)) : null,
+          organizerIds: updatedValues.organizerIds.map(id => doc(db, `organizers/${id}`)),
+          tagIds: updatedValues.tagIds.map(id => doc(db, `tags/${id}`)),
+          startDatetime: updatedValues.startDatetime ? Timestamp.fromDate(convertToLocalISOStringForFirestore(updatedValues.startDatetime)) : null,
+          endDatetime: updatedValues.endDatetime ? Timestamp.fromDate(convertToLocalISOStringForFirestore(updatedValues.endDatetime)) : null,
           createdAt: mode === 'add' ? Timestamp.fromDate(new Date()) :
-            values.createdAt ? Timestamp.fromDate(new Date(values.createdAt)) :
+            updatedValues.createdAt ? Timestamp.fromDate(new Date(updatedValues.createdAt)) :
               Timestamp.fromDate(new Date()),
           updatedAt: Timestamp.fromDate(new Date())
         };
@@ -257,10 +280,21 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
         }
       }
 
-      if (!values.eventLinks || values.eventLinks.length === 0) {
+      // Check if there are event links in the array OR if there's a value in the new event link input field
+      const hasEventLinks = values.eventLinks && values.eventLinks.length > 0;
+      const hasNewEventLink = newEventLink && newEventLink.trim() !== '';
+      
+      if (!hasEventLinks && !hasNewEventLink) {
         newErrors.eventLinks = ['At least one event link is required'];
-      } else {
-        // Validate URLs
+      } else if (hasNewEventLink) {
+        // If there's a value in the input field, validate it
+        try {
+          new URL(newEventLink);
+        } catch (err) {
+          newErrors.eventLinks = ['Please enter a valid URL in the event link field'];
+        }
+      } else if (hasEventLinks) {
+        // Validate URLs in the array
         for (const link of values.eventLinks) {
           try {
             new URL(link);
@@ -631,14 +665,14 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
 
   // Handle adding a new event link
   const addEventLink = () => {
-    const newLink = (document.getElementById('new-event-link') as HTMLInputElement)?.value;
-    if (!newLink) return;
+    if (!newEventLink) return;
 
     try {
-      new URL(newLink); // Validate the URL
+      new URL(newEventLink); // Validate the URL
 
-      if (!values.eventLinks.includes(newLink)) {
-        setField('eventLinks', [...values.eventLinks, newLink]);
+      if (!values.eventLinks.includes(newEventLink)) {
+        setField('eventLinks', [...values.eventLinks, newEventLink]);
+        setNewEventLink(''); // Clear the input field after adding
       }
       // Clear any previous errors when adding a valid link
       setFieldTouched(prev => ({
@@ -936,6 +970,8 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
           <input
             type="text"
             id="new-event-link"
+            value={newEventLink}
+            onChange={(e) => setNewEventLink(e.target.value)}
             placeholder="https://example.com/event"
             onBlur={() => handleFieldBlur('eventLinks')}
             className={`input input-bordered flex-grow ${fieldVisited.eventLinks && errors.eventLinks ? 'input-error' : ''}`}
