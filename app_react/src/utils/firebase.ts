@@ -1,5 +1,6 @@
 import { getApps, initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 // Your web app's Firebase configuration
 const firebaseConfig = process.env.NEXT_PUBLIC_USE_EMULATORS === 'true'
@@ -30,4 +31,12 @@ export const auth = getAuth(app);
 if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
   // Connect to Firebase Auth emulator when running in development
   connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+}
+
+// Initialize Firestore
+export const db = getFirestore(app);
+
+// Connect to Firestore emulator in development
+if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
+  connectFirestoreEmulator(db, 'localhost', 8080);
 }

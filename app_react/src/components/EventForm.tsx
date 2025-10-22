@@ -4,11 +4,12 @@
 import { useForm } from '@/hooks/useForm';
 import { showToast } from '@/utils/toast';
 import 'easymde/dist/easymde.min.css';
-import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from 'react';
 
 import { forwardRef, useImperativeHandle } from 'react';
+import { db } from '@/utils/firebase';
 
 // Dynamically import SimpleMDE to avoid SSR issues
 const SimpleMDE = dynamic(
@@ -177,16 +178,6 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
       setError(null);
 
       try {
-        console.log('EventForm: Getting Firestore instance');
-        const db = getFirestore();
-
-        // Configure emulator if in development
-        if (process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
-          const { connectFirestoreEmulator } = await import('firebase/firestore');
-          connectFirestoreEmulator(db, 'localhost', 8080);
-          console.log('EventForm: Connected to Firestore emulator');
-        }
-
         // Prepare data for Firestore - use local timezone when converting datetime values to Timestamps
         const eventData = {
           ...values,
@@ -296,14 +287,6 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
   useEffect(() => {
     if (mode === 'edit' && eventId && userId && !editDataLoaded) {
       const loadEventData = async () => {
-        const db = getFirestore();
-
-        // Configure emulator if in development
-        if (process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
-          const { connectFirestoreEmulator } = await import('firebase/firestore');
-          connectFirestoreEmulator(db, 'localhost', 8080);
-        }
-
         try {
           const eventRef = doc(db, 'events', eventId);
           const eventDoc = await getDoc(eventRef);
@@ -361,14 +344,6 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
   // Load organizers and tags data
   useEffect(() => {
     const loadReferenceData = async () => {
-      const db = getFirestore();
-
-      // Configure emulator if in development
-      if (process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
-        const { connectFirestoreEmulator } = await import('firebase/firestore');
-        connectFirestoreEmulator(db, 'localhost', 8080);
-      }
-
       try {
         // Load organizers
         const organizersQuery = query(collection(db, 'organizers'));
@@ -403,14 +378,6 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
   useEffect(() => {
     if (userId) {
       const checkAdmin = async () => {
-        const db = getFirestore();
-
-        // Configure emulator if in development
-        if (process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
-          const { connectFirestoreEmulator } = await import('firebase/firestore');
-          connectFirestoreEmulator(db, 'localhost', 8080);
-        }
-
         try {
           const userDoc = await getDoc(doc(db, `users/${userId}`));
           const userData = userDoc.data();
@@ -724,14 +691,6 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
     setError(null);
 
     try {
-      const db = getFirestore();
-
-      // Configure emulator if in development
-      if (process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
-        const { connectFirestoreEmulator } = await import('firebase/firestore');
-        connectFirestoreEmulator(db, 'localhost', 8080);
-      }
-
       const eventRef = doc(db, 'events', eventId);
       await deleteDoc(eventRef);
 
