@@ -104,6 +104,11 @@ export const showToast = (message: string, type: ToastType = 'info', duration: n
   // Add to container
   toastContainer.appendChild(toast);
 
+  // Variables to manage pause/resume functionality
+  let remainingTime = duration;
+  let startTime = Date.now();
+  let isPaused = false;
+
   // Set up auto-dismiss timer
   const dismissTimer = setTimeout(() => {
     removeToast(toast, toastContainer);
@@ -113,6 +118,31 @@ export const showToast = (message: string, type: ToastType = 'info', duration: n
   setTimeout(() => {
     progressBar.style.width = '0%';
   }, 10); // Small delay to ensure transition applies
+
+  // Handle mouse enter (pause countdown)
+  toast.addEventListener('mouseenter', () => {
+    if (!isPaused) {
+      isPaused = true;
+      remainingTime -= (Date.now() - startTime);
+      progressBar.style.transition = 'none';
+    }
+  });
+
+  // Handle mouse leave (resume countdown)
+  toast.addEventListener('mouseleave', () => {
+    if (isPaused) {
+      isPaused = false;
+      startTime = Date.now();
+      progressBar.style.transition = `width ${remainingTime}ms linear`;
+      progressBar.style.width = '0%';
+      
+      // Reset the timer with remaining time
+      clearTimeout(dismissTimer);
+      setTimeout(() => {
+        removeToast(toast, toastContainer);
+      }, remainingTime);
+    }
+  });
 
   // Handle close button click
   closeButton.addEventListener('click', () => {

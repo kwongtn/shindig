@@ -104,6 +104,16 @@ const EventDrawer = ({
     }
   };
 
+  // Listen for closeDrawer event from EventForm
+  useEffect(() => {
+    const handleCloseDrawer = () => {
+      onClose();
+    };
+
+    window.addEventListener('closeDrawer', handleCloseDrawer);
+    return () => window.removeEventListener('closeDrawer', handleCloseDrawer);
+  }, [onClose]);
+
   // Title based on mode
   const title = mode === 'add' ? 'Add Event Entry' : 'Edit Event Entry';
 
@@ -151,6 +161,7 @@ const EventDrawer = ({
             userId={user?.uid}
             drawerIsOpen={isOpen}
             onAIDataExtract={setHandleAIDataExtract}
+            onClose={onClose}
           />
         </div>
 

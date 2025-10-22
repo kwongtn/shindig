@@ -28,7 +28,7 @@ const convertToLocalISOStringForFirestore = (dateString: string): Date => {
   const [datePart, timePart] = dateString.split('T');
   const [year, month, day] = datePart.split('-').map(Number);
   const [hours, minutes] = timePart.split(':').map(Number);
-  
+
   // Create a new Date object using local time components
   return new Date(year, month - 1, day, hours, minutes);
 };
@@ -40,6 +40,7 @@ interface EventFormProps {
   userId: string | undefined;
   drawerIsOpen: boolean;
   onAIDataExtract: (handleAIDataExtract: (data: Record<string, unknown> | null) => void) => void; // Callback to handle AI extraction
+  onClose?: () => void; // Callback to close the drawer
 }
 
 // Define a ref type that exposes the delete and fieldVisited methods
@@ -70,7 +71,7 @@ interface FormValues {
 
 
 
-const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onChange, userId, drawerIsOpen, onAIDataExtract }, ref) => {
+const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onChange, userId, drawerIsOpen, onAIDataExtract, onClose }, ref) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -201,12 +202,15 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
         };
         console.log('EventForm: Prepared event data for Firestore', eventData);
 
+        let eventIdForToast = '';
+
         if (mode === 'add') {
           console.log('EventForm: Adding new event to Firestore');
           const newEventRef = doc(collection(db, 'events')); // Generate new ID
           await setDoc(newEventRef, eventData);
-          console.log('EventForm: New event added successfully with ID:', newEventRef.id);
-          showToast('🎉 Event added successfully!', 'success');
+          eventIdForToast = newEventRef.id;
+          console.log('EventForm: New event added successfully with ID:', eventIdForToast);
+          showToast(`🎉 Event added successfully! ID: ${eventIdForToast}`, 'success');
           localStorage.removeItem('eventFormDraft');
         } else if (mode === 'edit' && eventId) {
           console.log('EventForm: Updating existing event in Firestore with ID:', eventId);
@@ -214,11 +218,18 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
           // Remove id, createdAt from update since they're read-only in edit mode
           const { id, createdAt, ...updateData } = eventData;
           await updateDoc(eventRef, updateData);
+          eventIdForToast = eventId;
           console.log('EventForm: Event updated successfully');
-          showToast('🎉 Event updated successfully!', 'success');
+          showToast(`🎉 Event updated successfully! ID: ${eventIdForToast}`, 'success');
         } else if (mode === 'edit' && !eventId) {
           console.error('EventForm: Missing eventId in edit mode');
           showToast('Missing event ID for edit mode', 'error');
+          return;
+        }
+
+        // Close the drawer after successful submission
+        if (onClose) {
+          setTimeout(onClose, 1000); // Delay closing to allow user to see the success message
         }
 
 
@@ -724,7 +735,11 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
       const eventRef = doc(db, 'events', eventId);
       await deleteDoc(eventRef);
 
-      showToast('🎉 Event deleted successfully!', 'success');
+      showToast(`🎉 Event deleted successfully! ID: ${eventId}`, 'success');
+      // Close the drawer after successful deletion
+      if (onClose) {
+        setTimeout(onClose, 1000); // Delay closing to allow user to see the success message
+      }
       // This would be handled by parent component
     } catch (err) {
       console.error('Error deleting event:', err);
@@ -1171,17 +1186,17 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
         </div>
       )}
 
-      {/* Submit button */}
-      <div className="pt-4">
-        <button
-          type="submit"
-          disabled={submitting}
-          className="btn btn-primary w-full"
-          onClick={() => console.log('EventForm: Submit button clicked - form state is submitting:', submitting, 'mode:', mode)}
-        >
-          {submitting ? 'Submitting...' : 'Submit Event'}
-        </button>
-      </div>
+      {/* Submit button
+    <div className="pt-4">
+      <button
+        type="submit"
+        disabled={submitting}
+        className="btn btn-primary w-full"
+        onClick={() => console.log('EventForm: Submit button clicked - form state is submitting:', submitting, 'mode:', mode)}
+      >
+        {submitting ? 'Submitting...' : 'Submit Event'}
+      </button>
+    </div> */}
 
       {/* Delete button (only in edit mode) */}
       {mode === 'edit' && (
