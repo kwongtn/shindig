@@ -53,6 +53,20 @@ const EventDrawer = ({
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isOpen, isDirty]);
 
+  // Prevent body scroll when drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to ensure overflow is reset when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   // Handle click outside drawer
   useEffect(() => {
     if (!isOpen) return;
@@ -148,7 +162,7 @@ const EventDrawer = ({
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto flex-grow p-4">
+        <div className="overflow-y-auto flex-grow p-4 overflow-x-hidden">
           <AIBar
             onExtractComplete={handleExtractComplete}
             isFormDirty={isDirty}

@@ -89,7 +89,7 @@ const AIBar = ({ onExtractComplete, isFormDirty }: AIBarProps) => {
   };
 
   return (
-    <div className={`alert ${!error && isValidUrl ? 'alert-info' : error ? 'alert-error' : 'alert-info'} alert-soft mb-4 relative ${isLocked ? 'opacity-50' : ''}`}>
+    <div className={`alert ${!error && isValidUrl ? 'alert-info' : error ? 'alert-error' : 'alert-info'} alert-soft mb-4 relative ${isLocked ? 'opacity-50' : ''} overflow-x-auto`}>
       {isLocked && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-base-100/80 z-10">
           <span className="loading loading-spinner loading-md mb-2"></span>
@@ -97,12 +97,12 @@ const AIBar = ({ onExtractComplete, isFormDirty }: AIBarProps) => {
         </div>
       )}
       
-      <div className="join w-full">
+      <div className="join w-full max-w-full">
         <input
           ref={inputRef}
           type="text"
           placeholder="Input URL to extract event data using Gemini!"
-          className="join-item input input-bordered w-full"
+          className="join-item input input-bordered w-full min-w-0 flex-grow"
           value={url}
           onChange={(e) => {
             setUrl(e.target.value);
@@ -112,7 +112,7 @@ const AIBar = ({ onExtractComplete, isFormDirty }: AIBarProps) => {
           disabled={isLocked}
         />
         <button 
-          className="join-item btn btn-primary"
+          className="join-item btn btn-primary flex-shrink-0"
           onClick={handleExtract}
           disabled={isLocked}
         >
@@ -121,19 +121,19 @@ const AIBar = ({ onExtractComplete, isFormDirty }: AIBarProps) => {
       </div>
       
       {!isValidUrl && (
-        <div className="mt-2 text-error">
+        <div className="mt-2 text-error break-words">
           Please enter a valid URL
         </div>
       )}
       
       {error && (
-        <div className="alert alert-error alert-outline mt-2">
+        <div className="alert alert-error alert-outline mt-2 break-words whitespace-normal">
           {error}
         </div>
       )}
       
       {modelInfo && (
-        <div className="mt-2 text-sm">
+        <div className="mt-2 text-sm break-words">
           Model: {modelInfo}
         </div>
       )}
