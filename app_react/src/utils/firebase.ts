@@ -1,6 +1,8 @@
 import { getApps, initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
 
 // Your web app's Firebase configuration
 const firebaseConfig = process.env.NEXT_PUBLIC_USE_EMULATORS === 'true'
@@ -39,4 +41,20 @@ export const db = getFirestore(app);
 // Connect to Firestore emulator in development
 if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
   connectFirestoreEmulator(db, 'localhost', 8080);
+}
+
+// Initialize Firebase Functions
+export const functions = getFunctions(app);
+
+// Connect to Functions emulator in development
+if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
+  connectFunctionsEmulator(functions, 'localhost', 5001);
+}
+
+// Initialize Firebase Storage
+export const storage = getStorage(app);
+
+// Connect to Storage emulator in development
+if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
+  connectStorageEmulator(storage, 'localhost', 9199);
 }
