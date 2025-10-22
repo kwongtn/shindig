@@ -878,6 +878,7 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
               handleBlur(e);
               handleFieldBlur('startDatetime');
             }}
+            step="900"
             className={`input input-bordered w-full ${fieldVisited.startDatetime && errors.startDatetime ? 'input-error' : ''}`}
           />
           {fieldVisited.startDatetime && errors.startDatetime && <p className="text-error text-sm mt-1">{errors.startDatetime}</p>}
@@ -896,6 +897,7 @@ const EventForm = forwardRef<EventFormRef, EventFormProps>(({ mode, eventId, onC
               handleBlur(e);
               handleFieldBlur('endDatetime');
             }}
+            step="900"
             className={`input input-bordered w-full ${fieldVisited.endDatetime && errors.endDatetime ? 'input-error' : ''}`}
           />
           {fieldVisited.endDatetime && errors.endDatetime && <p className="text-error text-sm mt-1">{errors.endDatetime}</p>}
