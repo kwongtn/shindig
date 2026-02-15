@@ -132,3 +132,4 @@ dist
 app/.vscode
 .idea
 .firebase_export
+.firebase
