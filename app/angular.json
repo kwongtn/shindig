@@ -45,12 +45,7 @@
               "src/styles.less"
             ],
             "scripts": [],
-            "server": "src/main.server.ts",
-            "prerender": true,
             "sourceMap": true,
-            "ssr": {
-              "entry": "server.ts"
-            },
             "externalDependencies": [
               ""
             ]

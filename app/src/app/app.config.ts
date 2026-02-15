@@ -2,7 +2,7 @@ import { en_US, provideNzI18n } from "ng-zorro-antd/i18n";
 import { provideNzIcons } from "ng-zorro-antd/icon";
 import { provideMarkdown } from "ngx-markdown";
 
-import { isPlatformServer, registerLocaleData } from "@angular/common";
+import { registerLocaleData } from "@angular/common";
 import { provideHttpClient } from "@angular/common/http";
 import en from "@angular/common/locales/en";
 import {
@@ -10,8 +10,6 @@ import {
     ApplicationConfig,
     ErrorHandler,
     importProvidersFrom,
-    inject,
-    PLATFORM_ID,
     provideZoneChangeDetection,
 } from "@angular/core";
 import {
@@ -42,7 +40,6 @@ import {
 import { getPerformance, providePerformance } from "@angular/fire/performance";
 import { getStorage, provideStorage } from "@angular/fire/storage";
 import { FormsModule } from "@angular/forms";
-import { provideClientHydration } from "@angular/platform-browser";
 import {
     provideAnimationsAsync,
 } from "@angular/platform-browser/animations/async";
@@ -63,7 +60,6 @@ export const appConfig: ApplicationConfig = {
     providers: [
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideRouter(routes, withComponentInputBinding()),
-        provideClientHydration(),
         provideNzIcons(icons),
         provideNzI18n(en_US),
         importProvidersFrom(FormsModule),
@@ -92,12 +88,6 @@ export const appConfig: ApplicationConfig = {
         UserTrackingService,
         provideAppCheck(() => {
             if (environment.firebase.useEmulators) {
-                return undefined as unknown as AppCheck;
-            }
-            // Don't initialise AppCheck if running in server
-            // Workaround for https://github.com/angular/angularfire/issues/3488
-            const platformId = inject(PLATFORM_ID);
-            if (isPlatformServer(platformId)) {
                 return undefined as unknown as AppCheck;
             }
 
@@ -139,7 +129,7 @@ export const appConfig: ApplicationConfig = {
         },
         {
             provide: APP_INITIALIZER,
-            useFactory: () => () => {},
+            useFactory: () => () => { },
             deps: [Sentry.TraceService],
             multi: true,
         },
