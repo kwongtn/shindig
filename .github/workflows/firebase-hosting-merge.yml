@@ -14,12 +14,17 @@ jobs:
               with:
                   fetch-depth: 0
 
-            - run: cd app && npm ci && npm run build
+            - run: cd app && npm ci
               timeout-minutes: 10
+
+            - uses: FirebaseExtended/action-hosting-deploy@v0
+              with:
+                  repoToken: ${{ secrets.GITHUB_TOKEN }}
+                  firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SHINDIG_15693 }}
+                  channelId: live
+                  projectId: shindig-15693
               env:
-                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-                  SENTRY_ORG: ${{ vars.SENTRY_ORG }}
-                  SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+                  FIREBASE_CLI_EXPERIMENTS: webframeworks
 
             - name: Create Sentry release
               uses: getsentry/action-release@v1
@@ -31,11 +36,9 @@ jobs:
               with:
                   environment: production
 
-            - uses: FirebaseExtended/action-hosting-deploy@v0
-              with:
-                  repoToken: ${{ secrets.GITHUB_TOKEN }}
-                  firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SHINDIG_15693 }}
-                  channelId: live
-                  projectId: shindig-15693
+            - run: cd app && npm run sentry:sourcemaps
+              timeout-minutes: 10
               env:
-                  FIREBASE_CLI_EXPERIMENTS: webframeworks
+                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+                  SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+                  SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
