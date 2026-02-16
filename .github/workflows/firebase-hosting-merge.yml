@@ -36,3 +36,5 @@ jobs:
                   firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SHINDIG_15693 }}
                   channelId: live
                   projectId: shindig-15693
+              env:
+                  FIREBASE_CLI_EXPERIMENTS: webframeworks
